@@ -1,0 +1,5 @@
+add_subdirectory("sandbox1")
+add_subdirectory("sandbox2")
+add_subdirectory("sandbox3")
+add_subdirectory("sandbox4")
+add_subdirectory("sandbox5")
