@@ -4,7 +4,7 @@
 
 // assetit eri kansiosta riippuen ollanko debug vai relese knnksess.
 #if defined(_DEBUG)
-std::string ASSET_PATH = "../assets/";
+std::string ASSET_PATH = "assets/";
 #else 
 std::string ASSET_PATH = "assets/";
 #endif
