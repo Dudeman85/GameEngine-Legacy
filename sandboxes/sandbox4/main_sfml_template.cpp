@@ -12,6 +12,12 @@ std::string ASSET_PATH = "assets/";
 
 using namespace std;
 
+int scale = 50;
+int moveSpeed = 10;
+
+//[ROW][COLUMN]
+vector<vector<uint8_t> > tilemap(21, vector<uint8_t>(20, 1));
+
 sf::Texture loadTexture(string name)
 {
 	sf::Texture texture;
@@ -21,25 +27,6 @@ sf::Texture loadTexture(string name)
 	}
 	return texture;
 }
-
-class GameObject
-{
-public:
-	GameObject() {};
-	GameObject(int x, int y)
-	{
-		position.x = x;
-		position.y = y;
-	}
-
-	void move(float dx, float dy)
-	{
-		position.x += dx;
-		position.y += dy;
-	}
-
-	sf::Vector2f position;
-};
 
 class Platform
 {
@@ -64,25 +51,32 @@ public:
 
 		return rectangle;
 	}
-	sf::FloatRect getGlobalBounds() 
+	sf::FloatRect getGlobalBounds()
 	{
 		return sf::FloatRect(topLeft, sf::Vector2f(bottomRight - topLeft));
 	}
 };
 
-bool CheckCollision(Platform platform, sf::Sprite player)
+bool CheckTilemapCollision(sf::Vector2i position)
 {
-	return player.getGlobalBounds().intersects(platform.getGlobalBounds());
+	try
+	{
+		return tilemap[position.y / scale][position.x / scale];
+	}
+	catch (exception)
+	{
+		return true;
+	}
 }
 
 int main()
 {
-	int scale = 64;
-	int moveSpeed = 10;
 	float fallSpeed = 0;
 	float g = .42;
 	bool lmbDown = false;
 	bool rmbDown = false;
+
+	sf::Vector2f deltaPos;
 
 	sf::Texture texture = loadTexture("image1.png");
 	sf::Texture woodTexture = loadTexture("image.png");
@@ -92,7 +86,7 @@ int main()
 	sf::Sprite player(playerTexture);
 	player.setPosition(250, 250);
 
-	sf::Sprite mySprite(woodTexture);
+	sf::Sprite tilemapDrawerSprite(woodTexture);
 
 	sf::RectangleShape tempPlatform(sf::Vector2f(0, 0));
 	tempPlatform.setTexture(&texture);
@@ -102,33 +96,12 @@ int main()
 	sf::Vector2i mousePos;
 
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+	sf::RenderWindow window(sf::VideoMode(20 * scale, 21 * scale), "My window");
 	window.setFramerateLimit(60);
 
 	vector<sf::Texture> textures;
 	textures.push_back(woodTexture);
 	textures.push_back(wood2Texture);
-
-	vector<vector<uint8_t>> map = {
-		{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
-		{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1},
-		{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-		{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
-		{0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1},
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	};
-
-	vector<GameObject> players = {
-		GameObject(0, 0)
-	};
-
-	vector<GameObject> enemies = {
-		GameObject(0, 0)
-	};
 
 	// run the program as long as the window is open
 	while (window.isOpen())
@@ -146,20 +119,21 @@ int main()
 		window.clear(sf::Color::Black);
 
 		//Draw based on map
-		for (size_t x = 0; x < map.size(); x++)
+		for (size_t x = 0; x < tilemap.size(); x++)
 		{
-			for (size_t y = 0; y < map[x].size(); y++)
+			for (size_t y = 0; y < tilemap[x].size(); y++)
 			{
-				auto spriteType = map[x][y];
+				auto spriteType = tilemap[x][y];
 				if (spriteType != 0)
 				{
-					mySprite.setTexture(textures[spriteType - 1]);
-					mySprite.setPosition(y * scale, x * scale);
-					window.draw(mySprite);
+					tilemapDrawerSprite.setTexture(textures[spriteType - 1]);
+					tilemapDrawerSprite.setPosition(y * scale, x * scale);
+					window.draw(tilemapDrawerSprite);
 				}
 			}
 		}
 
+		/*
 		//Platform mouse drawing and deleting
 		{
 			//Draw all saved boxes
@@ -216,32 +190,53 @@ int main()
 			{
 				rmbDown = false;
 			}
+		}*/
+
+		//Tilemap design and manipulation
+		{
+			//Add with left click
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				try
+				{
+					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 1;
+				}
+				catch (exception) {}
+			}
+
+			//Clear with right click
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+			{
+				try
+				{
+					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 0;
+				}
+				catch (exception) {}
+			}
 		}
 
 		//Player movement
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				player.move(-1 * moveSpeed, 0);
+				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(-1 * moveSpeed - player.getGlobalBounds().width / 2 + 3, 0))))
+					deltaPos.x += -1 * moveSpeed;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				player.move(1 * moveSpeed, 0);
+				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(1 * moveSpeed + player.getGlobalBounds().width - 2, 0))))
+					deltaPos.x += 1 * moveSpeed;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				player.move(0, -1 * moveSpeed);
+				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(0, -1 * moveSpeed))))
+					deltaPos.y += -1 * moveSpeed;
 			}
 		}
 
-		for (int i = 0; i < platforms.size(); i++)
+		if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(0, fallSpeed + player.getGlobalBounds().height))))
 		{
-			cout << CheckCollision(platforms[i], player) << endl;
-		}
-
-		if (player.getPosition().y <= 500)
-		{
-			player.move(0, fallSpeed);
+			deltaPos.y += fallSpeed;
 			fallSpeed += g;
 		}
 		else
@@ -249,7 +244,10 @@ int main()
 			fallSpeed = 0;
 		}
 
-		// draw everything here...
+		player.move(deltaPos);
+		deltaPos = sf::Vector2f();
+
+		// draw everything here
 		window.draw(player);
 
 		// end the current frame
