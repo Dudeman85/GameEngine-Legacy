@@ -57,17 +57,26 @@ public:
 	}
 };
 
-bool CheckTilemapCollision(sf::Vector2i position)
+bool CheckTilemapCollision(sf::Sprite player, sf::Vector2f offset = sf::Vector2f(0, 0))
 {
-	try
-	{
-		return tilemap[position.y / scale][position.x / scale];
-	}
-	catch (exception)
-	{
-		return true;
-	}
+	sf::Vector2f position = player.getPosition() + offset;
+	int width = player.getGlobalBounds().width / 2;
+	int height = player.getGlobalBounds().height / 2;
+
+	bool collided = false;
+	if (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0)
+		collided = true;
+	if (tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0)
+		collided = true;
+	if (tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0)
+		collided = true;
+	if (tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0)
+		collided = true;
+
+	return collided;
 }
+
+
 
 int main()
 {
@@ -80,10 +89,10 @@ int main()
 
 	sf::Texture texture = loadTexture("image1.png");
 	sf::Texture woodTexture = loadTexture("image.png");
-	sf::Texture wood2Texture = loadTexture("wood2.png");
 	sf::Texture playerTexture = loadTexture("pallo.png");
 
 	sf::Sprite player(playerTexture);
+	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
 	player.setPosition(250, 250);
 
 	sf::Sprite tilemapDrawerSprite(woodTexture);
@@ -101,7 +110,6 @@ int main()
 
 	vector<sf::Texture> textures;
 	textures.push_back(woodTexture);
-	textures.push_back(wood2Texture);
 
 	// run the program as long as the window is open
 	while (window.isOpen())
@@ -197,44 +205,39 @@ int main()
 			//Add with left click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				try
-				{
+				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
 					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 1;
-				}
-				catch (exception) {}
 			}
 
 			//Clear with right click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
-				try
-				{
+				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
 					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 0;
-				}
-				catch (exception) {}
 			}
 		}
+
 
 		//Player movement
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(-1 * moveSpeed - player.getGlobalBounds().width / 2 + 3, 0))))
+				if (!CheckTilemapCollision(player, sf::Vector2f(-1 * moveSpeed, 0)))
 					deltaPos.x += -1 * moveSpeed;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(1 * moveSpeed + player.getGlobalBounds().width - 2, 0))))
+				if (!CheckTilemapCollision(player, sf::Vector2f(1 * moveSpeed, 0)))
 					deltaPos.x += 1 * moveSpeed;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(0, -1 * moveSpeed))))
+				if (!CheckTilemapCollision(player, sf::Vector2f(0, -1 * moveSpeed)))
 					deltaPos.y += -1 * moveSpeed;
 			}
 		}
 
-		if (!CheckTilemapCollision((sf::Vector2i)(player.getPosition() + sf::Vector2f(0, fallSpeed + player.getGlobalBounds().height))))
+		if (!CheckTilemapCollision(player, sf::Vector2f(0, fallSpeed)))
 		{
 			deltaPos.y += fallSpeed;
 			fallSpeed += g;
