@@ -4,10 +4,11 @@
 
 //assetit eri kansioista riippuen ollaanko debug vai release käännöksessä
 #if defined (_DEBUG)
-std::string ASSET_PATH = "../assets/";
+std::string ASSET_PATH = "assets/";
 #else
 std::string ASSET_PATH = "assets/";
 #endif
+
 
 sf::Texture loadTexture(const std::string& fileName)
 {
