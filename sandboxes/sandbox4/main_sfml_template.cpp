@@ -5,7 +5,7 @@
 #include <vector>
 
 #if defined(_DEBUG)
-std::string ASSET_PATH = "../assets/";
+std::string ASSET_PATH = "assets/";
 #else
 std::string ASSET_PATH = "assets/";
 #endif
@@ -64,7 +64,16 @@ public:
 
 		return rectangle;
 	}
+	sf::FloatRect getGlobalBounds() 
+	{
+		return sf::FloatRect(topLeft, sf::Vector2f(bottomRight - topLeft));
+	}
 };
+
+bool CheckCollision(Platform platform, sf::Sprite player)
+{
+	return player.getGlobalBounds().intersects(platform.getGlobalBounds());
+}
 
 int main()
 {
@@ -223,6 +232,11 @@ int main()
 			{
 				player.move(0, -1 * moveSpeed);
 			}
+		}
+
+		for (int i = 0; i < platforms.size(); i++)
+		{
+			cout << CheckCollision(platforms[i], player) << endl;
 		}
 
 		if (player.getPosition().y <= 500)
