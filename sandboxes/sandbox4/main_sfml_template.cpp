@@ -12,21 +12,20 @@ std::string ASSET_PATH = "assets/";
 
 using namespace std;
 
+//Constants
+const float g = .22;
+
+//Player movement Variables
 int scale = 50;
 int moveSpeed = 10;
+float fallSpeed = 0;
+sf::Vector2f deltaPos;
+float jumpPower = 0;
 
-//[ROW][COLUMN]
-vector<vector<uint8_t> > tilemap(21, vector<uint8_t>(20, 1));
+//Mouse button trackers
+bool lmbDown = false;
+bool rmbDown = false;
 
-sf::Texture loadTexture(string name)
-{
-	sf::Texture texture;
-	if (!texture.loadFromFile(ASSET_PATH + name))
-	{
-		printf("Load texture error");
-	}
-	return texture;
-}
 
 class Platform
 {
@@ -57,59 +56,65 @@ public:
 	}
 };
 
-bool CheckTilemapCollision(sf::Sprite player, sf::Vector2f offset = sf::Vector2f(0, 0))
+//Load texture with error checking
+sf::Texture loadTexture(string name)
 {
-	sf::Vector2f position = player.getPosition() + offset;
-	int width = player.getGlobalBounds().width / 2;
-	int height = player.getGlobalBounds().height / 2;
-
-	bool collided = false;
-	if (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0)
-		collided = true;
-	if (tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0)
-		collided = true;
-	if (tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0)
-		collided = true;
-	if (tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0)
-		collided = true;
-
-	return collided;
+	sf::Texture texture;
+	if (!texture.loadFromFile(ASSET_PATH + name))
+	{
+		printf("Load texture error");
+	}
+	return texture;
 }
 
+//Returns true if any corner of sprite is overlapping a non zero position of the tilemap.
+//Assumes origin of sprite is in the center. Optional offset for shifting the hitbox.
+bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, sf::Vector2f offset = sf::Vector2f(0, 0))
+{
+	sf::Vector2f position = sprite.getPosition() + offset;
+	int width = sprite.getGlobalBounds().width / 2;
+	int height = sprite.getGlobalBounds().height / 2;
 
+	return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
+		(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
+		(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
+		(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
+}
 
 int main()
 {
-	float fallSpeed = 0;
-	float g = .42;
-	bool lmbDown = false;
-	bool rmbDown = false;
+	//Create main level tilemap [ROW][COLUMN]
+	vector<vector<uint8_t>> tilemap(21, vector<uint8_t>(20, 1));
 
-	sf::Vector2f deltaPos;
-
+	//Load textures
 	sf::Texture texture = loadTexture("image1.png");
-	sf::Texture woodTexture = loadTexture("image.png");
 	sf::Texture playerTexture = loadTexture("pallo.png");
+	sf::Texture woodTexture = loadTexture("wood1.png");
+	sf::Texture wood2Texture = loadTexture("wood2.png");
 
+	//Add map textures to list
+	vector<sf::Texture> textures;
+	textures.push_back(woodTexture);
+	textures.push_back(wood2Texture);
+
+	//Create player
 	sf::Sprite player(playerTexture);
 	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
 	player.setPosition(250, 250);
 
 	sf::Sprite tilemapDrawerSprite(woodTexture);
 
-	sf::RectangleShape tempPlatform(sf::Vector2f(0, 0));
-	tempPlatform.setTexture(&texture);
+	//Old variables for drawing platforms
 	sf::Vector2i pos1;
 	sf::Vector2i pos2;
-	vector<Platform> platforms;
 	sf::Vector2i mousePos;
+	sf::RectangleShape tempPlatform(sf::Vector2f(0, 0));
+	tempPlatform.setTexture(&texture);
+	vector<Platform> platforms;
 
-	// create the window
-	sf::RenderWindow window(sf::VideoMode(20 * scale, 21 * scale), "My window");
+	//Create the window
+	sf::RenderWindow window(sf::VideoMode(20 * scale, 21 * scale), "Up game");
 	window.setFramerateLimit(60);
-
-	vector<sf::Texture> textures;
-	textures.push_back(woodTexture);
 
 	// run the program as long as the window is open
 	while (window.isOpen())
@@ -217,34 +222,94 @@ int main()
 			}
 		}
 
-
 		//Player movement
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
-				if (!CheckTilemapCollision(player, sf::Vector2f(-1 * moveSpeed, 0)))
+				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(-1 * moveSpeed, 0))) 
+				{
 					deltaPos.x += -1 * moveSpeed;
+				}
+				else 
+				{
+					for (int i = 2; i < 4; i++)
+					{
+						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f((-1 * moveSpeed) / i, 0))) 
+						{
+							deltaPos.x += (-1 * moveSpeed) / i;
+						}
+					}
+				}
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			{
-				if (!CheckTilemapCollision(player, sf::Vector2f(1 * moveSpeed, 0)))
+				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(1 * moveSpeed, 0)))
+				{
 					deltaPos.x += 1 * moveSpeed;
+				}
+				else
+				{
+					for (int i = 2; i < 4; i++)
+					{
+						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f((1 * moveSpeed) / i, 0)))
+						{
+							deltaPos.x += (1 * moveSpeed) / i;
+						}
+					}
+				}
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				if (!CheckTilemapCollision(player, sf::Vector2f(0, -1 * moveSpeed)))
-					deltaPos.y += -1 * moveSpeed;
+				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, -1 * jumpPower)))
+				{
+					deltaPos.y += -1 * jumpPower;
+					if (jumpPower > 0)
+						jumpPower -= g;
+					else
+						jumpPower = 0;
+				}
+				else
+				{
+					for (int i = 2; i < 4; i++)
+					{
+						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, (-1 * jumpPower) / i)))
+						{
+							deltaPos.y += (-1 * jumpPower) / (i + 1);
+						}
+						else
+						{
+							fallSpeed = 0;
+							jumpPower = 0;
+						}
+					}
+				}
+			}
+			else 
+			{
+				jumpPower = 0;
 			}
 		}
 
-		if (!CheckTilemapCollision(player, sf::Vector2f(0, fallSpeed)))
+		if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
 		{
 			deltaPos.y += fallSpeed;
-			fallSpeed += g;
+			if(fallSpeed < 20)
+				fallSpeed += g;
 		}
 		else
 		{
-			fallSpeed = 0;
+			for (int i = 2; i < 16; i++)
+			{
+				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, 2 / i)))
+				{
+					deltaPos.y += 2 / i;
+				}
+				else
+				{
+					fallSpeed = 0;
+					jumpPower = 10;
+				}
+			}
 		}
 
 		player.move(deltaPos);
