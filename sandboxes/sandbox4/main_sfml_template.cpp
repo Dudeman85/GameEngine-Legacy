@@ -1,31 +1,29 @@
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <stdio.h>
 #include <vector>
 
-#if defined(_DEBUG)
-std::string ASSET_PATH = "assets/";
-#else
-std::string ASSET_PATH = "assets/";
-#endif
-
 using namespace std;
 
 //Constants
-const float g = .22;
+const string levelPath = "levels/";
+const string assetPath = "levels/";
+const float g = .42;
+const int scale = 50;
+const int mapWidth = 20;
+const int mapHeight = 20;
 
 //Player movement Variables
-int scale = 50;
 int moveSpeed = 10;
 float fallSpeed = 0;
 sf::Vector2f deltaPos;
 float jumpPower = 0;
 
 //Mouse button trackers
-bool lmbDown = false;
-bool rmbDown = false;
-
+bool lmbDown, rmbDown, plusDown = false;
 
 class Platform
 {
@@ -56,11 +54,50 @@ public:
 	}
 };
 
+//Save 2D vector tilemap to file
+void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)
+{
+	filesystem::create_directory(levelPath);
+	ofstream tilemapSave(levelPath + file);
+
+	for (int x = 0; x < tilemap.size(); x++)
+	{
+		for (int y = 0; y < tilemap[0].size(); y++)
+		{
+			tilemapSave << tilemap[x][y];
+		}
+		tilemapSave << endl;
+	}
+
+	cout << "Saved tilemap to " << levelPath + file << endl;
+	tilemapSave.close();
+}
+
+//Load 2D vector tilemap from file
+vector<vector<uint8_t>> LoadTilemap(string file)
+{
+	ifstream tilemapSave((levelPath + file).c_str());
+
+	vector<vector<uint8_t>> tilemap(mapHeight, vector<uint8_t>(mapWidth, 1));
+	for (string sRow; getline(tilemapSave, sRow);)
+	{
+		vector<uint8_t> row;
+		for (int i = 0; i < sRow.length(); i++)
+		{
+			row.push_back(sRow[i]);
+		}
+		tilemap.push_back(row);
+	}
+
+	tilemapSave.close();
+	return tilemap;
+}
+
 //Load texture with error checking
 sf::Texture loadTexture(string name)
 {
 	sf::Texture texture;
-	if (!texture.loadFromFile(ASSET_PATH + name))
+	if (!texture.loadFromFile(assetPath + name))
 	{
 		printf("Load texture error");
 	}
@@ -75,16 +112,22 @@ bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, s
 	int width = sprite.getGlobalBounds().width / 2;
 	int height = sprite.getGlobalBounds().height / 2;
 
-	return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
-		(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
-		(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
-		(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
+	//Check if in bounds
+	if(position.x - width > 0 && position.x + width < mapWidth * scale && position.y + height < mapHeight * scale && position.y - height > 0)
+		//Check if any corner is within the tilemap
+		return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
+			(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
+			(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
+			(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
+
+	return true;
 }
 
 int main()
 {
 	//Create main level tilemap [ROW][COLUMN]
-	vector<vector<uint8_t>> tilemap(21, vector<uint8_t>(20, 1));
+	vector<vector<uint8_t>> tilemap(mapHeight, vector<uint8_t>(mapWidth, 1));
+	tilemap = LoadTilemap("map1");
 
 	//Load textures
 	sf::Texture texture = loadTexture("image1.png");
@@ -112,8 +155,15 @@ int main()
 	tempPlatform.setTexture(&texture);
 	vector<Platform> platforms;
 
+	//Debug and dev stuff
+	sf::Font arial;
+	arial.loadFromFile(assetPath + "\\fonts\\ARIAL.TTF");
+	sf::Text debugText;
+	debugText.setFont(arial);
+	debugText.setCharacterSize(25);
+
 	//Create the window
-	sf::RenderWindow window(sf::VideoMode(20 * scale, 21 * scale), "Up game");
+	sf::RenderWindow window(sf::VideoMode(mapWidth * scale, mapHeight * scale), "Game");
 	window.setFramerateLimit(60);
 
 	// run the program as long as the window is open
@@ -220,6 +270,19 @@ int main()
 				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
 					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 0;
 			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+			{
+				if (!plusDown)
+				{
+					plusDown = true;
+					SaveTilemap(tilemap, "map1");
+				}
+			}
+			else
+			{
+				plusDown = false;
+			}
 		}
 
 		//Player movement
@@ -274,7 +337,7 @@ int main()
 					{
 						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, (-1 * jumpPower) / i)))
 						{
-							deltaPos.y += (-1 * jumpPower) / (i + 1);
+							deltaPos.y += (-1 * jumpPower) / i;
 						}
 						else
 						{
@@ -290,6 +353,7 @@ int main()
 			}
 		}
 
+		//Gravity Physics
 		if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
 		{
 			deltaPos.y += fallSpeed;
@@ -307,7 +371,7 @@ int main()
 				else
 				{
 					fallSpeed = 0;
-					jumpPower = 10;
+					jumpPower = 15;
 				}
 			}
 		}
@@ -317,6 +381,7 @@ int main()
 
 		// draw everything here
 		window.draw(player);
+		window.draw(debugText);
 
 		// end the current frame
 		window.display();
