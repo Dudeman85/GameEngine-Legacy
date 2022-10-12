@@ -52,7 +52,8 @@ int main()
 	debugText.setCharacterSize(25);
 
 	//Create the window
-	sf::RenderWindow window(sf::VideoMode(mapWidth * scale, mapHeight * scale), "Game");
+	sf::View cam(sf::FloatRect(0, 0, 1000, 1000));
+	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Game");
 	window.setFramerateLimit(60);
 
 	// run the program as long as the window is open
@@ -90,15 +91,15 @@ int main()
 			//Add with left click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
-					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 1;
+				if (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale < tilemap.size() && window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale < tilemap[0].size())
+					tilemap[window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale][window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale] = 1;
 			}
 
 			//Clear with right click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
-				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
-					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 0;
+				if (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale < tilemap.size() && window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale < tilemap[0].size())
+					tilemap[window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale][window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale] = 0;
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
@@ -112,6 +113,18 @@ int main()
 			else
 			{
 				plusDown = false;
+			}
+		}
+
+		//Camera
+		{
+			if (cam.getCenter().y - player.getPosition().y > 300)
+			{
+				cam.move(0, -2 * (abs(cam.getCenter().y - player.getPosition().y) / 100));
+			}
+			if (cam.getCenter().y - player.getPosition().y < -300)
+			{
+				cam.move(0, 5 * (abs(cam.getCenter().y - player.getPosition().y) / 100));
 			}
 		}
 
@@ -131,6 +144,11 @@ int main()
 						{
 							deltaPos.x += (-1 * moveSpeed) / i;
 						}
+					}
+
+					if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
+					{
+
 					}
 				}
 			}
@@ -210,6 +228,7 @@ int main()
 		deltaPos = sf::Vector2f();
 
 		// draw everything here
+		window.setView(cam);
 		window.draw(player);
 		window.draw(debugText);
 
