@@ -11,7 +11,7 @@ using namespace std;
 
 //Physics Constants
 const float g = .42;
-const float drag = .42;
+const float drag = .82;
 
 //Player movement Variables
 int moveSpeed = 7;
@@ -42,7 +42,7 @@ int main()
 	//Create player
 	sf::Sprite player(playerTexture);
 	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
-	player.setPosition(250, 250);
+	player.setPosition(250, mapHeight * scale + scale);
 
 	sf::Sprite tilemapDrawerSprite(woodTexture);
 
@@ -56,6 +56,8 @@ int main()
 	//Create the window
 	sf::View cam(sf::FloatRect(0, 0, 1000, 1000));
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Game");
+
+	//cam.setCenter(500, player.getPosition().y + 300);
 	window.setFramerateLimit(60);
 
 	// run the program as long as the window is open
@@ -270,9 +272,12 @@ int main()
 		if (abs(playerVelocity.y) <= drag)
 			playerVelocity.y = 0;
 
-		if (CheckTilemapCollision(player, tilemap, deltaPos)) 
+		if (CheckTilemapCollision(player, tilemap, sf::Vector2f(deltaPos.x, 0))) 
 		{
 			deltaPos.x = 0;
+		}
+		if (CheckTilemapCollision(player, tilemap, sf::Vector2f(0, deltaPos.y))) 
+		{
 			deltaPos.y = 0;
 		}
 
