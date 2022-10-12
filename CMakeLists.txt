@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(GameEngine)
 option(ENGINE_BUILD_SANDBOXES "Build developer sandboxes" ON )
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # SFML: https://www.sfml-dev.org/
 # SFML Dokumentaatio: https://www.sfml-dev.org/documentation/2.5.1/
