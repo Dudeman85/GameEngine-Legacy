@@ -12,7 +12,7 @@ const string levelPath = "levels/";
 const string assetPath = "assets/";
 const int scale = 50;
 const int mapWidth = 20;
-const int mapHeight = 50;
+const int mapHeight = 20;
 
 //Save 2D vector tilemap to file
 void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)
