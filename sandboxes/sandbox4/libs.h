@@ -10,7 +10,7 @@ using namespace std;
 
 const string levelPath = "levels/";
 const string assetPath = "assets/";
-const int scale = 50;
+const int scale = 64;
 const int mapWidth = 20;
 const int mapHeight = 50;
 
