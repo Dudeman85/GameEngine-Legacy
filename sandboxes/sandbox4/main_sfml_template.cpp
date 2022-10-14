@@ -9,8 +9,10 @@
 
 using namespace std;
 
+int frame = 0;
+
 //Physics Constants
-const float g = .42;
+const float g = .48;
 const float drag = .82;
 
 //Player movement Variables
@@ -29,24 +31,29 @@ int main()
 	vector<vector<uint8_t>> tilemap = LoadTilemap("map1");
 
 	//Load textures
-	sf::Texture texture = loadTexture("image1.png");
 	sf::Texture playerTexture = loadTexture("pallo.png");
 	sf::Texture woodTexture = loadTexture("wood1.png");
-	sf::Texture wood2Texture = loadTexture("wood2.png");
+	sf::Texture strawberryTexture = loadTexture("strawberry.png");
+	sf::Texture winnerTexture = loadTexture("winner.png");
 
 	//Add map textures to list
 	vector<sf::Texture> textures;
 	textures.push_back(woodTexture);
-	textures.push_back(wood2Texture);
+	sf::Sprite tilemapDrawerSprite(woodTexture);
 
 	//Create player
 	sf::Sprite player(playerTexture);
 	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
-	player.setPosition(250, mapHeight * scale + scale);
+	player.setPosition(250, mapHeight * scale - scale);
+	player.setPosition(250, 500);
 
-	sf::Sprite tilemapDrawerSprite(woodTexture);
+	//Victory Textures
+	sf::Sprite strawberry(strawberryTexture);
+	strawberry.setPosition(100, 30);
+	sf::Sprite winner(winnerTexture);
+	winner.setOrigin(winner.getGlobalBounds().height / 2, winner.getGlobalBounds().width / 2);
 
-	//Debug and dev stuff
+	//Text stuff
 	sf::Font arial;
 	arial.loadFromFile(assetPath + "\\fonts\\ARIAL.TTF");
 	sf::Text debugText;
@@ -57,12 +64,17 @@ int main()
 	sf::View cam(sf::FloatRect(0, 0, 1000, 1000));
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Game");
 
+	vector<sf::Sprite*> toRender;
+	toRender.push_back(&player);
+	toRender.push_back(&strawberry);
+
 	//cam.setCenter(500, player.getPosition().y + 300);
 	window.setFramerateLimit(60);
 
 	// run the program as long as the window is open
 	while (window.isOpen())
 	{
+		frame++;
 		// check all the window's events that were triggered since the last iteration of the loop
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -74,6 +86,18 @@ int main()
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
+
+		//Victory stuff
+		{
+			strawberry.move(0, sin((float)frame / 30) * 0.2);
+			
+			if(player.getGlobalBounds().intersects(strawberry.getGlobalBounds()))
+			{
+				strawberry.setPosition(-500, 0);
+				winner.setPosition(cam.getCenter());
+				toRender.push_back(&winner);
+			}
+		}
 
 		//Draw based on map
 		for (size_t x = 0; x < tilemap.size(); x++)
@@ -95,15 +119,17 @@ int main()
 			//Add with left click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				if (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale < tilemap.size() && window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale < tilemap[0].size())
-					tilemap[window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale][window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale] = 1;
+				sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+				if (mousePos.y / scale < tilemap.size() && mousePos.y / scale >= 0 && mousePos.x / scale < tilemap[0].size() && mousePos.x / scale >= 0)
+					tilemap[mousePos.y / scale][mousePos.x / scale] = 1;
 			}
 
 			//Clear with right click
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
-				if (window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale < tilemap.size() && window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale < tilemap[0].size())
-					tilemap[window.mapPixelToCoords(sf::Mouse::getPosition(window)).y / scale][window.mapPixelToCoords(sf::Mouse::getPosition(window)).x / scale] = 0;
+				sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+				if (mousePos.y / scale < tilemap.size() && mousePos.y / scale >= 0 && mousePos.x / scale < tilemap[0].size() && mousePos.x / scale >= 0)
+					tilemap[mousePos.y / scale][mousePos.x / scale] = 0;
 			}
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
@@ -119,19 +145,20 @@ int main()
 				plusDown = false;
 			}
 		}
-
+		
 		//Camera
 		{
-			if (cam.getCenter().y - player.getPosition().y > 300)
+			if (cam.getCenter().y - player.getPosition().y > 200)
 			{
-				cam.move(0, -5 * ((abs(cam.getCenter().y - player.getPosition().y) - 300) / 30));
+				cam.move(0, -5 * ((abs(cam.getCenter().y - player.getPosition().y) - 200) / 30));
 			}
-			if (cam.getCenter().y - player.getPosition().y < -300)
+			if (cam.getCenter().y - player.getPosition().y < -200)
 			{
-				cam.move(0, 5 * ((abs(cam.getCenter().y - player.getPosition().y) - 300) / 30));
+				cam.move(0, 5 * ((abs(cam.getCenter().y - player.getPosition().y) - 200) / 30));
 			}
+			cam.setCenter(cam.getCenter().x, clamp(cam.getCenter().y, 0.f, float(mapHeight * scale - 500)));
 		}
-
+		
 		//Player movement
 		{
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && playerVelocity.x == 0)
@@ -286,8 +313,10 @@ int main()
 
 		// draw everything here
 		window.setView(cam);
-		window.draw(player);
-		window.draw(debugText);
+		for (int i = 0; i < toRender.size(); i++)
+		{
+			window.draw(*toRender[i]);
+		}
 
 		// end the current frame
 		window.display();
