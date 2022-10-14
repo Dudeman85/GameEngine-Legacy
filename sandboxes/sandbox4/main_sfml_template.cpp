@@ -9,11 +9,11 @@
 
 using namespace std;
 
-int frame = 0;
-
 //Physics Constants
 const float g = .48;
 const float drag = .82;
+
+int frame = 0;
 
 //Player movement Variables
 int moveSpeed = 7;
@@ -45,11 +45,10 @@ int main()
 	sf::Sprite player(playerTexture);
 	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
 	player.setPosition(250, mapHeight * scale - scale);
-	player.setPosition(250, 500);
 
 	//Victory Textures
 	sf::Sprite strawberry(strawberryTexture);
-	strawberry.setPosition(100, 30);
+	strawberry.setPosition(100, 230);
 	sf::Sprite winner(winnerTexture);
 	winner.setOrigin(winner.getGlobalBounds().height / 2, winner.getGlobalBounds().width / 2);
 
@@ -104,7 +103,7 @@ int main()
 		{
 			for (size_t y = 0; y < tilemap[x].size(); y++)
 			{
-				auto spriteType = tilemap[x][y];
+				uint8_t spriteType = tilemap[x][y];
 				if (spriteType != 0)
 				{
 					tilemapDrawerSprite.setTexture(textures[spriteType - 1]);
@@ -156,7 +155,7 @@ int main()
 			{
 				cam.move(0, 5 * ((abs(cam.getCenter().y - player.getPosition().y) - 200) / 30));
 			}
-			cam.setCenter(cam.getCenter().x, clamp(cam.getCenter().y, 0.f, float(mapHeight * scale - 500)));
+			cam.setCenter(cam.getCenter().x, clamp(cam.getCenter().y, 500.f, float(mapHeight * scale - 500)));
 		}
 		
 		//Player movement
@@ -177,7 +176,7 @@ int main()
 						}
 					}
 
-					if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
+					if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.1f))) && jumpPower < 7)
 					{
 						jumpPower = 0;
 						fallSpeed = 3;
@@ -209,7 +208,7 @@ int main()
 						}
 					}
 
-					if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
+					if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.1f))) && jumpPower < 7)
 					{
 						jumpPower = 0;
 						fallSpeed = 3;
@@ -304,6 +303,10 @@ int main()
 			deltaPos.x = 0;
 		}
 		if (CheckTilemapCollision(player, tilemap, sf::Vector2f(0, deltaPos.y))) 
+		{
+			deltaPos.y = 0;
+		}
+		if (CheckTilemapCollision(player, tilemap, deltaPos))
 		{
 			deltaPos.y = 0;
 		}
