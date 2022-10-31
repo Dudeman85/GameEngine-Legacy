@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <stdio.h>
 #include <string>
+#include <iostream>
 
 // assetit eri kansiosta riippuen ollanko debug vai relese knnksess.
 #if defined(_DEBUG)
@@ -19,6 +20,94 @@ sf::Texture loadTexture(const std::string& filename)
     }
     return texture;
 }
+
+// Pelaajalle ja Enemylle omat luokat,
+// colliderin testausta varten. 
+// En saanut toimimaan kunnolla ja aika
+// loppui kesken
+
+/*
+// Pelaaja luokka
+class Player
+{
+public:
+    // Pelaaja luokan konstruktori, joka
+    // saa muuttujien arvokseen float xPos, float yPos
+    Player(float xPos, float yPos)
+    {
+        // Pelaajan X position
+        // muuttujaan sijoitus
+        float positionX = xPos;
+
+        // Pelaajan Y position
+        // muutttujaan sijoitus
+        float positionY = yPos;
+    }
+
+    // Pelaajan getX() -funktio
+    int getX() const
+    {
+        return positionX;
+    }
+
+    // Pelaajan getY() -funktio
+    int getY() const
+    {
+        return positionY;
+    }
+
+    // Pelaajan move funktio, jossa sijoitetaan pelaajan
+    // uuden position arvot float deltaX ja float deltaY
+    // pelaajan muuttujiin positionX ja positionY
+    void move(float deltaX, float deltaY)
+    {
+        positionX += deltaX;
+        positionY += deltaY;
+    }
+
+private:
+    // Pelaajan X positio muuttuja
+    float positionX;
+    // Pelaajan Y positio muuttuja
+    float positionY;
+};
+
+// Enemy luokka
+class Enemy
+{
+public:
+    // Enemy luokan konstruktori, joka
+    // saa muuttujien arvokseen float xPos, float yPos
+    Enemy(float xPos, float yPos)
+    {
+        // Enemyn X position
+        // muuttujaan sijoitus
+        float positionX = xPos;
+
+        // Enemyn Y position
+        // muutttujaan sijoitus
+        float positionY = yPos;
+    }
+
+    // Enemyn getX() -funktio
+    int getX() const
+    {
+        return positionX;
+    }
+
+    // Enemyn getY() -funktio
+    int getY() const
+    {
+        return positionY;
+    }
+
+private:
+    // Enemyn X positio muuttuja
+    float positionX;
+    // Enemyn Y positio muuttuja
+    float positionY;
+};
+*/
 
 class GameObject
 {
@@ -118,8 +207,12 @@ int main() {
             deltaY += 10.0 * deltaTime;
         }
 
+        // Collision
+
+
         // 2. Move game objects according to input (update)
         players[0].move(deltaX, deltaY);
+        std::cout << players[0].getY() << std::endl;
 
         for (size_t playerIndex = 0; playerIndex < players.size(); ++playerIndex) {
             for (size_t enemyIndex = 0; enemyIndex < enemies.size(); ++enemyIndex) {
