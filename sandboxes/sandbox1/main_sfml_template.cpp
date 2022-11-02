@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include "miniaudio.h"
+#include "AudioDemo.h"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <stdio.h>
