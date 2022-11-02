@@ -11,6 +11,7 @@ namespace engine
 	public:
 		vector<int> delays;
 		vector<sf::Texture> textures;
+		int length = 0;
 
 		//Load Animation From texture vector with equal delay intervals in ms
 		void Load(vector<sf::Texture> frames, int delay) 
@@ -20,6 +21,7 @@ namespace engine
 			{
 				delays.push_back(delay);
 			}
+			length = textures.size();
 		}
 		//Load Animation from texture vector with custom delay intervals vector in ms
 		void Load(vector<sf::Texture> frames, vector<int> delay) 
@@ -28,10 +30,9 @@ namespace engine
 
 			for (size_t i = 0; i < frames.size(); i++)
 			{
-				if (i > delay.size())
-					delays.push_back(delay[delay.size() - 1]);
 				delays.push_back(delay[i]);
 			}
+			length = textures.size();
 		}
 	};
 

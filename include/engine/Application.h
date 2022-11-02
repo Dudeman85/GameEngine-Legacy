@@ -9,9 +9,10 @@
 
 using namespace std;
 
-//
 namespace engine 
 {
+	sf::Clock clock;
+
 	//Engine Resource Variables
 	string levelPath = "levels/";
 	string assetPath = "assets/";
