@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//
 namespace engine 
 {
 	//Engine Resource Variables
@@ -105,4 +106,6 @@ namespace engine
 		//If not in bounds return true
 		return true;
 	}
+
+	//sprite width, height
 }
