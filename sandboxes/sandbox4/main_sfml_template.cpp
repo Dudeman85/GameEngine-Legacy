@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <vector>
 #include <libs.h>
+#include <math.h>
 
 using namespace std;
 
@@ -88,7 +89,7 @@ int main()
 
 		//Victory stuff
 		{
-			strawberry.move(0, sin((float)frame / 30) * 0.2);
+			strawberry.move(0, sinf((float)frame / 30) * 0.2);
 			
 			if(player.getGlobalBounds().intersects(strawberry.getGlobalBounds()))
 			{
