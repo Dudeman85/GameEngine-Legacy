@@ -6,7 +6,7 @@ Jos tarve vaatii niin sovimme pitävämme pidemmän palaverin aamulla, joka on a
 
 # Tiimi
 
-[Aleksi Anderson](https://repo.kamit.fi/aleksiand) ![Sähköposti](https://repo.kamit.fi/ttv21sp_pelimoottoriohjelmointi/tiimi4/-/blob/main/doc/Email.png = 10x10)
+[Aleksi Anderson](https://repo.kamit.fi/aleksiand) ![Sähköposti]<img src="Email.png" width="200" height="100">
 [Viksteri Käppi](https://repo.kamit.fi/viksterikap)  
 
 # Ohjelmat
