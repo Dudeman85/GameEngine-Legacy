@@ -86,6 +86,17 @@ namespace engine
 		return texture;
 	}
 
+	//Load texture with error checking
+	sf::Image loadImage(string name)
+	{
+		sf::Image image;
+		if (!image.loadFromFile(assetPath + name))
+		{
+			printf("Load texture error");
+		}
+		return image;
+	}
+
 	//Returns true if any corner of sprite is overlapping a non zero position of the tilemap.
 	//Assumes origin of sprite is in the center. Optional offset for shifting the hitbox.
 	bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, sf::Vector2f offset = sf::Vector2f(0, 0))
