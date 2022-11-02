@@ -50,7 +50,7 @@ namespace engine
 			engine::Animation animation = animations[name];
 
 			int frame = 0;
-			//While 
+			//Do untill animation is stopped
 			do
 			{
 				//Change GameObject texture
@@ -72,7 +72,7 @@ namespace engine
 		}
 
 		//Stop current animation
-		void StopAnimation() 
+		void stopAnimation() 
 		{
 			playingAnimation = false;
 		}
