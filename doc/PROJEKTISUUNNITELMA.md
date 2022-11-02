@@ -6,6 +6,8 @@ Jos tarve vaatii niin sovimme pitävämme pidemmän palaverin aamulla, joka on a
 
 # Tiimi
 
+[Aleksi Anderson]()
+
 # Ohjelmat
 
 # Vaatimukset
