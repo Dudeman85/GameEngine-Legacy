@@ -6,7 +6,7 @@ Jos tarve vaatii niin sovimme pitävämme pidemmän palaverin aamulla, joka on a
 
 # Tiimi
 
-[Aleksi Anderson](https://repo.kamit.fi/aleksiand) ![Sähköposti](tiimi4/doc/Email.png "Email")  
+[Aleksi Anderson](https://repo.kamit.fi/aleksiand) ![Sähköposti](Email.png)  
 [Lasse Autio](https://repo.kamit.fi/lasseaut)  
 [Viksteri Käppi](https://repo.kamit.fi/viksterikap)  
 
