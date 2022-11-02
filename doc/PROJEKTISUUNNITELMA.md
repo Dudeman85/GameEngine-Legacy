@@ -22,4 +22,20 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 
 # Vaatimukset
 
+- [ ] Integration, Testing, CI/CD, (Testing on Gitlab runner running on Linux)  
+- [ ] Architecture (GameObject), scene saving to file?  
+- [ ] Graphics & Input (SFML), Sprite sheet / animations   
+- [ ] Physics (Box2d + omat koodit)  
+- [ ] Audio (miniaud.io)  
+- [ ] Scripting (LUA) 
+- [ ] Android support  
+- [ ] Networking (enet)  
+- [ ] Map / level /editor support (Tiled, Gleed2d)  
+- [ ] One or more examples 
+- [ ] Getting started tutorial 
+- [ ] API documentation (Doxygen)
+
 # Aikataulu
+
+162 h / 6 min  
+7 viikkoa * 16 h/ vko = 112 h
