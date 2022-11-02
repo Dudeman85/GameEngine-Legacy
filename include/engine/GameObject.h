@@ -3,28 +3,14 @@
 
 namespace engine
 {
+	class GameObject
+	{
+	public:
+		sf::Texture texture;
 
-///
-/// \brief The GameObject class
-///
-class GameObject
-{
-public:
-	///
-	/// \brief Creates new GameObject from texture.
-	/// \param texture		= Texture for sprite.
-	///
-	GameObject(sf::Texture& texture);
+		GameObject(sf::Texture& _texture) : texture(_texture)
+		{
 
-	///
-	/// \brief getSprite
-	/// \return Returns sprite of the game object.
-	///
-	inline sf::Sprite& getSprite() { return m_sprite; }
-	inline const sf::Sprite& getSprite() const { return m_sprite; }
-
-private:
-	sf::Sprite		m_sprite;
-};
-
+		}
+	};
 }

@@ -1,66 +1,108 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <memory>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
 #include <SFML/Graphics.hpp>
-#include <engine/GameObject.h>
+#include <string>
+#include <stdio.h>
+#include <vector>
 
-namespace engine
+using namespace std;
+
+namespace engine 
 {
+	//Engine Resource Variables
+	string levelPath = "levels/";
+	string assetPath = "assets/";
 
-///
-/// \brief The Application class
-///
-class Application
-{
-public:
-	///
-	/// \brief Application
-	/// \param textures
-	///
-	Application(const std::vector<std::string> textures, sf::RenderWindow* window = 0);
+	//Tilemap Variables
+	int scale = 50;
+	int mapWidth = 20;
+	int mapHeight = 54;
 
-	/// Tällä funktiolla voi spawnata uusia objekteja tyyliin app.spawn<Player()>(textures[0]);
-	/// \brief spawn<T>(size_t) -> std::shared_ptr<T>
-	/// \param textureIndex		= Tekstuurin indeksi, joka asetetaan peliobjektille.
-	/// \return Shared pointer of given GameObject (T) kind.
-	///
-	template<typename T>
-	inline std::shared_ptr<T> spawn(size_t textureIndex) {
-		std::shared_ptr<T> p = std::make_shared<T>(m_textures[textureIndex]);
-		m_gameObjects.push_back(p);
-		return p;
+	//Save 2D vector tilemap to file
+	void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)
+	{
+		//Create a new directory and tilemap save file
+		filesystem::create_directory(levelPath);
+		ofstream tilemapSave(levelPath + file, ios_base::out);
+
+		//For each x and y of given tilemap
+		for (int x = 0; x < tilemap.size(); x++)
+		{
+			for (int y = 0; y < tilemap[0].size(); y++)
+			{
+				//Write tilemap tile id to file
+				tilemapSave << tilemap[x][y];
+			}
+			tilemapSave << endl;
+		}
+
+		cout << "Saved tilemap to " << levelPath + file << endl;
+		tilemapSave.close();
 	}
 
-	///
-	/// \brief Updates a frame.
-	/// \return Returns deltaTime for frame.
-	///
-	float update();
+	//Load 2D vector tilemap from file
+	vector<vector<uint8_t>> LoadTilemap(string file)
+	{
+		//Try to open a tilemap of given name
+		ifstream tilemapSave(levelPath + file);
+		//If failed, return blank tilemap
+		if (tilemapSave.fail())
+		{
+			cout << "Failed to load tilemap " + file << endl;
+			vector<vector<uint8_t>> tilemap(mapHeight, vector<uint8_t>(mapWidth, 1));
+			return tilemap;
+		}
 
-	///
-	/// \brief Renders game to window.
-	///
-	void render() const;
+		//Create a new tilemap vector and iterate through each row and column of saved tilemap
+		vector<vector<uint8_t>> tilemap;
+		for (string sRow; getline(tilemapSave, sRow);)
+		{
+			vector<uint8_t> row;
+			for (int i = 0; i < sRow.length(); i++)
+			{
+				//Add tile to row
+				row.push_back(sRow[i]);
+			}
+			//Add row to tilemap
+			tilemap.push_back(row);
+		}
 
-	///
-	/// \brief shouldClose
-	/// \return True, if application should shut down.
-	///
-	bool shouldClose();
+		tilemapSave.close();
+		cout << "Loaded tilemap from " << levelPath + file << endl;
+		return tilemap;
+	}
 
-	///
-	/// \brief getGameObjects
-	/// \return Returns all game objects.
-	///
-	inline auto& getGameObjects() { return m_gameObjects; }
-	inline const auto& getGameObjects() const { return m_gameObjects; }
+	//Load texture with error checking
+	sf::Texture loadTexture(string name)
+	{
+		sf::Texture texture;
+		if (!texture.loadFromFile(assetPath + name))
+		{
+			printf("Load texture error");
+		}
+		return texture;
+	}
 
-private:
-	sf::RenderWindow*								m_window;
-	std::vector<sf::Texture>						m_textures;
-	std::vector< std::shared_ptr<GameObject> >		m_gameObjects;
-	sf::Clock										m_frameTimer;
-};
+	//Returns true if any corner of sprite is overlapping a non zero position of the tilemap.
+	//Assumes origin of sprite is in the center. Optional offset for shifting the hitbox.
+	bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, sf::Vector2f offset = sf::Vector2f(0, 0))
+	{
+		//Get position(center) width and height of collision box
+		sf::Vector2f position = sprite.getPosition() + offset;
+		int width = sprite.getGlobalBounds().width / 2;
+		int height = sprite.getGlobalBounds().height / 2;
 
+		//Check if in bounds
+		if (position.x - width > 0 && position.x + width < mapWidth * scale && position.y + height < mapHeight * scale && position.y - height > 0)
+			//Check if any corner is within the tilemap by indexing the tilemap with each corner position divided by tilemap pixel scale
+			return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
+			(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
+			(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
+			(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
+
+		//If not in bounds return true
+		return true;
+	}
 }
