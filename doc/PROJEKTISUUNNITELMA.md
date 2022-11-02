@@ -9,6 +9,7 @@ Jos tarve vaatii niin sovimme pitävämme pidemmän palaverin aamulla, joka on a
 [Aleksi Anderson](https://repo.kamit.fi/aleksiand) [<img src="Email.png" width="30" height="30">](mailto:aleksianderson@kamk.fi)  
 [Lasse Autio](https://repo.kamit.fi/lasseaut) [<img src="Email.png" width="30" height="30">](mailto:lasseautio@kamk.fi)  
 [Viksteri Käppi](https://repo.kamit.fi/viksterikap) [<img src="Email.png" width="30" height="30">](mailto:viksterikappi@kamk.fi) **Lead**  
+[Aaro Leskinen](https://repo.kamit.fi/aaroles) [<img src="Email.png" width="30" height="30">](mailto:aaroleskinen@kamk.fi)
 
 
 # Ohjelmat
