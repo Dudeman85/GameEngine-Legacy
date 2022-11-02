@@ -7,6 +7,10 @@
 #include <vector>
 #include <libs.h>
 
+#include <miniaudio/miniaudio.h>
+
+//#include <AudioDemo/AudioDemo.h>
+
 using namespace std;
 
 //Constants
