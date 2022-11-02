@@ -17,7 +17,7 @@ Jos tarve vaatii niin sovimme pitävämme pidemmän palaverin aamulla, joka on a
 [Gitlab repo](https://repo.kamit.fi/)  
 [CMake](https://cmake.org/)  
 [Clockify](https://clockify.me/)  
-[Visual Studio](https://visualstudio.microsoft.com/)
+[Visual Studio](https://visualstudio.microsoft.com/)  
 [Discord](https://discord.com/login)
 
 # Vaatimukset
