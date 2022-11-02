@@ -3,14 +3,18 @@
 #include<string>
 #include<iostream>
 #include<ctime>
-
+#include "engine/Application.h"
+#include "engine/GameObject.h"
+#include "engine/Application.h"
+#include "engine/GameObject.h"
+#include "engine/Sprite.h"
 //assetit eri kansioista riippuen ollaanko debug vai release käännöksessä
 #if defined (_DEBUG)
 std::string ASSET_PATH = "C:/Users/viksterikap/Desktop/Tiimi/tiimi4/sandboxes/sandbox3/assets/";
 #else
 std::string ASSET_PATH = "assets/";
 #endif
-
+#include <box2d/box2d.h>
 
 sf::Texture loadTexture(const std::string& fileName)
 {
@@ -74,6 +78,8 @@ bool sphereSphereCollisionCheck(const GameObject& o1, const GameObject& o2)
 
 int main()
 {
+    b2Vec2 gravity(0.0f, -10.0f);
+    b2World world(gravity);
     // create the window
     sf::RenderWindow window(sf::VideoMode(768, 640), "My window");
     std::vector<sf::Texture> textures =
@@ -84,9 +90,9 @@ int main()
         loadTexture("Ghost.png"),
         loadTexture("alumiini.png"),
         loadTexture("sun.png"),
+        loadTexture("texturemap1.png"),
     };
-    //srand(time(NULL));
-
+  
     sf::Clock frameTimer;
 
     int points = 0;
