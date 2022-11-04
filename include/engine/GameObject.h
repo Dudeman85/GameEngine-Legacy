@@ -45,6 +45,7 @@ namespace engine
 		int y = 0;
 		float xScale = 1;
 		float yScale = 1;
+		float rotationAngle = 0;
 
 		sf::Texture texture;
 
@@ -85,7 +86,7 @@ namespace engine
 			{
 				sprite.setPosition(x, y);
 				sprite.setScale(xScale, yScale);
-
+				sprite.setRotation(rotationAngle);
 
 				if (playingAnimation)
 				{
@@ -101,7 +102,8 @@ namespace engine
 		//Render GameObject to window
 		sf::Sprite draw()
 		{
-			sprite.setTexture(texture, true);
+			if(!playingAnimation)
+				sprite.setTexture(texture, true);
 
 			if (!enabled)
 			{
@@ -129,6 +131,7 @@ namespace engine
 		{
 			playingAnimation = false;
 			currentAnimation = "";
+			animationFrame = 0;
 		}
 
 		//Add an animation with custom delays in ms

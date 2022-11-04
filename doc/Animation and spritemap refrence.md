@@ -69,10 +69,11 @@ gameObject.autoAddAnimations(spritemap, 16, 16, delays, names);
 ```
 
 To start and stop animations use
-### void playAnimation(string name, bool repeat = false)
-### void stopAnimation()
+### <b>void playAnimation(string name, bool repeat = false)</b>
+### <b>void stopAnimation()</b>
 Play animation has an optional repeat, which will loop the animation untill stopAnimation() is called
 ```cpp
+//Starts and repeats animation1 untill stopAnimation() is called
 gameObject.playAnimation("animation1", true);
 gameObject.stopAnimation();
 ```
