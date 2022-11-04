@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Application.h"
 #include "Sprite.h"
+#include <cmath>
 
 using namespace std;
 

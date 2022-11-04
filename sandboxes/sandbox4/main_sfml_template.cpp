@@ -6,7 +6,6 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-#include <math.h>
 
 using namespace std;
 using namespace engine;
@@ -317,8 +316,6 @@ int main()
 		player.move(deltaPos);
 		deltaPos = sf::Vector2f();
 
-		knight.update();
-		window.draw(knight.draw());
 		// draw everything here
 		window.setView(cam);
 		for (int i = 0; i < toRender.size(); i++)
