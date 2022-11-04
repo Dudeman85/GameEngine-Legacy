@@ -12,10 +12,34 @@ namespace engine
 	private:
 		map<string, engine::Animation> animations;
 		sf::Sprite sprite;
+		sf::Clock animationTimer;
+		int animationFrame = 0;
+		bool repeatAnimation = false;
+
+		void advanceFrame()
+		{
+			//Change GameObject texture
+			texture = animations[currentAnimation].textures[animationFrame];
+
+			animationTimer.restart();
+			animationFrame++;
+
+			//If end of animation has been reached go to start or end animation
+			if (animationFrame >= animations[currentAnimation].length)
+			{
+				animationFrame = 0;
+				if (!repeatAnimation)
+				{
+					playingAnimation = false;
+					currentAnimation = "";
+				}
+			}
+		}
 
 	public:
 		bool enabled = true;
 		bool playingAnimation = false;
+		string currentAnimation = "";
 		int x = 0;
 		int y = 0;
 		float xScale = 1;
@@ -23,33 +47,65 @@ namespace engine
 
 		sf::Texture texture;
 
-		GameObject(sf::Texture& _texture) : texture(_texture)
-		{
+		GameObject() {}
+		GameObject(sf::Texture& _texture) : texture(_texture) {}
 
-		}
-
+		//Sets absolute position of GameObject
 		void setPosition(int xPos, int yPos)
 		{
 			x = xPos;
 			y = yPos;
 			sprite.setPosition(x, y);
 		}
+		//Moves the GameObject a relative distance
 		void move(int dx, int dy)
 		{
 			x += dx;
 			y += dy;
 			sprite.setPosition(x, y);
 		}
+		//Sets the scale multiplier
+		void setScale(float scale)
+		{
+			xScale = scale;
+			yScale = scale;
+		}
+		//Sets the scale multiplier
+		void setScale(float x, float y)
+		{
+			xScale = x;
+			yScale = y;
+		}
+
+		//Updates the GameObject. Call this every frame for every GameObject
+		void update()
+		{
+			if (enabled)
+			{
+				sprite.setPosition(x, y);
+				sprite.setScale(xScale, yScale);
+
+
+				if (playingAnimation)
+				{
+					//If delay ms has passed advance animation frame
+					if (animationTimer.getElapsedTime().asMilliseconds() >= animations[currentAnimation].delays[animationFrame])
+					{
+						advanceFrame();
+					}
+				}
+			}
+		}
 
 		//Render GameObject to window
 		sf::Sprite draw()
 		{
-			sprite.setPosition(x, y);
-			sprite.setScale(xScale, yScale);
-			sprite.setTexture(texture);
+			sprite.setTexture(texture, true);
 
 			if (!enabled)
-				sprite.setTexture(sf::Texture());
+			{
+				sprite.setScale(0, 0);
+			}
 
 			return sprite;
 		}
@@ -60,44 +116,22 @@ namespace engine
 		//If repeat is set to true it will loop untill stopAnimation is called
 		void playAnimation(string name, bool repeat = false)
 		{
-			//Create new timer for frame delays
-			sf::Clock animationTimer;
-
-			//Select chosen animation
 			playingAnimation = true;
-			engine::Animation animation = animations[name];
-
-			int frame = 0;
-			//Do untill animation is stopped
-			do
-			{
-				//Change GameObject texture
-				texture = animation.textures[frame];
-
-				//If delay ms has passed go to next frame and reset frame timer
-				if (animationTimer.getElapsedTime().asMicroseconds() >= animation.delays[frame])
-				{
-					animationTimer.restart();
-					frame++;
-					//If end of animation has been reached go to start or end animation
-					if (frame >= animation.length)
-					{
-						frame = 0;
-						if (!repeat)
-							playingAnimation = false;
-					}
-				}
-			} while (playingAnimation);
+			currentAnimation = name;
+			animationFrame = 0;
+			repeatAnimation = repeat;
+			animationTimer.restart();
 		}
 
 		//Stop current animation
 		void stopAnimation()
 		{
 			playingAnimation = false;
+			currentAnimation = "";
 		}
 
 		//Add an animation with custom delays in ms
-		void addAnimation(string name, vector<sf::Texture> textures, vector<int> delays)
+		void addAnimation(vector<sf::Texture> textures, vector<int> delays, string name)
 		{
 			engine::Animation newAnimation;
 			newAnimation.Load(textures, delays);
@@ -105,11 +139,16 @@ namespace engine
 			animations[name] = newAnimation;
 		}
 		//Add an animation with equal delays in ms
-		void addAnimation(string name, vector<sf::Texture> textures, int delays)
+		void addAnimation(vector<sf::Texture> textures, int delays, string name)
 		{
 			engine::Animation newAnimation;
 			newAnimation.Load(textures, delays);
 
+			animations[name] = newAnimation;
+		}
+		//Add an already made animation
+		void addAnimation(engine::Animation newAnimation, string name)
+		{
 			animations[name] = newAnimation;
 		}
 
@@ -136,7 +175,7 @@ namespace engine
 
 				//Create new animation and add buffer frames to it
 				engine::Animation newAnimation;
-				newAnimation.Load(textures, delays);
+				newAnimation.Load(animationSlice, delays);
 
 				//If there are names in the names list add the animation with that
 				if (names.size() > y)

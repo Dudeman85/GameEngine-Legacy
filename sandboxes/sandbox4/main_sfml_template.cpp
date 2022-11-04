@@ -31,9 +31,12 @@ int main()
 {
 	sf::Texture t = CustomSlice(loadImage("Knight Sprites.png"), 0, 0, 14, 15);
 	GameObject knight = GameObject(t);
-	knight.setPosition(205, mapHeight * scale - scale);
-	knight.autoAddAnimations(loadImage("Knight Sprites.png"), 16, 16, 500);
-	//knight.playAnimation("1", true);
+	knight.setPosition(205, mapHeight * scale - scale * 2);
+
+	knight.autoAddAnimations(loadImage("Knight Sprites.png"), 16, 16, 250);
+	knight.playAnimation("1", true);
+	knight.setScale(1);
+	knight.stopAnimation();
 
 	//Create main level tilemap [ROW][COLUMN]
 	vector<vector<uint8_t>> tilemap = LoadTilemap("map1");
@@ -47,7 +50,12 @@ int main()
 	//Add map textures to list
 	vector<sf::Texture> textures;
 	textures.push_back(woodTexture);
+	textures.push_back(playerTexture);
 	sf::Sprite tilemapDrawerSprite(woodTexture);
+
+	knight.addAnimation(textures, 200, "a");
+	knight.playAnimation("a", true);
+	knight.texture = woodTexture;
 
 	//Create player
 	sf::Sprite player(playerTexture);
@@ -322,6 +330,7 @@ int main()
 		player.move(deltaPos);
 		deltaPos = sf::Vector2f();
 
+		knight.update();
 		window.draw(knight.draw());
 		// draw everything here
 		window.setView(cam);
