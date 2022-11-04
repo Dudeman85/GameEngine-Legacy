@@ -6,7 +6,6 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-#include <math.h>
 
 
 using namespace std;
@@ -42,6 +41,7 @@ int main()
 	//Add map textures to list
 	vector<sf::Texture> textures;
 	textures.push_back(woodTexture);
+	textures.push_back(playerTexture);
 	sf::Sprite tilemapDrawerSprite(woodTexture);
 
 	//Create player

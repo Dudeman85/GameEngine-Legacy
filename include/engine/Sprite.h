@@ -40,13 +40,23 @@ namespace engine
 	//Returns a vector of textures ordered left to right top to bottom 
 	vector<sf::Texture> SliceSpritemap(sf::Image spritemap, int width, int height) 
 	{
+		//Throw warning if spritemap is not properly dimensioned
+		if (spritemap.getSize().x % width != 0)
+			cout << "Warning: Spritemap width is not a multiple of sprite width. Clipping may occur!\n";
+		if (spritemap.getSize().y % height != 0)
+			cout << "Warning: Spritemap height is not a multiple of sprite height. Clipping may occur!\n";
+
 		vector<sf::Texture> slicedSpritemap;
-		for (size_t x = 0; x < spritemap.getSize().x; x += width)
+		//Run through each full sprite in the spritemap
+		//if the final row or column are not full, skip them
+		for (size_t x = 0; x < spritemap.getSize().x - width + 1; x += width)
 		{
-			for (size_t y = 0; y < spritemap.getSize().y; y += height)
+			for (size_t y = 0; y < spritemap.getSize().y - height + 1; y += height)
 			{
+				//Copy sector of spritemap to new texture
 				sf::Image slice;
-				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, x + width, y + height));
+				slice.create(width, height);
+				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, x + width, y + height), true);
 
 				sf::Texture slicedTexture; 
 				slicedTexture.loadFromImage(slice);
@@ -63,11 +73,12 @@ namespace engine
 	sf::Texture CustomSlice(sf::Image spritemap, int x1, int y1, int x2, int y2) 
 	{
 		sf::Image slice;
-		slice.copy(spritemap, 0, 0, sf::IntRect(x1, y1, x2, y2));
-
-		sf::Texture slicedTexture;
+		slice.create(x2 - x1, y2 - y1);
+		slice.copy(spritemap, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
+		
+		sf::Texture slicedTexture = sf::Texture();
 		slicedTexture.loadFromImage(slice);
-
+		
 		return slicedTexture;
 	}
 }
