@@ -22,18 +22,23 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 
 # Vaatimukset
 
-- [ ] Integration, Testing, CI/CD, (Testing on Gitlab runner running on Linux)  
+- [x] Integration, Testing, CI/CD, (Testing on Gitlab runner running on Linux)  
 - [ ] Architecture (GameObject), scene saving to file?  
 - [ ] Graphics & Input (SFML), Sprite sheet / animations   
-- [ ] Physics (Box2d + omat koodit)  
+- [ ] Physics (Box2d + omat koodit) 
+    - [ ] Gravity 
+    - [ ] Collision
 - [ ] Audio (miniaud.io)  
-- [ ] Scripting (LUA) 
+    - [ ] Jump and Collision sounds
+    - [ ] Ambient
 - [ ] Android support  
 - [ ] Networking (enet)  
-- [ ] Map / level /editor support (Tiled, Gleed2d)  
+- [ ] Map / level /editor support (Tiled)  
 - [ ] One or more examples 
+    - [ ] Demo 1 (Side-scroller)
+    - [ ] Demo 2 (Top-down)
 - [ ] Getting started tutorial 
-- [ ] API documentation (Doxygen)
+- [ ] API documentation 
 
 # Aikataulu
 
