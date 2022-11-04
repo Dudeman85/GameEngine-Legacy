@@ -18,6 +18,8 @@ namespace engine
 		bool playingAnimation = false;
 		int x = 0;
 		int y = 0;
+		float xScale = 1;
+		float yScale = 1;
 
 		sf::Texture texture;
 
@@ -26,21 +28,37 @@ namespace engine
 
 		}
 
+		void setPosition(int xPos, int yPos)
+		{
+			x = xPos;
+			y = yPos;
+			sprite.setPosition(x, y);
+		}
+		void move(int dx, int dy)
+		{
+			x += dx;
+			y += dy;
+			sprite.setPosition(x, y);
+		}
+
 		//Render GameObject to window
-		void render(sf::RenderWindow window)
+		sf::Sprite draw()
 		{
 			sprite.setPosition(x, y);
+			sprite.setScale(xScale, yScale);
 			sprite.setTexture(texture);
 
-			if (enabled)
-				window.draw(sprite);
+			if (!enabled)
+				sprite.setTexture(sf::Texture());
+
+			return sprite;
 		}
 
 		//Animation methods
 
 		//Play an Animation
 		//If repeat is set to true it will loop untill stopAnimation is called
-		void playAnimation(string name, bool repeat = true) 
+		void playAnimation(string name, bool repeat = false)
 		{
 			//Create new timer for frame delays
 			sf::Clock animationTimer;
@@ -57,11 +75,12 @@ namespace engine
 				texture = animation.textures[frame];
 
 				//If delay ms has passed go to next frame and reset frame timer
-				if (animationTimer.getElapsedTime().asMicroseconds() >= animation.delays[frame]) {
+				if (animationTimer.getElapsedTime().asMicroseconds() >= animation.delays[frame])
+				{
 					animationTimer.restart();
 					frame++;
 					//If end of animation has been reached go to start or end animation
-					if (frame >= animation.length) 
+					if (frame >= animation.length)
 					{
 						frame = 0;
 						if (!repeat)
@@ -72,7 +91,7 @@ namespace engine
 		}
 
 		//Stop current animation
-		void stopAnimation() 
+		void stopAnimation()
 		{
 			playingAnimation = false;
 		}
@@ -104,15 +123,15 @@ namespace engine
 			textures = engine::SliceSpritemap(spritemap, width, height);
 
 			//For each row in the spritemap
-			for (size_t i = 0, j = 0; i < textures.size(); j++)
+			for (size_t y = 0; y < floor(spritemap.getSize().y / height); y++)
 			{
 				//Frame buffer to add to animation
 				vector<sf::Texture> animationSlice;
 				//For each column in the spritemap
-				for (i; i < textures.size() / (spritemap.getSize().x / width); i++)
+				for (size_t x = 0; x < floor(spritemap.getSize().x / width); x++)
 				{
 					//Add the next texture to the buffer 
-					animationSlice.push_back(textures[i]);
+					animationSlice.push_back(textures[x]);
 				}
 
 				//Create new animation and add buffer frames to it
@@ -120,11 +139,11 @@ namespace engine
 				newAnimation.Load(textures, delays);
 
 				//If there are names in the names list add the animation with that
-				if (names.size() < j)
-					animations[names[j]] = newAnimation;
+				if (names.size() > y)
+					animations[names[y]] = newAnimation;
 				else
 					//If not name it the index of the row
-					animations[to_string(j)] = newAnimation;
+					animations[to_string(y)] = newAnimation;
 			}
 		}
 
