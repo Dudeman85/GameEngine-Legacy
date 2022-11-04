@@ -5,11 +5,18 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-#include <libs.h>
 
+
+
+#define MINIAUDIO_IMPLEMENTATION
 #include <miniaudio/miniaudio.h>
 
+#include <libs.h>
+
+
 //#include <AudioDemo/AudioDemo.h>
+
+
 
 using namespace std;
 
@@ -219,7 +226,34 @@ int main()
 
 		// end the current frame
 		window.display();
-	}
 
+		// sound effects
+		//init:
+		// Muokataan vielä:
+		/*
+
+			auto result = ma_engine_init(NULL, &audioEngine);
+			if (result != MA_SUCCESS) {
+				throw std::runtime_error("Failed to initialize audio engine!");
+				return;
+			}
+
+			// deinit:
+
+			ma_engine_uninit(&audioEngine);
+
+
+			void Window::playSound(const std::string & fileName) {
+				auto result = ma_engine_play_sound(&init.audioEngine, fileName.c_str(), NULL);
+				if (result != MA_SUCCESS) {
+					throw std::runtime_error("Failed to play sound!");
+					return;
+				}
+			}
+
+		}
+		*/
+
+	}
 	return 0;
 }
