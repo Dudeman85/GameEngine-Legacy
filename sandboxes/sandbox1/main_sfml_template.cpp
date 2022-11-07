@@ -42,6 +42,8 @@ int main()
 	sf::Texture playerTexture = loadTexture("player.png");
 	sf::Texture woodTexture = loadTexture("wall.png");
 	sf::Texture wood2Texture = loadTexture("wall2.png");
+	sf::Texture enemyTexture = loadTexture("enemy.png");
+	sf::Texture winnerTexture = loadTexture("winner.png");
 
 	//Add map textures to list
 	vector<sf::Texture> textures;
@@ -51,10 +53,20 @@ int main()
 	//Create player
 	sf::Sprite player(playerTexture);
 	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
-	player.setPosition(250, 250);
+	player.setPosition(100, 100);
 
 	sf::Sprite tilemapDrawerSprite(woodTexture);
 
+	// Create enemy
+	sf::Sprite enemy(enemyTexture);
+	enemy.setOrigin(enemy.getGlobalBounds().height / 2, enemy.getGlobalBounds().width / 2);
+	enemy.setPosition(400, 400);
+	
+	//Create winner trophy
+	sf::Sprite winner(winnerTexture);
+	winner.setOrigin(enemy.getGlobalBounds().height / 2, winner.getGlobalBounds().width / 2);
+	winner.setPosition(900, 900);
+		
 	//Debug and dev stuff
 	sf::Font arial;
 	arial.loadFromFile(assetPath + "\\fonts\\ARIAL.TTF");
@@ -222,7 +234,9 @@ int main()
 
 		// draw everything here
 		window.draw(player);
+		window.draw(enemy);
 		window.draw(debugText);
+		window.draw(winner);
 
 		// end the current frame
 		window.display();

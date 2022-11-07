@@ -13,6 +13,12 @@ namespace engine
 	private:
 		map<string, engine::Animation> animations;
 		sf::Sprite sprite;
+
+		// Enemy 
+		sf::RectangleShape enemy;
+
+		
+
 		sf::Clock animationTimer;
 		int animationFrame = 0;
 		bool repeatAnimation = false;
