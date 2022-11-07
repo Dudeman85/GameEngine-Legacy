@@ -1,4 +1,4 @@
-
+/*
 #include<string>
 #include<iostream>
 #include <box2d/box2d.h>
@@ -44,3 +44,4 @@ int main()
 		printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
 	}
 }
+*/

@@ -1,4 +1,4 @@
-/*
+
 #include<stdio.h>
 #include<SFML/Graphics.hpp>
 #include<string>
@@ -123,6 +123,8 @@ int main()
 
     std::vector<GameObject> enemies = {
         GameObject(6,4),
+        GameObject(4,9),
+        GameObject(9,6),
         GameObject(2,7)
     };
 
@@ -141,7 +143,7 @@ int main()
     };
 
     std::vector<GameObject> pisteet = {
-        GameObject(9,9)
+        GameObject(11,9)
     };
 
 
@@ -191,7 +193,7 @@ int main()
         }
         srand(time(NULL));
         int randomizer = 0 + rand() % 2 + -1;
-        int randomizer1 = 0 + rand() % 2 + -1;
+        int randomizer1 = 0 + rand() % 3 + -2;
 
         //2. Move game objects according to input(update)
         players[0].move(deltaX, deltaY);
@@ -199,6 +201,8 @@ int main()
 
         enemies[0].move(deltaX * randomizer, deltaY * randomizer);
         enemies[1].move(deltaX * randomizer1, deltaY * randomizer1);
+        enemies[3].move(deltaX * randomizer, deltaY * randomizer);
+       
 
         
         // Enemy spawner
@@ -331,4 +335,3 @@ int main()
 
     return 0;
 }
-*/
