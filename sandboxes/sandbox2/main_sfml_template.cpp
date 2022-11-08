@@ -1,32 +1,63 @@
-#include <SFML/Graphics.hpp>
+/*
+* Itsenäistä opiskelua
+
+#include <iostream>
 #include <stdio.h>
 #include <string>
-#include <iostream>
 
-// assetit eri kansiosta riippuen ollanko debug vai relese knnksess.
-#if defined(_DEBUG)
-std::string ASSET_PATH = "assets/";
-#else 
-std::string ASSET_PATH = "assets/";
-#endif
+// SFML includes
+#include <SFML/Graphics.hpp>
 
-sf::Texture loadTexture(const std::string& filename)
+int main()
 {
-    sf::Texture texture;
-    if (!texture.loadFromFile(ASSET_PATH + filename))
+    // Window
+    sf::RenderWindow window(sf::VideoMode(990, 900), "Game Window");
+
+    // Event triggers
+    sf::Event event;
+
+    // Suorita ohjelmaa niin pitkään,
+    // kun ikkuna on auki
+    while (window.isOpen())
     {
-        // error
-        printf("Error loading image!\n");
+
+        // Käy läpi kaikki Eventit,
+        // jotka tapahtuivat viime loopista
+        while (window.pollEvent(event))
+        {
+            // Kutsutaan close komentoa
+            // ja suljetaan ikkuna
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+        }
+
+        // Päivitys
+
+        // Renderöinti
+        // Puhdista näyttö uudella värillä
+        window.clear(sf::Color::Cyan);
+
+        // Piirrä peli
+
+        // Kerro ohjelmalle, että
+        // näyttö ei piirrä enään
+        window.display();
+
     }
-    return texture;
+
+    // Ohjelman loppu
+    return 0;
 }
 
+
 // Pelaajalle ja Enemylle omat luokat,
-// colliderin testausta varten. 
+// colliderin testausta varten.
 // En saanut toimimaan kunnolla ja aika
 // loppui kesken
 
-/*
+
 // Pelaaja luokka
 class Player
 {
@@ -72,6 +103,7 @@ private:
     float positionY;
 };
 
+
 // Enemy luokka
 class Enemy
 {
@@ -107,7 +139,34 @@ private:
     // Enemyn Y positio muuttuja
     float positionY;
 };
+
 */
+#include <iostream>
+
+// SFML includes
+#include <SFML/Graphics.hpp>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+
+// assetit eri kansiosta riippuen ollanko debug vai relese knnksess.
+#if defined(_DEBUG)
+std::string ASSET_PATH = "assets/";
+#else 
+std::string ASSET_PATH = "assets/";
+#endif
+
+sf::Texture loadTexture(const std::string& filename)
+{
+    sf::Texture texture;
+    if (!texture.loadFromFile(ASSET_PATH + filename))
+    {
+        // error
+        printf("Error loading image!\n");
+    }
+    return texture;
+}
+
 
 class GameObject
 {
@@ -145,6 +204,7 @@ bool sphereSphereCollisonCheck(const GameObject& o1, const GameObject& o2)
 }
 
 int main() {
+    // Window creation
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
     std::vector<sf::Texture> textures = {
         loadTexture("image.png"),
@@ -174,6 +234,7 @@ int main() {
     sf::Sprite mySprite(textures[0]);
 
     // run the program as long as the window is open
+    // Game loop
     while (window.isOpen()) {
         // check all the window's events that were triggered since the last iteration of the loop
         sf::Event event;
