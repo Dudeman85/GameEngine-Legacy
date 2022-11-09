@@ -58,12 +58,12 @@ namespace engine
 		GameObject(bool dynamic = false) 
 		{
 			b2BodyDef rbDef;
-			rigidbody = engine::world.CreateBody(&rbDef);
+			rigidbody = engine::world->CreateBody(&rbDef);
 		}
 		GameObject(sf::Texture& _texture, bool dynamic = false) : texture(_texture) 
 		{
 			b2BodyDef rbDef;
-			rigidbody = engine::world.CreateBody(&rbDef);
+			rigidbody = engine::world->CreateBody(&rbDef);
 		}
 
 		//Sets absolute position of GameObject
