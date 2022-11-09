@@ -11,7 +11,7 @@
 #include "engine/Sprite.h"
 //assetit eri kansioista riippuen ollaanko debug vai release käännöksessä
 #if defined (_DEBUG)
-std::string ASSET_PATH = "C:/Users/vikst/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/";
+std::string ASSET_PATH = "C:/Users/viksterikap/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/";
 #else
 std::string ASSET_PATH = "assets/";
 #endif
