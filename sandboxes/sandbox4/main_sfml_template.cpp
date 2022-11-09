@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <vector>
 
-
 using namespace std;
 using namespace engine;
 
@@ -29,6 +28,13 @@ bool lmbDown, rmbDown, plusDown, spaceDown = false;
 
 int main()
 {
+
+	sf::Vertex line[] =
+	{
+		sf::Vertex(sf::Vector2f(10, 10)),
+		sf::Vertex(sf::Vector2f(150, 150))
+	};
+
 	//Create main level tilemap [ROW][COLUMN]
 	vector<vector<uint8_t>> tilemap = LoadTilemap("map1");
 
@@ -147,7 +153,7 @@ int main()
 				plusDown = false;
 			}
 		}
-		
+		/*
 		//Camera
 		{
 			if (cam.getCenter().y - player.getPosition().y > 200)
@@ -159,7 +165,7 @@ int main()
 				cam.move(0, 5 * ((abs(cam.getCenter().y - player.getPosition().y) - 200) / 30));
 			}
 			cam.setCenter(cam.getCenter().x, clamp(cam.getCenter().y, 500.f, float(mapHeight * scale - 500)));
-		}
+		}*/
 		
 		//Player movement
 		{
@@ -323,6 +329,8 @@ int main()
 		{
 			window.draw(*toRender[i]);
 		}
+
+		window.draw(line, 2, sf::Lines);
 
 		// end the current frame
 		window.display();

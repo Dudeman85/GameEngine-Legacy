@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Application.h"
-#include "Sprite.h"
+#include "engine/Application.h"
+#include "engine/Sprite.h"
 #include <cmath>
 
 using namespace std;
