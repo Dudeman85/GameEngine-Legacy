@@ -11,18 +11,18 @@ namespace engine
 	class GameObject
 	{
 	private:
+		//Box2D
+		b2Body* rigidbody;
+
+		//Animation
 		map<string, engine::Animation> animations;
-		sf::Sprite sprite;
-
-		// Enemy 
-		sf::RectangleShape enemy;
-
-		
-
 		sf::Clock animationTimer;
 		int animationFrame = 0;
 		bool repeatAnimation = false;
 
+		sf::Sprite sprite;
+
+		//Increments the current animation frame by one
 		void advanceFrame()
 		{
 			//Change GameObject texture
@@ -55,8 +55,16 @@ namespace engine
 
 		sf::Texture texture;
 
-		GameObject() {}
-		GameObject(sf::Texture& _texture) : texture(_texture) {}
+		GameObject(bool dynamic = false) 
+		{
+			b2BodyDef rbDef;
+			rigidbody = engine::world.CreateBody(&rbDef);
+		}
+		GameObject(sf::Texture& _texture, bool dynamic = false) : texture(_texture) 
+		{
+			b2BodyDef rbDef;
+			rigidbody = engine::world.CreateBody(&rbDef);
+		}
 
 		//Sets absolute position of GameObject
 		void setPosition(int xPos, int yPos)

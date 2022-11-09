@@ -6,6 +6,7 @@ using namespace std;
 
 namespace engine 
 {
+	//Animation class, contains one animation per instance
 	class Animation
 	{
 	public:

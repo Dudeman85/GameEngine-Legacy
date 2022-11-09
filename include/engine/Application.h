@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
+#include <box2d/box2d.h>
 
 using namespace std;
 
@@ -17,10 +18,28 @@ namespace engine
 	string levelPath = "levels/";
 	string assetPath = "assets/";
 
+	//Box2D
+	b2Vec2 gravity;
+	b2World world;
+	float timeStep = 1.0f / 60.0f;
+	int32 velocityIterations = 6;
+	int32 positionIterations = 2;
+
 	//Tilemap Variables
 	int scale = 50;
 	int mapWidth = 20;
 	int mapHeight = 54;
+
+	void Init(b2Vec2 gravity = b2Vec2_zero) 
+	{
+		gravity.Set(gravity.x, gravity.y);
+		world.SetGravity(gravity);
+	}
+
+	void Update() 
+	{
+		world.Step(timeStep, velocityIterations, positionIterations);
+	}
 
 	//Save 2D vector tilemap to file
 	void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)

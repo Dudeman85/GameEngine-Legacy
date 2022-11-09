@@ -21,7 +21,7 @@ gameObject.setScale(5);
 gameObject.setScale(2, 6);
 ```
 
-## members
+## Members
 
 You can also directly access the transform members for read and write:
 ```cpp
