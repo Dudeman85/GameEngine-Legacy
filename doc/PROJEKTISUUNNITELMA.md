@@ -56,4 +56,4 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 162 h / 6 min  
 7 viikkoa * 16 h/ vko = 112 h
 
-[<img src="ExcelCapture.png" width="100" height="100">]
+<img src="ExcelCapture.PNG" width="700" height="400">
