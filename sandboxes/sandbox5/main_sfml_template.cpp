@@ -1,29 +1,12 @@
-#include "engine/GameObject.h"
 #include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <SFML/Graphics.hpp>
-#include <string>
-#include <stdio.h>
-#include <vector>
-
-class Vector
-{
-public:
-	sf::Vector2f start;
-	float angle;
-	float length;
-};
+#include "engine/ECSCore.h"
 
 int main()
 {
+	ecs::EntityManager entityManager;
 
-	sf::Vertex line[] =
-	{
-		sf::Vertex(sf::Vector2f(250, 250)),
-		sf::Vertex(sf::Vector2f(150, 150))
-	};
 
+	/*
 	//Create the window
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Game");
 
@@ -42,10 +25,6 @@ int main()
 				window.close();
 		}
 
-		line[1].position = sf::Vector2f(sf::Mouse::getPosition(window));
-
-
-
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
@@ -55,6 +34,6 @@ int main()
 		// end the current frame
 		window.display();
 	}
-
+	*/
 	return 0;
 }
