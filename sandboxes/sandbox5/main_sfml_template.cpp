@@ -3,7 +3,6 @@
 
 int main()
 {
-	ecs::EntityManager entityManager;
 
 
 	/*
