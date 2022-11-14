@@ -1,9 +1,18 @@
 #include <iostream>
 #include "engine/ECSCore.h"
 
+struct Position
+{
+	int x;
+	int y;
+};
+
 int main()
 {
+	ECS ecs;
 
+	Entity player = ecs.newEntity();
+	ecs.addComponent(player, Position{.x = 4, .y = 10});
 
 	/*
 	//Create the window

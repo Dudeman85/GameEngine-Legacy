@@ -17,7 +17,7 @@ namespace engine
 	//Engine Resource Variables
 	string levelPath = "levels/";
 	string assetPath = "assets/";
-
+	
 	//Box2D
 	b2Vec2 gravity(0.0f, 0.0f);
 	b2World* world;
