@@ -4,6 +4,7 @@
 #include <stack>
 #include <map>
 #include <set>
+#include <memory>
 
 const uint16_t MAX_ENTITIES = 10000;
 const uint16_t MAX_COMPONENTS = 100;
@@ -227,11 +228,11 @@ public:
 	std::shared_ptr<T> registerSystem()
 	{
 		//Name of the new system's type
-		const char* sytemType = typeid(T).name();
+		const char* systemType = typeid(T).name();
 
 		//Create new system and return a pointer to it
 		std::shared_ptr<T> system = std::make_shared<T>();
-		systems.insert({ sytemType, system });
+		systems.insert({ systemType, (system) });
 		return system;
 	}
 
@@ -355,8 +356,8 @@ public:
 	}
 
 	template<typename T>
-	void setSystemSignatures(Signature signature)
+	void setSystemSignature(Signature signature)
 	{
 		systemManager->setSignature<T>(signature);
 	}
-};
+}; 

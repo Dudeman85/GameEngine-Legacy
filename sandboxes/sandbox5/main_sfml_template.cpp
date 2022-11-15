@@ -1,47 +1,65 @@
 #include <iostream>
 #include "engine/ECSCore.h"
+#include <chrono>
 
+//Create one instance of the ecs manager
+ECS ecs;
+
+//Simple position and gravity Components
 struct Position
 {
-	int x;
-	int y;
+	float x, y;
+};
+struct Gravity
+{
+	float x, y;
+};
+
+//System class, this holds every function of the GravitySystem system
+class GravitySystem : public System
+{
+public:
+	//Update the entity's position
+	void Update()
+	{
+		//For each entity that has the required components
+		for (auto const& entity : entities)
+		{
+			//Get the relevant components from entity
+			Position& position = ecs.getComponent<Position>(entity);
+			Gravity& gravity = ecs.getComponent<Gravity>(entity);
+
+			//Update the entity's postion component
+			position.y += gravity.y;
+			position.x += gravity.x;
+		}
+	}
 };
 
 int main()
 {
-	ECS ecs;
+	//Register the gravity system, it is accessible by this pointer
+	std::shared_ptr<GravitySystem> gravitySystem = ecs.registerSystem<GravitySystem>();
 
+	//Add Position and Gravity components as requirements for GravitySystem system
+	Signature gravitySystemSignature;
+	gravitySystemSignature.set(ecs.getComponentId<Position>());
+	gravitySystemSignature.set(ecs.getComponentId<Gravity>());
+	ecs.setSystemSignature<GravitySystem>(gravitySystemSignature);
+
+	//Create a new entity
 	Entity player = ecs.newEntity();
+
+	//Add the position component and set it's starting position
 	ecs.addComponent(player, Position{.x = 4, .y = 10});
+	//Add the gravity component and set it's direction
+	ecs.addComponent(player, Gravity{ .x = 0, .y = -1.0f });
 
-	/*
-	//Create the window
-	sf::RenderWindow window(sf::VideoMode(1000, 1000), "Game");
-
-	//cam.setCenter(500, player.getPosition().y + 300);
-	window.setFramerateLimit(60);
-
-	// run the program as long as the window is open
-	while (window.isOpen())
+	while (true)
 	{
-		// check all the window's events that were triggered since the last iteration of the loop
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
+		//Gravity system updates every entity with the required components
+		gravitySystem->Update();
 
-
-		// clear the window with black color
-		window.clear(sf::Color::Black);
-
-		window.draw(line, 2, sf::Lines);
-
-		// end the current frame
-		window.display();
+		std::cout << "Y: " << ecs.getComponent<Position>(player).y << ", X: " << ecs.getComponent<Position>(player).x << std::endl;
 	}
-	*/
-	return 0;
 }
