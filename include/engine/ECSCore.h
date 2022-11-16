@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <map>
 #include <bitset>
 #include <stack>
@@ -6,10 +7,13 @@
 #include <set>
 #include <memory>
 
+//Max amount of unique entities and components, needed for array sizing
 const uint16_t MAX_ENTITIES = 10000;
 const uint16_t MAX_COMPONENTS = 100;
 
+//Entity is only a numerical id
 using Entity = uint16_t;
+//The signature is a bitset with one bit per possible component
 using Signature = std::bitset<MAX_COMPONENTS>;
 
 //Class for managing entities
@@ -93,7 +97,7 @@ public:
 	{
 		if (entityToIndex.find(entity) == entityToIndex.end())
 		{
-			std::cout << "Trying to remove non-existent component" << std::endl;
+			std::cout << "Warning: Trying to remove non-existent component" << std::endl;
 			return;
 		}
 
@@ -115,6 +119,11 @@ public:
 
 	T& getComponent(Entity entity)
 	{
+		if (entityToIndex.find(entity) == entityToIndex.end())
+		{
+			throw("Error: Entity does not have component\n");
+		}
+
 		//Return a reference to entity's component
 		return componentArray[entityToIndex[entity]];
 	}
@@ -216,6 +225,7 @@ public:
 	std::set<Entity> entities;
 };
 
+//Manager class to make sure every system has the correct list of entitites
 class SystemManager
 {
 public:
@@ -275,6 +285,7 @@ public:
 	}
 };
 
+//General ECS manager class to interface with the entire ECS framework
 class ECS
 {
 public:
@@ -348,13 +359,15 @@ public:
 		return componentManager->getComponentId<T>();
 	}
 
-	//Registers a system
+	//Registers a system, returns a pointer to that system
+	//Every system needs to be registered before it can be used
 	template<typename T>
 	std::shared_ptr<T> registerSystem()
 	{
 		return systemManager->registerSystem<T>();
 	}
 
+	//Sets the signature of required components for a system
 	template<typename T>
 	void setSystemSignature(Signature signature)
 	{
