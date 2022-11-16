@@ -1,5 +1,6 @@
 #include <iostream>
 #include "engine/ECSCore.h"
+#include <AL/al.h>
 #include <chrono>
 
 //Create one instance of the ecs manager
