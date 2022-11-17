@@ -216,6 +216,7 @@ public:
 	std::set<Entity> entities;
 };
 
+//Stores and manages every system
 class SystemManager
 {
 public:
@@ -275,6 +276,7 @@ public:
 	}
 };
 
+//Manages and communicates between every other manager
 class ECS
 {
 public:
