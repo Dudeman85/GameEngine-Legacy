@@ -1,5 +1,6 @@
 #include <iostream>
 #include "engine/ECSCore.h"
+#include <AL/al.h>
 #include <chrono>
 
 //Create one instance of the ecs manager
@@ -53,7 +54,7 @@ int main()
 	//Add the position component and set it's starting position
 	ecs.addComponent(player, Position{.x = 4, .y = 10});
 	//Add the gravity component and set it's direction
-	ecs.addComponent(player, Gravity{ .x = 0, .y = -1.0f });
+	ecs.addComponent(player, Gravity{ .x = 1.0, .y = 0.0f });
 
 	while (true)
 	{
