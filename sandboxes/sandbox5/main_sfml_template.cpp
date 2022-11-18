@@ -2,7 +2,10 @@
 #include "engine/ECSCore.h"
 #include <AL/al.h>
 #include <chrono>
+#include <AL/al.h>
+#include <AL/alc.h>
 
+ALCdevice* device = alcOpenDevice(NULL);
 //Create one instance of the ecs manager
 ECS ecs;
 
