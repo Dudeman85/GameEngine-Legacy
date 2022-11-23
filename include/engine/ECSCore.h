@@ -295,6 +295,7 @@ public:
 
 	ECS()
 	{
+		//Create instance for every manager
 		componentManager = new ComponentManager();
 		entityManager = new EntityManager();
 		systemManager = new SystemManager();
