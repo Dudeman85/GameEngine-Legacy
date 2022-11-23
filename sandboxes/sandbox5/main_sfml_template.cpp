@@ -50,7 +50,6 @@ int main()
 	gravitySystemSignature.set(ecs.getComponentId<Position>());
 	gravitySystemSignature.set(ecs.getComponentId<Gravity>());
 	ecs.setSystemSignature<GravitySystem>(gravitySystemSignature);
-
 	//Create a new entity
 	Entity player = ecs.newEntity();
 
