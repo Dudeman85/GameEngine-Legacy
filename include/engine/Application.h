@@ -7,12 +7,34 @@
 #include <stdio.h>
 #include <vector>
 #include <box2d/box2d.h>
+#include "ECSCore.h"
+#include "Sprite.h"
 
 using namespace std;
 
+extern ECS ecs;
+
 namespace engine 
 {
-	sf::Clock clock;
+	class Engine
+	{
+	public:
+		std::shared_ptr<AnimationSystem> animationSystem;
+
+		Engine()
+		{
+			//Register all engine systems here
+
+			//Animation System
+			animationSystem = ecs.registerSystem<AnimationSystem>();
+			Signature animationSystemSignature;
+			animationSystemSignature.set(ecs.getComponentId<Sprite>());
+			animationSystemSignature.set(ecs.getComponentId<Animator>());
+			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
+
+			//Render System
+		}
+	};
 
 	//Engine Resource Variables
 	string levelPath = "levels/";
@@ -137,6 +159,4 @@ namespace engine
 		//If not in bounds return true
 		return true;
 	}
-
-	//sprite width, height
 }

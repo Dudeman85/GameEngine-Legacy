@@ -13,15 +13,15 @@ namespace engine
 	struct Sprite
 	{
 		sf::Texture sprite;
-		int layer = 0;
+		int zOverride = 0;
 	};
 
-	//Container for a single animation
+	//Container for a single animation (shouldn't be used as a component)
 	struct Animation
 	{
 		vector<sf::Texture> textures;
 		vector<int> delays;
-		int length = 0;
+		uint64_t length = 0;
 	};
 
 	//Animator Component
@@ -86,66 +86,59 @@ namespace engine
 				}
 			}
 		}
-	};
 
-	//Automatically slice and create animations from a spritemap with delays in ms and optional names.
-	//Adds one animation per row of sprites in the spritemap. You must provide one delay per sprite in the delays vector. 
-	//All sprites must have the same width and height.
-	vector<Animation> AnimationsFromSpritemap(sf::Image spritemap, int width, int height, vector<int> delays)
-	{
-		//Get a list of textures from the spritemap
-		vector<sf::Texture> textures;
-		textures = engine::SliceSpritemap(spritemap, width, height);
-
-		vector<Animation> newAnimations;
-
-		if (delays.size() < textures.size())
+		//Add animations to entity, they will be accessible by given names
+		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
 		{
-			cout << "Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n";
-			return vector<Animation>();
-		}
+			if (animations.size() != names.size())
+				throw("Not enough names for each animation!");
 
-		//For each row in the spritemap
-		for (size_t y = 0; y < floor(spritemap.getSize().y / height); y++)
-		{
-			//Frame buffer to add to animation
-			vector<sf::Texture> animationSlice;
-			vector<int> delaySlice;
+			Animator& animator = ecs.getComponent<Animator>(entity);
 
-			//For each column in the spritemap
-			for (size_t x = 0; x < floor(spritemap.getSize().x / width); x++)
+			//For each animation to add
+			for (size_t i = 0; i < animations.size(); i++)
 			{
-				//Add the next texture to the buffer 
-				animationSlice.push_back(textures[x + y]);
-				delaySlice.push_back(delays[x + y]);
+				animator.animations.insert({ names[i], animations[i] });
 			}
-
-			Animation newAnimation{
-				.textures = animationSlice,
-				.delays = delaySlice,
-				.length = animationSlice.size()
-			};
-
-			newAnimations.push_back(newAnimation);
 		}
-		return newAnimations;
-	}
 
-	//Add animations to entity, optionally provide names for those animations, otherwise they will be numbered in order
-	void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names = vector<string>()) 
-	{
-		Animator& animator = ecs.getComponent<Animator>(entity);
-
-		//For each animation to add
-		for (size_t i = 0; i < animations.size(); i++)
+		//Add an animation to entity, it will be accessibl by given name
+		void AddAnimation(Entity entity, Animation animation, string name)
 		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
 			//Add the animation indexed by given name or number order
-			if (names.size() > i) 
-				animator.animations.insert({names[i], animations[i]});
-			else
-				animator.animations.insert({ to_string(i), animations[i] });
+			animator.animations.insert({ name, animation });
+
 		}
-	}
+
+		//Play an animation, optionally set it to repeat
+		void PlayAnimation(Entity entity, string animation, bool repeat = false)
+		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			animator.currentAnimation = animation;
+			animator.animationFrame = 0;
+			animator.repeatAnimation = repeat;
+			animator.playingAnimation = true;
+			animator.animationTimer.restart();
+		}
+
+		//Stop an animation, optionally provide the specific animation to stop
+		void StopAnimation(Entity entity, string animation = "")
+		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			//If trying to stop animation that is not playing, return without doing anything
+			if (animation != "")
+				if (animator.currentAnimation != animation)
+					return;
+
+			animator.currentAnimation = "";
+			animator.animationFrame = 0;
+			animator.playingAnimation = false;
+		}
+	};
 
 	//Slices an image into equal sized textures of width and height in pixels.
 	//Returns a vector of textures ordered left to right top to bottom 
@@ -191,5 +184,61 @@ namespace engine
 		slicedTexture.loadFromImage(slice);
 
 		return slicedTexture;
+	}
+
+	//Automatically slice and create animations from a spritemap with delays in ms and optional names.
+	//Adds one animation per row of sprites in the spritemap. You must provide one delay per sprite in the delays vector. 
+	//All sprites must have the same width and height.
+	vector<Animation> AnimationsFromSpritemap(sf::Image spritemap, int width, int height, vector<int> delays)
+	{
+		//Get a list of textures from the spritemap
+		vector<sf::Texture> textures;
+		textures = SliceSpritemap(spritemap, width, height);
+
+		vector<Animation> newAnimations;
+
+		if (delays.size() < textures.size())
+		{
+			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
+		}
+
+		//For each row in the spritemap
+		for (size_t y = 0; y < floor(spritemap.getSize().y / height); y++)
+		{
+			//Frame buffer to add to animation
+			vector<sf::Texture> animationSlice;
+			vector<int> delaySlice;
+
+			//For each column in the spritemap
+			for (size_t x = 0; x < floor(spritemap.getSize().x / width); x++)
+			{
+				//Add the next texture to the buffer 
+				animationSlice.push_back(textures[x + y]);
+				delaySlice.push_back(delays[x + y]);
+			}
+
+			Animation newAnimation{
+				.textures = animationSlice,
+				.delays = delaySlice,
+				.length = animationSlice.size()
+			};
+
+			newAnimations.push_back(newAnimation);
+		}
+		return newAnimations;
+	}
+
+	//Create one animation from frames and delays in ms
+	Animation CreateAnimation(vector<sf::Texture> frames, vector<int> delays) 
+	{
+		if (frames.size() != delays.size())
+			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
+
+		Animation newAnimation{
+			.textures = frames,
+			.delays = delays,
+			.length = frames.size()
+		};
+		return newAnimation;
 	}
 }
