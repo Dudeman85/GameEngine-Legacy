@@ -12,8 +12,9 @@ namespace engine
 	//Sprite component
 	struct Sprite
 	{
-		sf::Texture sprite;
+		sf::Texture texture;
 		int zOverride = 0;
+		sf::Sprite sprite;
 	};
 
 	//Container for a single animation (shouldn't be used as a component)
@@ -35,6 +36,22 @@ namespace engine
 		bool playingAnimation = false;
 
 		sf::Clock animationTimer;
+	};
+	//Render System
+	class RenderSystem :public System
+	{
+	public:
+		void Render(sf::RenderWindow window)
+		{
+			//Goes through list of entities, sets textures to sprites and draws them to window
+			for (auto const& entity : entities)
+			{
+				Sprite& sprite = ecs.getComponent<Sprite>(entity);
+				sprite.sprite.setTexture(sprite.texture);
+				window.draw(sprite.sprite);
+			}
+		}
+
 	};
 
 	//Animator system
@@ -70,7 +87,7 @@ namespace engine
 			Sprite& sprite = ecs.getComponent<Sprite>(entity);
 
 			//Change GameObject texture
-			sprite.sprite = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
+			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
 
 			animator.animationTimer.restart();
 			animator.animationFrame++;

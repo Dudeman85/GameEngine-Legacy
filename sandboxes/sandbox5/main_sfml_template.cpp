@@ -1,5 +1,5 @@
 #include <iostream>
-#include "engine/ECSCore.h"
+#include "engine/Application.h"
 #include <chrono>
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -42,6 +42,7 @@ ALCdevice* device = alcOpenDevice(NULL);
 
 int main()
 {
+	engine::Engine engine;
 	//Register the gravity system, it is accessible by this pointer
 	std::shared_ptr<GravitySystem> gravitySystem = ecs.registerSystem<GravitySystem>();
 
@@ -62,7 +63,7 @@ int main()
 	{
 		//Gravity system updates every entity with the required components
 		gravitySystem->Update();
-
+		
 		std::cout << "Y: " << ecs.getComponent<Position>(player).y << ", X: " << ecs.getComponent<Position>(player).x << std::endl;
 	}
 }

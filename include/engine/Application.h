@@ -20,7 +20,7 @@ namespace engine
 	{
 	public:
 		std::shared_ptr<AnimationSystem> animationSystem;
-
+		std::shared_ptr<RenderSystem> renderSystem;
 		Engine()
 		{
 			//Register all engine systems here
@@ -33,6 +33,10 @@ namespace engine
 			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
 
 			//Render System
+			renderSystem = ecs.registerSystem<RenderSystem>();
+			Signature renderSystemSignature;
+			renderSystemSignature.set(ecs.getComponentId<Sprite>());
+			ecs.setSystemSignature<RenderSystem>(renderSystemSignature);
 		}
 	};
 
