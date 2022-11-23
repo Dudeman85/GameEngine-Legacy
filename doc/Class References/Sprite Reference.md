@@ -1,4 +1,4 @@
-# Animation and spritemap refrence
+# Sprite reference
 
 All Animation and spritemap functions are within the "engine" namespace
 

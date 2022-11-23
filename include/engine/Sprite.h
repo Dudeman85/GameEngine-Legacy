@@ -21,7 +21,7 @@ namespace engine
 	{
 		vector<sf::Texture> textures;
 		vector<int> delays;
-		int length = 0;
+		uint64_t length = 0;
 	};
 
 	//Animator Component
@@ -140,6 +140,52 @@ namespace engine
 		}
 	};
 
+	//Slices an image into equal sized textures of width and height in pixels.
+	//Returns a vector of textures ordered left to right top to bottom 
+	vector<sf::Texture> SliceSpritemap(sf::Image spritemap, int width, int height)
+	{
+		//Throw warning if spritemap is not properly dimensioned
+		if (spritemap.getSize().x % width != 0)
+			cout << "Warning: Spritemap width is not a multiple of sprite width. Clipping may occur!\n";
+		if (spritemap.getSize().y % height != 0)
+			cout << "Warning: Spritemap height is not a multiple of sprite height. Clipping may occur!\n";
+
+		vector<sf::Texture> slicedSpritemap;
+		//Run through each full sprite in the spritemap
+		//if the final row or column are not full, skip them
+		for (size_t x = 0; x < (int)spritemap.getSize().x - width + 1; x += width)
+		{
+			for (size_t y = 0; y < (int)spritemap.getSize().y - height + 1; y += height)
+			{
+				//Copy sector of spritemap to new texture
+				sf::Image slice;
+				slice.create(width, height);
+				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, x + width, y + height), true);
+
+				sf::Texture slicedTexture;
+				slicedTexture.loadFromImage(slice);
+
+				slicedSpritemap.push_back(slicedTexture);
+			}
+		}
+
+		return slicedSpritemap;
+	}
+
+	//Gets a subregion of an image by pixel coordinates from top-left to bottom-right
+	//Return sliced texture
+	sf::Texture CustomSlice(sf::Image spritemap, int x1, int y1, int x2, int y2)
+	{
+		sf::Image slice;
+		slice.create(x2 - x1, y2 - y1);
+		slice.copy(spritemap, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
+
+		sf::Texture slicedTexture = sf::Texture();
+		slicedTexture.loadFromImage(slice);
+
+		return slicedTexture;
+	}
+
 	//Automatically slice and create animations from a spritemap with delays in ms and optional names.
 	//Adds one animation per row of sprites in the spritemap. You must provide one delay per sprite in the delays vector. 
 	//All sprites must have the same width and height.
@@ -147,7 +193,7 @@ namespace engine
 	{
 		//Get a list of textures from the spritemap
 		vector<sf::Texture> textures;
-		textures = engine::SliceSpritemap(spritemap, width, height);
+		textures = SliceSpritemap(spritemap, width, height);
 
 		vector<Animation> newAnimations;
 
@@ -194,51 +240,5 @@ namespace engine
 			.length = frames.size()
 		};
 		return newAnimation;
-	}
-
-	//Slices an image into equal sized textures of width and height in pixels.
-	//Returns a vector of textures ordered left to right top to bottom 
-	vector<sf::Texture> SliceSpritemap(sf::Image spritemap, int width, int height)
-	{
-		//Throw warning if spritemap is not properly dimensioned
-		if (spritemap.getSize().x % width != 0)
-			cout << "Warning: Spritemap width is not a multiple of sprite width. Clipping may occur!\n";
-		if (spritemap.getSize().y % height != 0)
-			cout << "Warning: Spritemap height is not a multiple of sprite height. Clipping may occur!\n";
-
-		vector<sf::Texture> slicedSpritemap;
-		//Run through each full sprite in the spritemap
-		//if the final row or column are not full, skip them
-		for (size_t x = 0; x < (int)spritemap.getSize().x - width + 1; x += width)
-		{
-			for (size_t y = 0; y < (int)spritemap.getSize().y - height + 1; y += height)
-			{
-				//Copy sector of spritemap to new texture
-				sf::Image slice;
-				slice.create(width, height);
-				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, x + width, y + height), true);
-
-				sf::Texture slicedTexture;
-				slicedTexture.loadFromImage(slice);
-
-				slicedSpritemap.push_back(slicedTexture);
-			}
-		}
-
-		return slicedSpritemap;
-	}
-
-	//Gets a subregion of an image by pixel coordinates from top-left to bottom-right
-	//Return sliced texture
-	sf::Texture CustomSlice(sf::Image spritemap, int x1, int y1, int x2, int y2)
-	{
-		sf::Image slice;
-		slice.create(x2 - x1, y2 - y1);
-		slice.copy(spritemap, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
-
-		sf::Texture slicedTexture = sf::Texture();
-		slicedTexture.loadFromImage(slice);
-
-		return slicedTexture;
 	}
 }
