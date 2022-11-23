@@ -28,6 +28,14 @@ target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+# OpenAL32 copy
+configure_file("bin/OpenAL32.dll" "sandboxes/sandbox1" COPYONLY)
+configure_file("bin/OpenAL32.dll" "sandboxes/sandbox2" COPYONLY)
+configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3" COPYONLY)
+configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4" COPYONLY)
+configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5" COPYONLY)
+
+
 
 #set(ENGINE_LIBS engine sfml-graphics)
 

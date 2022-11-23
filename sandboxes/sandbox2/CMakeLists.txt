@@ -1,5 +1,7 @@
 add_executable(sandbox2 main_sfml_template.cpp)
 target_link_libraries(sandbox2 engine)
+add_executable(Aaro_TestScene Aaro_TestScene.cpp)
+target_link_libraries(Aaro_TestScene engine)
 
 # sandbox2 Header Files
 #target_include_directories("${PROJECT_NAME}" PUBLIC
