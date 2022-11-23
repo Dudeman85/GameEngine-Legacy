@@ -29,11 +29,14 @@ target_include_directories(engine PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 # OpenAL32 copy
-configure_file("bin/OpenAL32.dll" "sandboxes/sandbox1" COPYONLY)
-configure_file("bin/OpenAL32.dll" "sandboxes/sandbox2" COPYONLY)
-configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3" COPYONLY)
-configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4" COPYONLY)
-configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5" COPYONLY)
+IF (WIN32)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox1" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox2" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5" COPYONLY)
+ENDIF()
+
 
 
 
