@@ -9,6 +9,35 @@ extern ECS ecs;
 
 namespace engine
 {
+	// Transform component
+	struct Transform
+	{
+		float x, y, z;
+		float xScale, yScale;
+		float rotation;
+	};
+
+	// Transform system
+	class TransformSystem : public System
+	{
+	public:
+		void Update()
+		{
+			for (auto const& entity : entities)
+			{
+
+			}
+		}
+
+		void setPosition(Entity entity, float x, float y, float z = 0)
+		{
+			Transform& transform = ecs.getComponent<Transform>(entity);
+			transform.x = x;
+			transform.y = y;
+			transform.z = z;
+		}
+	};
+
 	//Sprite component
 	struct Sprite
 	{
@@ -41,13 +70,15 @@ namespace engine
 	class RenderSystem :public System
 	{
 	public:
-		void Render(sf::RenderWindow window)
+		void Render(sf::RenderWindow& window)
 		{
 			//Goes through list of entities, sets textures to sprites and draws them to window
 			for (auto const& entity : entities)
 			{
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
 				sprite.sprite.setTexture(sprite.texture);
+				Transform& transform = ecs.getComponent<Transform>(entity);
+				sprite.sprite.setPosition(sf::Vector2(transform.x, transform.y));
 				window.draw(sprite.sprite);
 			}
 		}

@@ -21,6 +21,7 @@ namespace engine
 	public:
 		std::shared_ptr<AnimationSystem> animationSystem;
 		std::shared_ptr<RenderSystem> renderSystem;
+		std::shared_ptr<TransformSystem> transformSystem;
 		Engine()
 		{
 			//Register all engine systems here
@@ -36,7 +37,14 @@ namespace engine
 			renderSystem = ecs.registerSystem<RenderSystem>();
 			Signature renderSystemSignature;
 			renderSystemSignature.set(ecs.getComponentId<Sprite>());
+			renderSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<RenderSystem>(renderSystemSignature);
+
+			//Transform System
+			transformSystem = ecs.registerSystem<TransformSystem>();
+			Signature transformSystemSignature;
+			transformSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
 		}
 	};
 
