@@ -2,32 +2,54 @@
 #include "ECSCore.h"
 #include <box2d/box2d.h>
 
-ECS ecs;
-struct Position
-{
-	float x, y;
-};
-struct Gravity
-{
-	float x, y;
-};
+extern ECS ecs;
 
-class GravitySystem : public System
+namespace engine
 {
-public:
-	//Update the entity's position
-	void Update()
+	b2Vec2 gravity(0.0f, 0.0f);
+	struct Gravity
 	{
-		//For each entity that has the required components
-		for (auto const& entity : entities)
-		{
-			//Get the relevant components from entity
-			Position& position = ecs.getComponent<Position>(entity);
-			Gravity& gravity = ecs.getComponent<Gravity>(entity);
+		float x, y;
 
-			//Update the entity's postion component
-			position.y += gravity.y;
-			position.x += gravity.x;
+	};
+	b2World* world;
+	float timeStep = 1.0f / 60.0f;
+
+
+	// Gravity system
+	class GravitySystem : public System
+	{
+	public:
+		void Update()
+		{
+			for (auto const& entity : entities)
+			{
+
+			}
 		}
-	}
-};
+		void Init(b2Vec2 gravity = b2Vec2_zero)
+		{
+			gravity.Set(gravity.x, gravity.y);
+			world->SetGravity(gravity);
+		}
+
+
+		void setGravity(Entity entity, float x, float y)
+		{
+			Gravity& gravity = ecs.getComponent<Gravity>(entity);
+			gravity.x = x;
+			gravity.y = y;
+		
+		}
+
+	};
+
+
+}
+//Box2D
+//b2Vec2 gravity(0.0f, 0.0f);
+//float timeStep = 1.0f / 60.0f;
+//int32 velocityIterations = 6;
+//int32 positionIterations = 2;
+//
+//

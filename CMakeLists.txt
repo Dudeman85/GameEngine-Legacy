@@ -30,11 +30,11 @@ target_include_directories(engine PUBLIC
 )
 # OpenAL32 copy
 IF (WIN32)
-	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox1" COPYONLY)
-	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox2" COPYONLY)
-	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3" COPYONLY)
-	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4" COPYONLY)
-	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox1/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox2/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5/OpenAL32.dll" COPYONLY)
 ENDIF()
 
 
