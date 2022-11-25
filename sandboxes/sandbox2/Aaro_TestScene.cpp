@@ -3,11 +3,10 @@
 //Create one instance of the ecs manager
 ECS ecs;
 
-
 int main()
 {
     // New engine instance, contains basic systems
-    engine::Engine engine;
+    engine::EngineLib engine;
 
     //Create a new entity
     Entity player = ecs.newEntity();
@@ -20,7 +19,7 @@ int main()
 
     // Loading texture
     // new sf texture
-    sf::Image spritesheet = engine::loadImage("texturemap1.png");
+    sf::Image spritesheet = engine::LoadImage("texturemap1.png");
 
     //first sprite
     sf::Texture texture = engine::CustomSlice(spritesheet, 0, 0, 64, 64);
@@ -33,7 +32,6 @@ int main()
 
     // set player position
     engine.transformSystem->setPosition(player, 100, 60);
-
 
     // Window creation
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");

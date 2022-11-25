@@ -9,6 +9,7 @@ extern ECS ecs;
 
 namespace engine
 {
+
 	// Transform component
 	struct Transform
 	{
@@ -46,7 +47,7 @@ namespace engine
 		sf::Sprite sprite;
 	};
 
-	//Container for a single animation (shouldn't be used as a component)
+	//Container for a single animation (not a component)
 	struct Animation
 	{
 		vector<sf::Texture> textures;
@@ -66,6 +67,7 @@ namespace engine
 
 		sf::Clock animationTimer;
 	};
+
 	//Render System
 	class RenderSystem :public System
 	{
@@ -75,10 +77,16 @@ namespace engine
 			//Goes through list of entities, sets textures to sprites and draws them to window
 			for (auto const& entity : entities)
 			{
+				//Get relevant components
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
-				sprite.sprite.setTexture(sprite.texture);
 				Transform& transform = ecs.getComponent<Transform>(entity);
+
+				//Set the sprite's texture, position, and scale
+				sprite.sprite.setTexture(sprite.texture);
 				sprite.sprite.setPosition(sf::Vector2(transform.x, transform.y));
+				sprite.sprite.setScale(sf::Vector2(transform.xScale, transform.yScale));
+					
+				//Draw the sprite to provided window
 				window.draw(sprite.sprite);
 			}
 		}
@@ -138,7 +146,7 @@ namespace engine
 		//Add animations to entity, they will be accessible by given names
 		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
 		{
-			if (animations.size() != names.size())
+			if (animations.size() > names.size())
 				throw("Not enough names for each animation!");
 
 			Animator& animator = ecs.getComponent<Animator>(entity);
@@ -201,14 +209,14 @@ namespace engine
 		vector<sf::Texture> slicedSpritemap;
 		//Run through each full sprite in the spritemap
 		//if the final row or column are not full, skip them
-		for (size_t x = 0; x < (int)spritemap.getSize().x - width + 1; x += width)
+		for (size_t y = 0; y < spritemap.getSize().y - height + 1; y += height)
 		{
-			for (size_t y = 0; y < (int)spritemap.getSize().y - height + 1; y += height)
+			for (size_t x = 0; x < spritemap.getSize().x - width + 1; x += width)
 			{
 				//Copy sector of spritemap to new texture
 				sf::Image slice;
 				slice.create(width, height);
-				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, x + width, y + height), true);
+				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, width, height), true);
 
 				sf::Texture slicedTexture;
 				slicedTexture.loadFromImage(slice);
@@ -240,15 +248,14 @@ namespace engine
 	vector<Animation> AnimationsFromSpritemap(sf::Image spritemap, int width, int height, vector<int> delays)
 	{
 		//Get a list of textures from the spritemap
-		vector<sf::Texture> textures;
-		textures = SliceSpritemap(spritemap, width, height);
+		vector<sf::Texture> textures = SliceSpritemap(spritemap, width, height);
+
+		if (delays.size() < textures.size())
+			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
 
 		vector<Animation> newAnimations;
 
-		if (delays.size() < textures.size())
-		{
-			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
-		}
+		cout << floor(spritemap.getSize().y / height);
 
 		//For each row in the spritemap
 		for (size_t y = 0; y < floor(spritemap.getSize().y / height); y++)
@@ -257,12 +264,13 @@ namespace engine
 			vector<sf::Texture> animationSlice;
 			vector<int> delaySlice;
 
-			//For each column in the spritemap
+			//For each column in the row
 			for (size_t x = 0; x < floor(spritemap.getSize().x / width); x++)
 			{
+				int a = floor(spritemap.getSize().x / width) * y + x;
 				//Add the next texture to the buffer 
-				animationSlice.push_back(textures[x + y]);
-				delaySlice.push_back(delays[x + y]);
+				animationSlice.push_back(textures[floor(spritemap.getSize().x / width) * y + x]);
+				delaySlice.push_back(delays[floor(spritemap.getSize().x / width)]);
 			}
 
 			Animation newAnimation{

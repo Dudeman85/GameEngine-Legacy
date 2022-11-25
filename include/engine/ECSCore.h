@@ -374,4 +374,4 @@ public:
 	{
 		systemManager->setSignature<T>(signature);
 	}
-}; 
+};

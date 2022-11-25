@@ -16,13 +16,14 @@ extern ECS ecs;
 
 namespace engine 
 {
-	class Engine
+	class EngineLib
 	{
 	public:
-		std::shared_ptr<AnimationSystem> animationSystem;
-		std::shared_ptr<RenderSystem> renderSystem;
-		std::shared_ptr<TransformSystem> transformSystem;
-		Engine()
+		shared_ptr<AnimationSystem> animationSystem;
+		shared_ptr<RenderSystem> renderSystem;
+		shared_ptr<TransformSystem> transformSystem;
+
+		EngineLib()
 		{
 			//Register all engine systems here
 
@@ -130,7 +131,7 @@ namespace engine
 	}
 
 	//Load texture with error checking
-	sf::Texture loadTexture(string name)
+	sf::Texture LoadTexture(string name)
 	{
 		sf::Texture texture;
 		if (!texture.loadFromFile(assetPath + name))
@@ -141,7 +142,7 @@ namespace engine
 	}
 
 	//Load texture with error checking
-	sf::Image loadImage(string name)
+	sf::Image LoadImage(string name)
 	{
 		sf::Image image;
 		if (!image.loadFromFile(assetPath + name))

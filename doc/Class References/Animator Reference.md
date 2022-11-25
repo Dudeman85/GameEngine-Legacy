@@ -1,6 +1,6 @@
-# Animator refrence
+# Animator and Sprite reference
 
-The animator system and all related components and functions are within the engine namespace
+<b><u>The animator system and all related components and functions are within the engine namespace</u></b>
 
 ## Creating Animations
 To create animations, you can either automatically slice them from a spritemap, or manually provide each frame and timing. <br>
@@ -24,8 +24,12 @@ vector<Animation> animations = AnimationsFromSpritemap(spritemap, 16, 16, vector
 Animation animation = CreateAnimation(frames, vector<int> {1, 1, 1, 1}) 
 ```
 
-## Animator
-To add animations to entities you can use the AddAnimations() or AddAnimation() method of the Animator system.
+## Animator System
+As the Animator system is a member of the standard engine library, it is accessible through the Engine class and does not need to be registered.
+
+The animator system requires the Sprite and Animator components.
+
+To add animations to entities you can use the AddAnimations() or AddAnimation() methods of the Animator system.
 
 ### <b>void AddAnimations(Entity entity, vector\<Animation\> animations, vector\<string\> names)</b>
 ### <b>void AddAnimation(Entity entity, Animation animation, string name)</b>
@@ -52,4 +56,21 @@ For StopAnimation you can provide the name of the animation to stop, which only 
 //Starts and repeats animation1 of enemy untill StopAnimation() is called
 animatorSystem.PlayAnimation(enemy, "animation1", true);
 animatorSystem.StopAnimation(enemy);
+```
+
+## Usage
+As with every implementation in the standard engine library, the animator system is used as such:
+```cpp
+//ECS manager
+ECS ecs;
+
+//The engine class containing every system from the standard engine library
+Engine engine;
+
+//Create a new entity
+Entity e = ecs.newEntity();
+
+//Add the Sprite and Animator components
+ecs.addComponent(player, Sprite());
+ecs.addComponent(player, Animator());
 ```
