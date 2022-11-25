@@ -1,5 +1,5 @@
 #include "engine/Application.h"
-#include <sfml/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 
 //Create instances of the ECS controller and the standard engine library
 ECS ecs;
