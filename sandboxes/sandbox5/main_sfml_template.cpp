@@ -7,38 +7,38 @@
 
 ALCdevice* device = alcOpenDevice(NULL);
 //Create one instance of the ecs manager
-//ECS ecs;
+ECS ecs;
 
 //Simple position and gravity Components
-//struct Position
-//{
-//	float x, y;
-//};
-//struct Gravity
-//{
-//	float x, y;
-//};
+struct Position
+{
+	float x, y;
+};
+struct Gravity
+{
+	float x, y;
+};
 
 //System class, this holds every function of the GravitySystem system
-//class GravitySystem : public System
-//{
-//public:
-//	//Update the entity's position
-//	void Update()
-//	{
-//		//For each entity that has the required components
-//		for (auto const& entity : entities)
-//		{
-//			//Get the relevant components from entity
-//			Position& position = ecs.getComponent<Position>(entity);
-//			Gravity& gravity = ecs.getComponent<Gravity>(entity);
-//
-//			//Update the entity's postion component
-//			position.y += gravity.y;
-//			position.x += gravity.x;
-//		}
-//	}
-//};
+class GravitySystem : public System
+{
+public:
+	//Update the entity's position
+	void Update()
+	{
+		//For each entity that has the required components
+		for (auto const& entity : entities)
+		{
+			//Get the relevant components from entity
+			Position& position = ecs.getComponent<Position>(entity);
+			Gravity& gravity = ecs.getComponent<Gravity>(entity);
+
+			//Update the entity's postion component
+			position.y += gravity.y;
+			position.x += gravity.x;
+		}
+	}
+};
 
 int main()
 {
