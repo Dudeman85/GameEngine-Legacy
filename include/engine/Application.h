@@ -6,9 +6,12 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-#include <box2d/box2d.h>
+
+//ECS modules
 #include "ECSCore.h"
 #include "Sprite.h"
+#include "Transform.h"
+#include "Gravity.h"
 
 using namespace std;
 
@@ -25,7 +28,7 @@ namespace engine
 
 		EngineLib()
 		{
-			//Register all engine systems here
+			//Register all default engine systems here
 
 			//Animation System
 			animationSystem = ecs.registerSystem<AnimationSystem>();
@@ -52,18 +55,11 @@ namespace engine
 	//Engine Resource Variables
 	string levelPath = "levels/";
 	string assetPath = "assets/";
-	
-	
 
 	//Tilemap Variables
 	int scale = 50;
 	int mapWidth = 20;
 	int mapHeight = 54;
-
-	void Update() 
-	{
-		//world->Step(timeStep, velocityIterations, positionIterations);
-	}
 
 	//Save 2D vector tilemap to file
 	void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)
