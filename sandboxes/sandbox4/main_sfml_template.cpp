@@ -14,14 +14,16 @@ int main()
 	ecs.addComponent(player, engine::Animator());
 
 	//Load the spritesheet
-	sf::Image spritemap = engine::LoadImage("Knight Sprites.png");
-	sf::Texture defaultTexture = engine::CustomSlice(spritemap, 0, 0, 16, 16);
+	sf::Image spritesheet = engine::LoadImage("Knight Sprites.png");
+	sf::Texture defaultTexture = engine::CustomSlice(spritesheet, 0, 0, 16, 16);
+
+	vector<sf::Texture> textures = engine::SliceSpritesheet(spritesheet, 16, 16);
 
 	//Set the players default texture
 	ecs.getComponent<engine::Sprite>(player).texture = defaultTexture;
 	
-	//Add animations to player automatically sliced from the spritemap
-	lib.animationSystem->AddAnimations(player, engine::AnimationsFromSpritemap(spritemap, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
+	//Add animations to player automatically sliced from the spritesheet
+	lib.animationSystem->AddAnimations(player, engine::AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
 
 	//Play the "Down" animation of player on repeat
 	lib.animationSystem->PlayAnimation(player, "Down", true);

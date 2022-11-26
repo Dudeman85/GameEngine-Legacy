@@ -198,43 +198,43 @@ namespace engine
 
 	//Slices an image into equal sized textures of width and height in pixels.
 	//Returns a vector of textures ordered left to right top to bottom 
-	vector<sf::Texture> SliceSpritemap(sf::Image spritemap, int width, int height)
+	vector<sf::Texture> SliceSpritesheet(sf::Image spritesheet, int width, int height)
 	{
-		//Throw warning if spritemap is not properly dimensioned
-		if (spritemap.getSize().x % width != 0)
-			cout << "Warning: Spritemap width is not a multiple of sprite width. Clipping may occur!\n";
-		if (spritemap.getSize().y % height != 0)
-			cout << "Warning: Spritemap height is not a multiple of sprite height. Clipping may occur!\n";
+		//Throw warning if spritesheet is not properly dimensioned
+		if (spritesheet.getSize().x % width != 0)
+			cout << "Warning: Spritesheet width is not a multiple of sprite width. Clipping may occur!\n";
+		if (spritesheet.getSize().y % height != 0)
+			cout << "Warning: Spritesheet height is not a multiple of sprite height. Clipping may occur!\n";
 
-		vector<sf::Texture> slicedSpritemap;
-		//Run through each full sprite in the spritemap
+		vector<sf::Texture> slicedSpritesheet;
+		//Run through each full sprite in the spritesheet
 		//if the final row or column are not full, skip them
-		for (size_t y = 0; y < spritemap.getSize().y - height + 1; y += height)
+		for (size_t y = 0; y < spritesheet.getSize().y - height + 1; y += height)
 		{
-			for (size_t x = 0; x < spritemap.getSize().x - width + 1; x += width)
+			for (size_t x = 0; x < spritesheet.getSize().x - width + 1; x += width)
 			{
-				//Copy sector of spritemap to new texture
+				//Copy sector of spritesheet to new texture
 				sf::Image slice;
 				slice.create(width, height);
-				slice.copy(spritemap, 0, 0, sf::IntRect(x, y, width, height), true);
+				slice.copy(spritesheet, 0, 0, sf::IntRect(x, y, width, height), true);
 
 				sf::Texture slicedTexture;
 				slicedTexture.loadFromImage(slice);
 
-				slicedSpritemap.push_back(slicedTexture);
+				slicedSpritesheet.push_back(slicedTexture);
 			}
 		}
 
-		return slicedSpritemap;
+		return slicedSpritesheet;
 	}
 
 	//Gets a subregion of an image by pixel coordinates from top-left to bottom-right
 	//Return sliced texture
-	sf::Texture CustomSlice(sf::Image spritemap, int x1, int y1, int x2, int y2)
+	sf::Texture CustomSlice(sf::Image spritesheet, int x1, int y1, int x2, int y2)
 	{
 		sf::Image slice;
 		slice.create(x2 - x1, y2 - y1);
-		slice.copy(spritemap, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
+		slice.copy(spritesheet, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
 
 		sf::Texture slicedTexture = sf::Texture();
 		slicedTexture.loadFromImage(slice);
@@ -242,35 +242,35 @@ namespace engine
 		return slicedTexture;
 	}
 
-	//Automatically slice and create animations from a spritemap with delays in ms and optional names.
-	//Adds one animation per row of sprites in the spritemap. You must provide one delay per sprite in the delays vector. 
+	//Automatically slice and create animations from a spritesheet with delays in ms and optional names.
+	//Adds one animation per row of sprites in the spritesheet. You must provide one delay per sprite in the delays vector. 
 	//All sprites must have the same width and height.
-	vector<Animation> AnimationsFromSpritemap(sf::Image spritemap, int width, int height, vector<int> delays)
+	vector<Animation> AnimationsFromSpritesheet(sf::Image spritesheet, int width, int height, vector<int> delays)
 	{
-		//Get a list of textures from the spritemap
-		vector<sf::Texture> textures = SliceSpritemap(spritemap, width, height);
+		//Get a list of textures from the spritesheet
+		vector<sf::Texture> textures = SliceSpritesheet(spritesheet, width, height);
 
 		if (delays.size() < textures.size())
 			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
 
 		vector<Animation> newAnimations;
 
-		cout << floor(spritemap.getSize().y / height);
+		cout << floor(spritesheet.getSize().y / height);
 
-		//For each row in the spritemap
-		for (size_t y = 0; y < floor(spritemap.getSize().y / height); y++)
+		//For each row in the spritesheet
+		for (size_t y = 0; y < floor(spritesheet.getSize().y / height); y++)
 		{
 			//Frame buffer to add to animation
 			vector<sf::Texture> animationSlice;
 			vector<int> delaySlice;
 
 			//For each column in the row
-			for (size_t x = 0; x < floor(spritemap.getSize().x / width); x++)
+			for (size_t x = 0; x < floor(spritesheet.getSize().x / width); x++)
 			{
-				int a = floor(spritemap.getSize().x / width) * y + x;
+				int a = floor(spritesheet.getSize().x / width) * y + x;
 				//Add the next texture to the buffer 
-				animationSlice.push_back(textures[floor(spritemap.getSize().x / width) * y + x]);
-				delaySlice.push_back(delays[floor(spritemap.getSize().x / width)]);
+				animationSlice.push_back(textures[floor(spritesheet.getSize().x / width) * y + x]);
+				delaySlice.push_back(delays[floor(spritesheet.getSize().x / width)]);
 			}
 
 			Animation newAnimation{
