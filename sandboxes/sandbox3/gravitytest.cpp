@@ -1,8 +1,8 @@
-/*
+
 #include<string>
 #include<iostream>
 #include <box2d/box2d.h>
-
+/*
 int main()
 {
 	//gravity settings
@@ -24,7 +24,7 @@ int main()
 	b2Body* body = world.CreateBody(&bodyDef);
 
 	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(1.0f, 1.0f);
+	dynamicBox.SetAsBox(1.0f, 3.0f);
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &dynamicBox;
