@@ -11,6 +11,8 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory("ext/SFML-2.5.1")
 include_directories("ext/SFML-2.5.1/include")
 include_directories("include")
+# tmxlite-master library
+SET(TMXLITE_STATIC_LIB TRUE CACHE BOOL "")
 add_subdirectory("ext/tmxlite-master/tmxlite")
 add_subdirectory("ext/tmxlite-master/SFMLExample")
 
@@ -37,9 +39,6 @@ IF (WIN32)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5/OpenAL32.dll" COPYONLY)
 ENDIF()
-
-
-
 
 #set(ENGINE_LIBS engine sfml-graphics)
 

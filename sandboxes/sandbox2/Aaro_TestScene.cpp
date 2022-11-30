@@ -1,5 +1,4 @@
 #include "engine/Application.h"
-
 //Create one instance of the ecs manager
 ECS ecs;
 
@@ -7,6 +6,8 @@ int main()
 {
     // New engine instance, contains basic systems
     engine::EngineLib engine;
+    // Tiled Map object
+    tmx::Map map;
 
     //Create a new entity
     Entity player = ecs.newEntity();
@@ -35,6 +36,13 @@ int main()
 
     // Window creation
     sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+    //assets tmx load function
+    map.load("assets/demo.tmx");
+
+    // Layers creation
+    MapLayer layerZero(map, 0);
+    MapLayer layerOne(map, 1);
+    MapLayer layerTwo(map, 2);
     // run the program as long as the window is open
     // Game loop
     while (window.isOpen()) {
@@ -49,6 +57,10 @@ int main()
 
         // Rendering
         engine.renderSystem->Render(window);
+        // layer drawing
+        window.draw(layerZero);
+        window.draw(layerOne);
+        window.draw(layerTwo);
 
 
         // 4: end the current frame (swap buffers)

@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <vector>
 
+// tmxlite includes
+#include <tmxlite/Map.hpp>
+#include <engine/SFMLOrthogonalLayer.h>
+
 //ECS modules
 #include "ECSCore.h"
 #include "Sprite.h"
