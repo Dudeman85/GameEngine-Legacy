@@ -21,8 +21,8 @@ endif()
 SET (CMAKE_CXX_FLAGS_DEBUG "-g -D_DEBUG_")
 SET (CMAKE_CXX_FLAGS_RELEASE "-O4 -DNDEBUG")
 
-find_package(TMXLITE REQUIRED)
-find_package(SFML 2 REQUIRED graphics window system)
+#find_package(TMXLITE REQUIRED)
+#find_package(SFML 2 REQUIRED graphics window system)
 
 include_directories(
   ${TMXLITE_INCLUDE_DIR}
@@ -31,14 +31,14 @@ include_directories(
 set(PROJECT_SRC src/main.cpp)
 
 if(WIN32)
-  add_executable(${PROJECT_NAME} WIN32 ${PROJECT_SRC})
+  add_executable(${PROJECT_NAME} ${PROJECT_SRC})
 else()
   add_executable(${PROJECT_NAME} ${PROJECT_SRC})
 endif()
 
 target_link_libraries(${PROJECT_NAME}
   ${TMXLITE_LIBRARIES}
-  ${SFML_LIBRARIES})
+  ${SFML_LIBRARIES} tmxlite sfml-graphics)
 
 #install executable
 install(TARGETS ${PROJECT_NAME}
