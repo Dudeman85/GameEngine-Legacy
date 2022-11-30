@@ -1,273 +1,391 @@
 #include <iostream>
+#include <chrono>
+#include <AL/al.h>
+#include <AL/alc.h>
 #include <fstream>
-#include <filesystem>
-#include <SFML/Graphics.hpp>
-#include <string>
-#include <stdio.h>
-#include <vector>
+
+bool check_al_errors(/*const std::string& filename, const std::uint_fast32_t line*/)
+{
+    ALenum error = alGetError();
+    if (error != AL_NO_ERROR)
+    {
+       // std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n";
+        switch (error)
+        {
+        case AL_INVALID_NAME:
+            std::cerr << "AL_INVALID_NAME: a bad name (ID) was passed to an OpenAL function";
+            break;
+        case AL_INVALID_ENUM:
+            std::cerr << "AL_INVALID_ENUM: an invalid enum value was passed to an OpenAL function";
+            break;
+        case AL_INVALID_VALUE:
+            std::cerr << "AL_INVALID_VALUE: an invalid value was passed to an OpenAL function";
+            break;
+        case AL_INVALID_OPERATION:
+            std::cerr << "AL_INVALID_OPERATION: the requested operation is not valid";
+            break;
+        case AL_OUT_OF_MEMORY:
+            std::cerr << "AL_OUT_OF_MEMORY: the requested operation resulted in OpenAL running out of memory";
+            break;
+        default:
+            std::cerr << "UNKNOWN AL ERROR: " << error;
+        }
+        std::cerr << std::endl;
+        return false;
+    }
+    return true;
+}
+/*
+template<typename alFunction, typename... Params>
+auto alCallImpl(const char* filename,
+    const std::uint_fast32_t line,
+    alFunction function,
+    Params... params)
+    ->typename std::enable_if_t<!std::is_same_v<void, decltype(function(params...))>, decltype(function(params...))>
+{
+    auto ret = function(std::forward<Params>(params)...);
+    check_al_errors(filename, line);
+    return ret;
+}
+
+template<typename alFunction, typename... Params>
+auto alCallImpl(const char* filename,
+    const std::uint_fast32_t line,
+    alFunction function,
+    Params... params)
+    ->typename std::enable_if_t<std::is_same_v<void, decltype(function(params...))>, bool>
+{
+    function(std::forward<Params>(params)...);
+    return check_al_errors(filename, line);
+}
+
+#define alCall(function, ...) alCallImpl(__FILE__, __LINE__, function, __VA_ARGS__)
+*/
+
+#define alcCall(function, device, ...) alcCallImpl(__FILE__, __LINE__, function, device, __VA_ARGS__)
 
 
 
-#define MINIAUDIO_IMPLEMENTATION
-#include <miniaudio/miniaudio.h>
+bool check_alc_errors(const std::string& filename, const std::uint_fast32_t line, ALCdevice* device)
+{
+    ALCenum error = alcGetError(device);
+    if (error != ALC_NO_ERROR)
+    {
+        std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n";
+        switch (error)
+        {
+        case ALC_INVALID_VALUE:
+            std::cerr << "ALC_INVALID_VALUE: an invalid value was passed to an OpenAL function";
+            break;
+        case ALC_INVALID_DEVICE:
+            std::cerr << "ALC_INVALID_DEVICE: a bad device was passed to an OpenAL function";
+            break;
+        case ALC_INVALID_CONTEXT:
+            std::cerr << "ALC_INVALID_CONTEXT: a bad context was passed to an OpenAL function";
+            break;
+        case ALC_INVALID_ENUM:
+            std::cerr << "ALC_INVALID_ENUM: an unknown enum value was passed to an OpenAL function";
+            break;
+        case ALC_OUT_OF_MEMORY:
+            std::cerr << "ALC_OUT_OF_MEMORY: an unknown enum value was passed to an OpenAL function";
+            break;
+        default:
+            std::cerr << "UNKNOWN ALC ERROR: " << error;
+        }
+        std::cerr << std::endl;
+        return false;
+    }
+    return true;
+}
 
-#include <libs.h>
+template<typename alcFunction, typename... Params>
+auto alcCallImpl(const char* filename,
+    const std::uint_fast32_t line,
+    alcFunction function,
+    ALCdevice* device,
+    Params... params)
+    ->typename std::enable_if_t<std::is_same_v<void, decltype(function(params...))>, bool>
+{
+    function(std::forward<Params>(params)...);
+    return check_alc_errors(filename, line, device);
+}
+
+template<typename alcFunction, typename ReturnType, typename... Params>
+auto alcCallImpl(const char* filename,
+    const std::uint_fast32_t line,
+    alcFunction function,
+    ReturnType& returnValue,
+    ALCdevice* device,
+    Params... params)
+    ->typename std::enable_if_t<!std::is_same_v<void, decltype(function(params...))>, bool>
+{
+    returnValue = function(std::forward<Params>(params)...);
+    return check_alc_errors(filename, line, device);
+}
 
 
-//#include <AudioDemo/AudioDemo.h>
 
+std::int32_t convert_to_int(char* buffer, std::size_t len)
+{
+    std::int32_t a = 0;
+    if (std::endian::native == std::endian::little)
+        std::memcpy(&a, buffer, len);
+    else
+        for (std::size_t i = 0; i < len; ++i)
+            reinterpret_cast<char*>(&a)[3 - i] = buffer[i];
+    return a;
+}
 
+bool load_wav_file_header(std::ifstream& file,
+    std::uint8_t& channels,
+    std::int32_t& sampleRate,
+    std::uint8_t& bitsPerSample,
+    ALsizei& size)
+{
+    char buffer[4];
+    if (!file.is_open())
+        return false;
 
-using namespace std;
+    // the RIFF
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read RIFF" << std::endl;
+        return false;
+    }
+    if (std::strncmp(buffer, "RIFF", 4) != 0)
+    {
+        std::cerr << "ERROR: file is not a valid WAVE file (header doesn't begin with RIFF)" << std::endl;
+        return false;
+    }
 
-//Constants
-const float g = .42;
+    // the size of the file
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read size of file" << std::endl;
+        return false;
+    }
 
-//Player movement Variables
-int moveSpeed = 10;
-float fallSpeed = 0;
-sf::Vector2f deltaPos;
-float jumpPower = 0;
+    // the WAVE
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read WAVE" << std::endl;
+        return false;
+    }
+    if (std::strncmp(buffer, "WAVE", 4) != 0)
+    {
+        std::cerr << "ERROR: file is not a valid WAVE file (header doesn't contain WAVE)" << std::endl;
+        return false;
+    }
 
-//Button trackers
-bool lmbDown, rmbDown, plusDown = false;
+    // "fmt/0"
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read fmt/0" << std::endl;
+        return false;
+    }
+
+    // this is always 16, the size of the fmt data chunk
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read the 16" << std::endl;
+        return false;
+    }
+
+    // PCM should be 1?
+    if (!file.read(buffer, 2))
+    {
+        std::cerr << "ERROR: could not read PCM" << std::endl;
+        return false;
+    }
+
+    // the number of channels
+    if (!file.read(buffer, 2))
+    {
+        std::cerr << "ERROR: could not read number of channels" << std::endl;
+        return false;
+    }
+    channels = convert_to_int(buffer, 2);
+
+    // sample rate
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read sample rate" << std::endl;
+        return false;
+    }
+    sampleRate = convert_to_int(buffer, 4);
+
+    // (sampleRate * bitsPerSample * channels) / 8
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read (sampleRate * bitsPerSample * channels) / 8" << std::endl;
+        return false;
+    }
+
+    // ?? dafaq
+    if (!file.read(buffer, 2))
+    {
+        std::cerr << "ERROR: could not read dafaq" << std::endl;
+        return false;
+    }
+
+    // bitsPerSample
+    if (!file.read(buffer, 2))
+    {
+        std::cerr << "ERROR: could not read bits per sample" << std::endl;
+        return false;
+    }
+    bitsPerSample = convert_to_int(buffer, 2);
+
+    // data chunk header "data"
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read data chunk header" << std::endl;
+        return false;
+    }
+    if (std::strncmp(buffer, "data", 4) != 0)
+    {
+        std::cerr << "ERROR: file is not a valid WAVE file (doesn't have 'data' tag)" << std::endl;
+        return false;
+    }
+
+    // size of data
+    if (!file.read(buffer, 4))
+    {
+        std::cerr << "ERROR: could not read data size" << std::endl;
+        return false;
+    }
+    size = convert_to_int(buffer, 4);
+
+    /* cannot be at the end of file */
+    if (file.eof())
+    {
+        std::cerr << "ERROR: reached EOF on the file" << std::endl;
+        return false;
+    }
+    if (file.fail())
+    {
+        std::cerr << "ERROR: fail state set on the file" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+std::vector<char> load_wav(const std::string& filename,
+    std::uint8_t& channels,
+    std::int32_t& sampleRate,
+    std::uint8_t& bitsPerSample,
+    ALsizei& size)
+{
+    std::vector<char> soundData;
+    std::ifstream in(filename, std::ios::binary);
+    if (!in.is_open())
+    {
+        std::cerr << "ERROR: Could not open \"" << filename << "\"" << std::endl;
+        return soundData;
+    }
+    if (!load_wav_file_header(in, channels, sampleRate, bitsPerSample, size))
+    {
+        std::cerr << "ERROR: Could not load wav header of \"" << filename << "\"" << std::endl;
+        return soundData;
+    }
+
+    
+    soundData.resize(size);
+    in.read(&soundData[0], size);
+
+    return soundData;
+}
 
 int main()
 {
-	//Create main level tilemap [ROW][COLUMN]
-	vector<vector<uint8_t>> tilemap = LoadTilemap("map1");
+    ALCdevice* openALDevice = alcOpenDevice(nullptr);
+    if (!openALDevice)
+        return 0;
 
-	//Load textures
-	sf::Texture texture = loadTexture("image.png");
-	sf::Texture playerTexture = loadTexture("player.png");
-	sf::Texture woodTexture = loadTexture("wall.png");
-	sf::Texture wood2Texture = loadTexture("wall2.png");
-	sf::Texture enemyTexture = loadTexture("enemy.png");
-	sf::Texture winnerTexture = loadTexture("winner.png");
+    ALCcontext* openALContext = alcCreateContext(openALDevice, nullptr);
 
-	//Add map textures to list
-	vector<sf::Texture> textures;
-	textures.push_back(woodTexture);
-	textures.push_back(wood2Texture);
+    /*
+    {
+        std::cerr << "ERROR: Could not create audio context" << std::endl;
+        return 0;
 
-	//Create player
-	sf::Sprite player(playerTexture);
-	player.setOrigin(player.getGlobalBounds().height / 2, player.getGlobalBounds().width / 2);
-	player.setPosition(100, 100);
+    }*/
 
-	sf::Sprite tilemapDrawerSprite(woodTexture);
+    ALCboolean contextMadeCurrent = false;
+    alcMakeContextCurrent(openALContext);
+    /*alcMakeContextCurrent(contextMadeCurrent, openALDevice, openALContext)
+        || contextMadeCurrent != ALC_TRUE)
+    {
+        std::cerr << "ERROR: Could not make audio context current" << std::endl;
+        return 0;
+    }*/
+    
+    std::uint8_t channels;
+    std::int32_t sampleRate;
+    std::uint8_t bitsPerSample;
+  //  std::vector<char> soundData;
+    ALsizei size;
+    auto data = load_wav("iamtheprotectorofthissystem.wav", channels, sampleRate, bitsPerSample, size);
 
-	// Create enemy
-	sf::Sprite enemy(enemyTexture);
-	enemy.setOrigin(enemy.getGlobalBounds().height / 2, enemy.getGlobalBounds().width / 2);
-	enemy.setPosition(400, 400);
-	
-	//Create winner trophy
-	sf::Sprite winner(winnerTexture);
-	winner.setOrigin(enemy.getGlobalBounds().height / 2, winner.getGlobalBounds().width / 2);
-	winner.setPosition(900, 900);
-		
-	//Debug and dev stuff
-	sf::Font arial;
-	arial.loadFromFile(assetPath + "\\fonts\\ARIAL.TTF");
-	sf::Text debugText;
-	debugText.setFont(arial);
-	debugText.setCharacterSize(25);
+    if(data.size() == 0)
+    {
+        std::cerr << "ERROR: Could not load wav" << std::endl;
+        return 0;
+    }
 
-	//Create the window
-	sf::RenderWindow window(sf::VideoMode(mapWidth * scale, mapHeight * scale), "Game");
-	window.setFramerateLimit(60);
+  
+    ALuint buffer;
+    alGenBuffers(1, &buffer);
 
-	// run the program as long as the window is open
-	while (window.isOpen())
-	{
-		// check all the window's events that were triggered since the last iteration of the loop
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
+    ALenum format;
+    if (channels == 1 && bitsPerSample == 8)
+        format = AL_FORMAT_MONO8;
+    else if (channels == 1 && bitsPerSample == 16)
+        format = AL_FORMAT_MONO16;
+    else if (channels == 2 && bitsPerSample == 8)
+        format = AL_FORMAT_STEREO8;
+    else if (channels == 2 && bitsPerSample == 16)
+        format = AL_FORMAT_STEREO16;
+    else
+    {
+        std::cerr
+            << "ERROR: unrecognised wave format: "
+            << channels << " channels, "
+            << bitsPerSample << " bps" << std::endl;
+        return 0;
+    }
+    
+    alBufferData(buffer, format, data.data(), data.size(), sampleRate);
+    data.clear(); // erase the sound in RAM
 
-		// clear the window with black color
-		window.clear(sf::Color::Black);
+    ALuint source;
+    alGenSources( 1, &source);
+    alSourcef( source, AL_PITCH, 1);
+    alSourcef( source, AL_GAIN, 1.0f);
+    alSource3f( source, AL_POSITION, 0, 0, 0);
+    alSource3f( source, AL_VELOCITY, 0, 0, 0);
+    alSourcei(source, AL_LOOPING, AL_FALSE);
+    alSourcei( source, AL_BUFFER, buffer);
 
-		//Draw based on map
-		for (size_t x = 0; x < tilemap.size(); x++)
-		{
-			for (size_t y = 0; y < tilemap[x].size(); y++)
-			{
-				auto spriteType = tilemap[x][y];
-				if (spriteType != 0)
-				{
-					tilemapDrawerSprite.setTexture(textures[spriteType - 1]);
-					tilemapDrawerSprite.setPosition(y * scale, x * scale);
-					window.draw(tilemapDrawerSprite);
-				}
-			}
-		}
+    alSourcePlay( source);
 
-		//Tilemap design and manipulation
-		{
-			//Add with left click
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			{
-				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
-					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 1;
-			}
+    ALint state = AL_PLAYING;
 
-			//Clear with right click
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-			{
-				if (sf::Mouse::getPosition(window).y / scale < tilemap.size() && sf::Mouse::getPosition(window).x / scale < tilemap[0].size())
-					tilemap[sf::Mouse::getPosition(window).y / scale][sf::Mouse::getPosition(window).x / scale] = 0;
-			}
+    while (state == AL_PLAYING)
+    {
+        alGetSourcei(source, AL_SOURCE_STATE, &state);
+    }
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
-			{
-				if (!plusDown)
-				{
-					plusDown = true;
-					SaveTilemap(tilemap, "map1");
-				}
-			}
-			else
-			{
-				plusDown = false;
-			}
-		}
+    alDeleteSources( 1, &source);
+    alDeleteBuffers( 1, &buffer);
 
-		//Player movement
-		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(-1 * moveSpeed, 0)))
-				{
-					deltaPos.x += -1 * moveSpeed;
-				}
-				else
-				{
-					for (int i = 2; i < 4; i++)
-					{
-						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f((-1 * moveSpeed) / i, 0)))
-						{
-							deltaPos.x += (-1 * moveSpeed) / i;
-						}
-					}
-				}
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			{
-				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(1 * moveSpeed, 0)))
-				{
-					deltaPos.x += 1 * moveSpeed;
-				}
-				else
-				{
-					for (int i = 2; i < 4; i++)
-					{
-						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f((1 * moveSpeed) / i, 0)))
-						{
-							deltaPos.x += (1 * moveSpeed) / i;
-						}
-					}
-				}
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			{
-				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, -1 * jumpPower)))
-				{
-					deltaPos.y += -1 * jumpPower;
-					if (jumpPower > 0)
-						jumpPower -= g;
-					else
-						jumpPower = 0;
-				}
-				else
-				{
-					for (int i = 2; i < 4; i++)
-					{
-						if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, (-1 * jumpPower) / i)))
-						{
-							deltaPos.y += (-1 * jumpPower) / i;
-						}
-						else
-						{
-							fallSpeed = 0;
-							jumpPower = 0;
-						}
-					}
-				}
-			}
-			else
-			{
-				jumpPower = 0;
-			}
-		}
+    alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, nullptr);
+    alcCall(alcDestroyContext, openALDevice, openALContext);
 
-		//Gravity Physics
-		if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, max(fallSpeed, 0.01f))))
-		{
-			deltaPos.y += fallSpeed;
-			if (fallSpeed < 20)
-				fallSpeed += g;
-		}
-		else
-		{
-			for (int i = 2; i < 16; i++)
-			{
-				if (!CheckTilemapCollision(player, tilemap, sf::Vector2f(0, 2 / i)))
-				{
-					deltaPos.y += 2 / i;
-				}
-				else
-				{
-					fallSpeed = 0;
-					jumpPower = 15;
-				}
-			}
-		}
+    ALCboolean closed;
+    alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
+    
+    return 0;
 
-		player.move(deltaPos);
-		deltaPos = sf::Vector2f();
-
-		// draw everything here
-		window.draw(player);
-		window.draw(enemy);
-		window.draw(debugText);
-		window.draw(winner);
-
-		// end the current frame
-		window.display();
-
-		// sound effects
-		//init:
-		// Muokataan vielä:
-		/*
-
-			auto result = ma_engine_init(NULL, &audioEngine);
-			if (result != MA_SUCCESS) {
-				throw std::runtime_error("Failed to initialize audio engine!");
-				return;
-			}
-
-			// deinit:
-
-			ma_engine_uninit(&audioEngine);
-
-
-			void Window::playSound(const std::string & fileName) {
-				auto result = ma_engine_play_sound(&init.audioEngine, fileName.c_str(), NULL);
-				if (result != MA_SUCCESS) {
-					throw std::runtime_error("Failed to play sound!");
-					return;
-				}
-			}
-
-		}
-		*/
-
-	}
-	return 0;
 }
