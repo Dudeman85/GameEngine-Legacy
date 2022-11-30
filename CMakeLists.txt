@@ -18,6 +18,7 @@ include_directories("ext/box2d-main/include")
 # miniaudio
 include_directories("ext")
 
+file(GLOB_RECURSE ENGINE_SOURCE_FILES "./src/*.cpp")
 file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h")
 
 # engine -library
