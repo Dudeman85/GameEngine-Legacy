@@ -11,7 +11,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory("ext/SFML-2.5.1")
 include_directories("ext/SFML-2.5.1/include")
 include_directories("include")
-
+add_subdirectory("ext/tmxlite-master/tmxlite")
 
 add_subdirectory("ext/box2d-main")
 include_directories("ext/box2d-main/include")
