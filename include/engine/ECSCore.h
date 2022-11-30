@@ -7,6 +7,8 @@
 #include <set>
 #include <memory>
 
+#include <assert.h>
+
 //Max amount of unique entities and components, needed for array sizing
 const uint16_t MAX_ENTITIES = 10000;
 const uint16_t MAX_COMPONENTS = 100;
@@ -21,6 +23,7 @@ class EntityManager
 {
 public:
 	std::stack<Entity> availableEntities;
+	std::set<Entity> usedEntities;
 	Signature entitySignatures[MAX_ENTITIES];
 	uint16_t entityCount = 0;
 
@@ -36,26 +39,27 @@ public:
 	//Return a unique entity id
 	Entity newEntity()
 	{
-		if (entityCount >= MAX_ENTITIES)
-		{
-			std::cout << "Too Many Entities!" << std::endl;
-			return -1;
-		}
+		assert((entityCount < MAX_ENTITIES) && "Too Many Entities!");
 
 		entityCount++;
 
-		Entity e = availableEntities.top();
+		Entity entity = availableEntities.top();
 		availableEntities.pop();
 
-		return e;
+		usedEntities.insert(entity);
+
+		return entity;
 	}
 
 	//Set the entity id as available
-	void deleteEntity(Entity e)
+	void deleteEntity(Entity entity)
 	{
-		entitySignatures[e].reset();
+		assert(usedEntities.count(entity) > 0);
+
+		usedEntities.erase(entity);
+		entitySignatures[entity].reset();
 		entityCount--;
-		availableEntities.push(e);
+		availableEntities.push(entity);
 	}
 };
 
@@ -119,10 +123,7 @@ public:
 
 	T& getComponent(Entity entity)
 	{
-		if (entityToIndex.find(entity) == entityToIndex.end())
-		{
-			throw("Error: Entity does not have component\n");
-		}
+		assert((entityToIndex.count(entity) > 0) && "Entity does not have desired component component!");
 
 		//Return a reference to entity's component
 		return componentArray[entityToIndex[entity]];
@@ -162,6 +163,8 @@ public:
 	template<typename T>
 	uint16_t getComponentId()
 	{
+		assert((typeToId.count(typeid(T).name()) > 0) && "Trying to get ID of non-registered component!");
+
 		return typeToId[typeid(T).name()];
 	}
 
@@ -288,11 +291,12 @@ public:
 //General ECS manager class to interface with the entire ECS framework
 class ECS
 {
-public:
+private:
 	EntityManager* entityManager;
 	ComponentManager* componentManager;
 	SystemManager* systemManager;
 
+public:
 	ECS()
 	{
 		//Create instance for every manager

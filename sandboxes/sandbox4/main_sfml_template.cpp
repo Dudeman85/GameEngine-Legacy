@@ -3,10 +3,10 @@
 
 //Create instances of the ECS controller and the standard engine library
 ECS ecs;
-engine::EngineLib lib;
 
 int main()
 {
+	engine::EngineLib lib;
 	//Create a new entity and add the Transform, Sprite, and Animator components
 	Entity player = ecs.newEntity();
 	ecs.addComponent(player, engine::Transform{.x = 100, .y = 100, .xScale = 10, .yScale = 10});
@@ -27,7 +27,7 @@ int main()
 
 	//Play the "Down" animation of player on repeat
 	lib.animationSystem->PlayAnimation(player, "Down", true);
-
+	
 	//SFML window
 	sf::RenderWindow window(sf::VideoMode(800, 600), "test");
 
@@ -40,13 +40,13 @@ int main()
 			if (event.type == sf::Event::Closed)
 				window.close();
 		window.clear(sf::Color::Black);
-
+		
 		//Run the animationSystem's Update method each frame
 		lib.animationSystem->Update();
 
 		//Run the renderSystem's Render method each frame
 		lib.renderSystem->Render(window);
-
+		
 		//SFML display window
 		window.display();
 	}

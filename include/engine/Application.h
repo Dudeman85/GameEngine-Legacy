@@ -28,6 +28,11 @@ namespace engine
 
 		EngineLib()
 		{
+			//Register all default engine components here
+			ecs.registerComponent<Sprite>();
+			ecs.registerComponent<Transform>();
+			ecs.registerComponent<Animator>();
+
 			//Register all default engine systems here
 
 			//Animation System
