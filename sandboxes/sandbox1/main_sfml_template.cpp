@@ -3,6 +3,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <fstream>
+#include <bit>
 
 bool check_al_errors(/*const std::string& filename, const std::uint_fast32_t line*/)
 {
