@@ -4,7 +4,7 @@
 
 
 /** We need this to easily convert between pixel and real-world coordinates*/
-static const float SCALE = 30.f;
+static const float SCALE = 64.f;
 void CreateBox(b2World& World, int MouseX, int MouseY)
 {
 	b2BodyDef BodyDef;
@@ -13,7 +13,7 @@ void CreateBox(b2World& World, int MouseX, int MouseY)
 	b2Body* Body = World.CreateBody(&BodyDef);
 
 	b2PolygonShape Shape;
-	Shape.SetAsBox((32.f / 2) / SCALE, (32.f / 2) / SCALE);
+	Shape.SetAsBox((64.f/2) / SCALE, (64.f/2) / SCALE);
 	b2FixtureDef FixtureDef;
 	FixtureDef.density = 1.f;
 	FixtureDef.friction = 0.7f;
@@ -29,7 +29,7 @@ void createGround(b2World& World, float X, float Y)
 	b2Body* Body = World.CreateBody(&BodyDef);
 
 	b2PolygonShape Shape;
-	Shape.SetAsBox((800.f / 2) / SCALE, (16.f / 2) / SCALE);
+	Shape.SetAsBox((800.f / 2) / SCALE, (64.f / 2) / SCALE);
 	b2FixtureDef FixtureDef;
 	FixtureDef.density = 0.f;
 	FixtureDef.shape = &Shape;
@@ -47,8 +47,8 @@ int main()
 	
 	sf::Texture GroundTexture;
 	sf::Texture BoxTexture;
-	GroundTexture.loadFromFile("C:/Users/viksterikap/Desktop/Tiimi/tiimi4/build/sandboxes/sandbox3/assets/Ground.png");
-	BoxTexture.loadFromFile("C:/Users/viksterikap/Desktop/Tiimi/tiimi4/build/sandboxes/sandbox3/assets/Jill.png");
+	GroundTexture.loadFromFile("C:/Users/vikst/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ground.png");
+	BoxTexture.loadFromFile("C:/Users/vikst/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ghost.png");
 
 	while (window.isOpen())
 	{
@@ -67,6 +67,7 @@ int main()
 			int MouseX = sf::Mouse::getPosition(window).x;
 			int MouseY = sf::Mouse::getPosition(window).y;
 			CreateBox(world, MouseX, MouseY);
+			//Sleep(300);
 		}
 		world.Step(1 / 60.f, 8, 3);
 

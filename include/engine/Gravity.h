@@ -10,7 +10,7 @@ namespace engine
 	bool fixedRotation;
 	b2World* world;
 	float timeStep = 1.0f / 60.0f;
-
+	static const float SCALE = 64.f;
 
 	// Gravity system
 	class GravitySystem : public System
@@ -30,6 +30,23 @@ namespace engine
 			world->SetGravity(gravity);
 		}
 
+		void CreateBox(b2World& World, int X, int Y)
+		{
+			b2BodyDef BodyDef;
+			BodyDef.position = b2Vec2(X / SCALE, Y / SCALE);
+			BodyDef.type = b2_dynamicBody;
+			b2Body* Body = World.CreateBody(&BodyDef);
+
+		}
+
+		void createGround(b2World& World, float X, float Y)
+		{
+			b2BodyDef BodyDef;
+			BodyDef.position = b2Vec2(X / SCALE, Y / SCALE);
+			BodyDef.type = b2_staticBody;
+			b2Body* Body = World.CreateBody(&BodyDef);
+
+		}
 
 	};
 
