@@ -329,7 +329,7 @@ int main()
     std::uint8_t bitsPerSample;
   //  std::vector<char> soundData;
     ALsizei size;
-    auto data = load_wav("iamtheprotectorofthissystem.wav", channels, sampleRate, bitsPerSample, size);
+    auto data = load_wav("spring-weather-1.wav", channels, sampleRate, bitsPerSample, size);
 
     if(data.size() == 0)
     {
