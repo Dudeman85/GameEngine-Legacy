@@ -67,7 +67,7 @@ int main()
 			int MouseX = sf::Mouse::getPosition(window).x;
 			int MouseY = sf::Mouse::getPosition(window).y;
 			CreateBox(world, MouseX, MouseY);
-			Sleep(300);
+			//Sleep(300);
 		}
 		world.Step(1 / 60.f, 8, 3);
 
