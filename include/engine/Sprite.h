@@ -188,7 +188,7 @@ namespace engine
 				//Copy sector of spritesheet to new texture
 				sf::Image slice;
 				slice.create(width, height);
-				slice.copy(spritesheet, 0, 0, sf::IntRect(x, y, width, height), true);
+				slice.copy(spritesheet, 0, 0, sf::IntRect(x, y, width, height));
 
 				sf::Texture slicedTexture;
 				slicedTexture.loadFromImage(slice);
@@ -206,7 +206,7 @@ namespace engine
 	{
 		sf::Image slice;
 		slice.create(x2 - x1, y2 - y1);
-		slice.copy(spritesheet, 0, 0, sf::IntRect(x1, y1, x2, y2), true);
+		slice.copy(spritesheet, 0, 0, sf::IntRect(x1, y1, x2, y2));
 
 		sf::Texture slicedTexture = sf::Texture();
 		slicedTexture.loadFromImage(slice);
