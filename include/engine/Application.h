@@ -65,6 +65,16 @@ namespace engine
 	string levelPath = "levels/";
 	string assetPath = "assets/";
 
+	//Draws each layer of the tilemap to the render window
+	void RenderTilemap(tmx::Map* tilemap, sf::RenderWindow* window)
+	{
+		for (size_t i = 0; i < tilemap->getLayers().size(); i++)
+		{
+			MapLayer mapLayer(*tilemap, i);
+			window->draw(mapLayer);
+		}
+	}
+
 	//Tilemap Variables
 	int scale = 50;
 	int mapWidth = 20;
