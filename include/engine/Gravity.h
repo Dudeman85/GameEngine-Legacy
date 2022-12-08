@@ -30,12 +30,20 @@ namespace engine
 			world->SetGravity(gravity);
 		}
 
-		void CreateBox(b2World& World, int X, int Y)
+		void CreateActor(b2World& World, int X, int Y)
 		{
 			b2BodyDef BodyDef;
 			BodyDef.position = b2Vec2(X / SCALE, Y / SCALE);
 			BodyDef.type = b2_dynamicBody;
 			b2Body* Body = World.CreateBody(&BodyDef);
+
+			b2PolygonShape Shape;
+			Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
+			b2FixtureDef FixtureDef;
+			FixtureDef.density = 1.f;
+			FixtureDef.friction = 0.7f;
+			FixtureDef.shape = &Shape;
+			Body->CreateFixture(&FixtureDef);
 
 		}
 
@@ -46,16 +54,16 @@ namespace engine
 			BodyDef.type = b2_staticBody;
 			b2Body* Body = World.CreateBody(&BodyDef);
 
+			b2PolygonShape Shape;
+			Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
+			b2FixtureDef FixtureDef;
+			FixtureDef.density = 0.f;
+			FixtureDef.shape = &Shape;
+			Body->CreateFixture(&FixtureDef);
+
 		}
 
 	};
 
 
 }
-//Box2D
-//b2Vec2 gravity(0.0f, 0.0f);
-//float timeStep = 1.0f / 60.0f;
-//int32 velocityIterations = 6;
-//int32 positionIterations = 2;
-//
-//

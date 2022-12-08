@@ -29,7 +29,7 @@ void createGround(b2World& World, float X, float Y)
 	b2Body* Body = World.CreateBody(&BodyDef);
 
 	b2PolygonShape Shape;
-	Shape.SetAsBox((800.f / 2) / SCALE, (64.f / 2) / SCALE);
+	Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
 	b2FixtureDef FixtureDef;
 	FixtureDef.density = 0.f;
 	FixtureDef.shape = &Shape;
@@ -41,7 +41,7 @@ int main()
 	//gravity settings
 	b2Vec2 gravity(0.0f, 6.0f);
 	b2World world(gravity);
-	createGround(world, 400.f, 500.f);
+	createGround(world, 16.f, 500.f);
 	sf::RenderWindow window(sf::VideoMode(800, 600), "test");
 	
 	
@@ -67,7 +67,7 @@ int main()
 			int MouseX = sf::Mouse::getPosition(window).x;
 			int MouseY = sf::Mouse::getPosition(window).y;
 			CreateBox(world, MouseX, MouseY);
-			//Sleep(300);
+			Sleep(300);
 		}
 		world.Step(1 / 60.f, 8, 3);
 
@@ -88,7 +88,7 @@ int main()
 			{
 				sf::Sprite GroundSprite;
 				GroundSprite.setTexture(GroundTexture);
-				GroundSprite.setOrigin(400.f, 8.f);
+				GroundSprite.setOrigin(16.f, 16.f);
 				GroundSprite.setPosition(BodyIterator->GetPosition().x * SCALE, BodyIterator->GetPosition().y * SCALE);
 				GroundSprite.setRotation(180 / b2_pi * BodyIterator->GetAngle());
 				window.draw(GroundSprite);
