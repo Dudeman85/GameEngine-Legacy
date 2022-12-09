@@ -1,27 +1,26 @@
-# Week 46
+# Week 47
 
 
 Aleksi
 
-- Added ECS objects
-- Transferred animator to ECS
-- created class diagram
-- Away on Friday(work)
+- Teached ECS to team
+- Updated Animator documentation
+
 
 
 Lasse
 
-- Included openAL
-- getting to know ecs
+- Followed ECS tutoring
+- Sick on Friday
 
 
 Aaro
 
-- getting to know ecs
+- Tested sprite/transform
+- Getting familiar with Tiled
 
 
 Viksteri
 
-- improved documentation
-- Created class diagram
-- Away on Friday(sick)
+- Added render to ECS
+- started to implement gravity

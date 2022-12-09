@@ -1,27 +1,24 @@
-# Week 46
+# Week 48
 
 
 Aleksi
 
-- Added ECS objects
-- Transferred animator to ECS
-- created class diagram
+- fixed asserts in ECS
 - Away on Friday(work)
 
 
 Lasse
 
-- Included openAL
-- getting to know ecs
+- Added sounds
 
 
 Aaro
 
-- getting to know ecs
+- Added Tiled to project
 
 
 Viksteri
 
-- improved documentation
-- Created class diagram
+- continued to implement gravity
+- Created graphical physics testing
 - Away on Friday(sick)
