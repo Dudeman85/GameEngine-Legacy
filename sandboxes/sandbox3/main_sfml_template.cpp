@@ -1,4 +1,4 @@
-#include "engine/Application.h"
+//#include "engine/Application.h"
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 
@@ -29,7 +29,7 @@ void createGround(b2World& World, float X, float Y)
 	b2Body* Body = World.CreateBody(&BodyDef);
 
 	b2PolygonShape Shape;
-	Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
+	Shape.SetAsBox((500.f / 2) / SCALE, (64.f / 2) / SCALE);
 	b2FixtureDef FixtureDef;
 	FixtureDef.density = 0.f;
 	FixtureDef.shape = &Shape;
@@ -47,8 +47,8 @@ int main()
 	
 	sf::Texture GroundTexture;
 	sf::Texture BoxTexture;
-	GroundTexture.loadFromFile("C:/Users/vikst/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ground.png");
-	BoxTexture.loadFromFile("C:/Users/vikst/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ghost.png");
+	GroundTexture.loadFromFile("C:/Users/viksterikap/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ground.png");
+	BoxTexture.loadFromFile("C:/Users/viksterikap/Desktop/projekti/tiimi4/sandboxes/sandbox3/assets/Ghost.png");
 
 	while (window.isOpen())
 	{
@@ -67,7 +67,7 @@ int main()
 			int MouseX = sf::Mouse::getPosition(window).x;
 			int MouseY = sf::Mouse::getPosition(window).y;
 			CreateBox(world, MouseX, MouseY);
-			//Sleep(300);
+			
 		}
 		world.Step(1 / 60.f, 8, 3);
 
