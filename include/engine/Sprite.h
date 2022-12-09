@@ -44,7 +44,7 @@ namespace engine
 	class RenderSystem :public System
 	{
 	public:
-		void Render(sf::RenderWindow& window)
+		void Update(sf::RenderWindow& window)
 		{
 			//Goes through list of entities, sets textures to sprites and draws them to window
 			for (auto const& entity : entities)

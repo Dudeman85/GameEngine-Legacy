@@ -4,6 +4,7 @@ option(ENGINE_BUILD_SANDBOXES "Build developer sandboxes" ON )
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
+set(ALSOFT_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory("ext/OpenAL")
 # SFML: https://www.sfml-dev.org/
 # SFML Dokumentaatio: https://www.sfml-dev.org/documentation/2.5.1/

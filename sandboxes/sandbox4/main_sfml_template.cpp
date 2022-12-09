@@ -49,7 +49,7 @@ int main()
 		engine::RenderTilemap(&map, &window);
 
 		//Run the renderSystem's Render method each frame
-		lib.renderSystem->Render(window);
+		lib.renderSystem->Update(window);
 
 
 		//SFML display window

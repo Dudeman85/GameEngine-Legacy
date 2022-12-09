@@ -56,7 +56,7 @@ int main()
         window.clear(sf::Color::Cyan);
 
         // Rendering
-        engine.renderSystem->Render(window);
+        engine.renderSystem->Update(window);
         // layer drawing
         window.draw(layerZero);
         window.draw(layerOne);
