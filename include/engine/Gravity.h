@@ -6,14 +6,15 @@ extern ECS ecs;
 
 namespace engine
 {
-	b2Vec2 gravity(0.0f, 0.0f);
-	bool fixedRotation;
-	b2World* world;
-	float timeStep = 1.0f / 60.0f;
-	static const float SCALE = 64.f;
+	
+
+	struct Rigidbody
+	{
+		unique_ptr<b2Body> Body;
+	};
 
 	// Gravity system
-	class GravitySystem : public System
+	class PhysicsSystem : public System
 	{
 	public:
 		void Update()
@@ -30,12 +31,12 @@ namespace engine
 			world->SetGravity(gravity);
 		}
 
-		void CreateActor(b2World& World, int X, int Y)
+		void CreateActor(b2World& world, int x, int y)
 		{
 			b2BodyDef BodyDef;
-			BodyDef.position = b2Vec2(X / SCALE, Y / SCALE);
+			BodyDef.position = b2Vec2(x / SCALE, y / SCALE);
 			BodyDef.type = b2_dynamicBody;
-			b2Body* Body = World.CreateBody(&BodyDef);
+			b2Body* Body = world.CreateBody(&BodyDef);
 
 			b2PolygonShape Shape;
 			Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
@@ -45,14 +46,21 @@ namespace engine
 			FixtureDef.shape = &Shape;
 			Body->CreateFixture(&FixtureDef);
 
+
 		}
 
-		void createGround(b2World& World, float X, float Y)
+		void DefineBody(Entity entity, float width, float height, float density, float friction , bool isStatic=false)
+		{
+
+		}
+
+
+		void createGround(b2World& world, float x, float y)
 		{
 			b2BodyDef BodyDef;
-			BodyDef.position = b2Vec2(X / SCALE, Y / SCALE);
+			BodyDef.position = b2Vec2(x / SCALE, y / SCALE);
 			BodyDef.type = b2_staticBody;
-			b2Body* Body = World.CreateBody(&BodyDef);
+			b2Body* Body = world.CreateBody(&BodyDef);
 
 			b2PolygonShape Shape;
 			Shape.SetAsBox((64.f / 2) / SCALE, (64.f / 2) / SCALE);
@@ -62,6 +70,12 @@ namespace engine
 			Body->CreateFixture(&FixtureDef);
 
 		}
+	private:
+		b2Vec2 gravity;
+		bool fixedRotation;
+		b2World* world;
+		float timeStep = 1.0f / 60.0f;
+		const float SCALE = 64.f;
 
 	};
 

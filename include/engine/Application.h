@@ -10,6 +10,8 @@
 // tmxlite includes
 #include <tmxlite/Map.hpp>
 #include <engine/SFMLOrthogonalLayer.h>
+// ObjectGroup include for Box2d collision
+#include <tmxlite/ObjectGroup.hpp>
 
 //ECS modules
 #include "ECSCore.h"
@@ -29,6 +31,7 @@ namespace engine
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
+		shared_ptr<PhysicsSystem> physicsSystem;
 
 		EngineLib()
 		{
@@ -36,6 +39,7 @@ namespace engine
 			ecs.registerComponent<Sprite>();
 			ecs.registerComponent<Transform>();
 			ecs.registerComponent<Animator>();
+			ecs.registerComponent<Rigidbody>();
 
 			//Register all default engine systems here
 
@@ -58,6 +62,13 @@ namespace engine
 			Signature transformSystemSignature;
 			transformSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
+			
+			//Physics System
+			physicsSystem = ecs.registerSystem<PhysicsSystem>();
+			Signature physicsSystemSignature;
+			physicsSystemSignature.set(ecs.getComponentId<Rigidbody>());
+			physicsSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
 		}
 	};
 
