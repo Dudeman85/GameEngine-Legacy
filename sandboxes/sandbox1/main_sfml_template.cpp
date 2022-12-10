@@ -6,6 +6,11 @@
 #include <bit>
 #include <cstring>
 #include <vector>
+#include <string>
+#include "Application.h"
+
+using namespace std;
+
 
 bool check_al_errors(/*const std::string& filename, const std::uint_fast32_t line*/)
 {
@@ -390,5 +395,8 @@ int main()
     alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
     
     return 0;
+
+
+
 
 }

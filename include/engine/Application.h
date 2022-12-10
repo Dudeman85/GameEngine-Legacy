@@ -187,4 +187,29 @@ namespace engine
 		//If not in bounds return true
 		return true;
 	}
+
+	//integrating sound:
+
+	class soundAmbient {        // The class
+	public:              // Access specifier
+		
+		void playSound(string name);   // Method/function declaration
+		
+	};
+
+	// Method/function definition outside the class
+	void soundAmbient::playSound(string name) {
+			
+			cout << "Sound effect plays";
+
+			}
+
+	int main() {
+		soundAmbient myObj;     // Create an object of soundAmbient
+		myObj.playSound("spring-weather-1.wav");  // Call the method
+
+		 
+		return 0;
+	}
+	
 }
