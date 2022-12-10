@@ -6,8 +6,7 @@ extern ECS ecs;
 
 namespace engine
 {
-
-
+	//Rigisbody component
 	struct Rigidbody
 	{
 		b2Body* body;
@@ -17,11 +16,6 @@ namespace engine
 	class PhysicsSystem : public System
 	{
 	public:
-
-		PhysicsSystem()
-		{
-			world = new b2World(gravity);
-		}
 
 		void Update()
 		{
@@ -37,13 +31,13 @@ namespace engine
 			}
 		}
 
+		//Initializes the Box2D world with desired gravity. MUST BE RUN BEFORE USING PHYSICS SYSTEM!
 		void Init(float x, float y)
 		{
-			b2Vec2 gravity;
-			gravity.Set(x, y);
+			b2Vec2 gravity(x, y);
+			world = new b2World(gravity);
 			world->SetGravity(gravity);
 		}
-
 
 		//Creates new box2d rigidbody and gives size, density and friction to entity and defines whether or not it is static
 		void DefineBody(Entity entity, float width, float height, float density = 1.f, float friction = 0.7f, bool isStatic = false)
@@ -66,23 +60,15 @@ namespace engine
 			fixtureDef.friction = friction;
 			fixtureDef.shape = &shape;
 
-			//sets entitys rigidbody
+			//sets entity's rigidbody
 			rigidbody.body = world->CreateBody(&bodyDef);
 			rigidbody.body->CreateFixture(&fixtureDef);
 		}
 
 	private:
-		b2Vec2 gravity;
-		bool fixedRotation;
+		b2Vec2 gravity = b2Vec2(0, 0);
 		b2World* world;
 		float timeStep = 1.0f / 60.0f;
 		const float SCALE = 64.f;
-
-		//PhysicsSystem();
-		PhysicsSystem(const PhysicsSystem&);
-		PhysicsSystem& operator=(const PhysicsSystem&);
-
 	};
-
-
 }
