@@ -37,7 +37,7 @@ vector<sf::Texture> textures = SliceSpritesheet(spritesheet, 16, 16);
 
 ## Sprite
 
-The sprite component contains a drawable sprite.
+The sprite component contains a drawable sprite. It's origin is center.
 It can be changed as such,
 ```cpp
 //Set the entity's texture

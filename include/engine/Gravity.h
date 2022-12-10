@@ -12,7 +12,7 @@ namespace engine
 		b2Body* body;
 	};
 
-	// Gravity system
+	//Physics system
 	class PhysicsSystem : public System
 	{
 	public:
@@ -34,20 +34,20 @@ namespace engine
 		//Initializes the Box2D world with desired gravity. MUST BE RUN BEFORE USING PHYSICS SYSTEM!
 		void Init(float x, float y)
 		{
-			b2Vec2 gravity(x, y);
+			gravity.Set(x, y);
 			world = new b2World(gravity);
 			world->SetGravity(gravity);
 		}
 
 		//Creates new box2d rigidbody and gives size, density and friction to entity and defines whether or not it is static
-		void DefineBody(Entity entity, float width, float height, float density = 1.f, float friction = 0.7f, bool isStatic = false)
+		void DefineBody(Entity entity, float width, float height, bool isStatic = false, float density = 1.f, float friction = 0.7f)
 		{
 			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
 
 			//defines a new body, it's position and whether or not it is static.
 			b2BodyDef bodyDef;
-			bodyDef.position = b2Vec2(transform.x / SCALE, transform.y / SCALE);
+			bodyDef.position = b2Vec2(transform.x, transform.y);
 			bodyDef.type = isStatic ? b2_staticBody : b2_dynamicBody;
 
 			//defines the size of created body
@@ -69,6 +69,6 @@ namespace engine
 		b2Vec2 gravity = b2Vec2(0, 0);
 		b2World* world;
 		float timeStep = 1.0f / 60.0f;
-		const float SCALE = 64.f;
+		const float SCALE = 1; //magic number
 	};
 }

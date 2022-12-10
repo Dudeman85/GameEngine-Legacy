@@ -55,7 +55,7 @@ namespace engine
 
 				//Set the sprite's texture, position, and scale
 				sprite.sprite.setTexture(sprite.texture);
-				sprite.sprite.setPosition(sf::Vector2(transform.x, transform.y));
+				sprite.sprite.setPosition(sf::Vector2f(transform.x - sprite.texture.getSize().x * transform.xScale / 2, transform.y - sprite.texture.getSize().y * transform.yScale / 2));
 				sprite.sprite.setScale(sf::Vector2(transform.xScale, transform.yScale));
 					
 				//Draw the sprite to provided window

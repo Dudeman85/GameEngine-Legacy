@@ -3,29 +3,32 @@
 //Create instances of the ECS controller and the standard engine library
 ECS ecs;
 
+using namespace engine;
+
 int main()
 {
-	engine::EngineLib lib;
-	//Create a new entity and add the Transform, Sprite, and Animator components
+	EngineLib lib;
+
+	//Create player
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, engine::Transform{ .x = 100, .y = 100, .xScale = 10, .yScale = 10 });
-	ecs.addComponent(player, engine::Sprite());
-	ecs.addComponent(player, engine::Animator());
+	ecs.addComponent(player, Transform{ .x = 100, .y = 100, .xScale = 10, .yScale = 10 });
+	ecs.addComponent(player, Sprite());
+	ecs.addComponent(player, Animator());
 
 	//Load the spritesheet
-	sf::Image spritesheet = engine::LoadImage("Knight Sprites.png");
-	sf::Texture defaultTexture = engine::CustomSlice(spritesheet, 0, 0, 16, 16);
+	sf::Image spritesheet = LoadImage("Knight Sprites.png");
+	sf::Texture defaultTexture = CustomSlice(spritesheet, 0, 0, 16, 16);
 
-	vector<sf::Texture> textures = engine::SliceSpritesheet(spritesheet, 16, 16);
+	vector<sf::Texture> textures = SliceSpritesheet(spritesheet, 16, 16);
 
 	//Set the players default texture
-	ecs.getComponent<engine::Sprite>(player).texture = defaultTexture;
+	ecs.getComponent<Sprite>(player).texture = defaultTexture;
 
 	//Add animations to player automatically sliced from the spritesheet
-	lib.animationSystem->AddAnimations(player, engine::AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
+	lib.animationSystem->AddAnimations(player, AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
 
 	//Play the "Down" animation of player on repeat
-	lib.animationSystem->PlayAnimation(player, "Down", true);
+	//lib.animationSystem->PlayAnimation(player, "Down", true);
 
 	tmx::Map map;
 	map.load("assets/untitled.tmx");
@@ -46,7 +49,7 @@ int main()
 		//Run the animationSystem's Update method each frame
 		lib.animationSystem->Update();
 
-		engine::RenderTilemap(&map, &window);
+		RenderTilemap(&map, &window);
 
 		//Run the renderSystem's Render method each frame
 		lib.renderSystem->Update(window);
