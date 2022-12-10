@@ -13,7 +13,7 @@ int main()
 	sf::Texture defaultTexture = engine::LoadTexture("Ghost.png");
 	ecs.getComponent<engine::Sprite>(player).texture = defaultTexture;
 
-	lib.physicsSystem->Init(0.f, 0.5f);
+	lib.physicsSystem->Init(0.1f, 0.5f);
 	lib.physicsSystem->DefineBody(player, 64.f, 64.f);
 
 	while (window.isOpen())
