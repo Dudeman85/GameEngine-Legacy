@@ -65,10 +65,38 @@ namespace engine
 			rigidbody.body->CreateFixture(&fixtureDef);
 		}
 
+		/*
+		void Velocity(Entity entity, float vx, float vy)
+		{
+
+			char moveState;
+			//Enumeration for movements
+			enum _moveState {
+				MS_STOP,
+				MS_LEFT,
+				MS_RIGHT,
+				MS_JUMP,
+			};
+			//sets movement speed. Instant movement, no gradual acceleration
+			switch (moveState)
+			{
+			case MS_LEFT:  velocity.x = -vx; break;
+			case MS_STOP:  velocity.x = 0; break;
+			case MS_RIGHT: velocity.x = vx; break;
+			//apply immediate force upwards
+			case MS_JUMP: body->ApplyLinearImpulse(b2Vec2(0, vy)); break;
+			}
+			body->SetLinearVelocity(velocity);
+
+
+		}
+		*/
+
 	private:
 		b2Vec2 gravity = b2Vec2(0, 0);
 		b2World* world;
 		float timeStep = 1.0f / 60.0f;
 		const float SCALE = 1; //magic number
+		//b2Vec2 velocity = body->GetLinearVelocity();
 	};
 }
