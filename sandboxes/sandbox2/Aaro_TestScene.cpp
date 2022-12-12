@@ -86,6 +86,13 @@ int main()
                     colliders.push_back(sf::FloatRect(rect.left, rect.height, rect.top, rect.width));
                 }
             }
+
+            const auto& tilesets = map.getTilesets();
+
+            for (const auto& tileset : tilesets)
+            {
+                //read out tile set properties, load textures etc...
+            }
         }
     } 
 

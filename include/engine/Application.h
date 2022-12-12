@@ -10,8 +10,10 @@
 // tmxlite includes
 #include <tmxlite/Map.hpp>
 #include <engine/SFMLOrthogonalLayer.h>
-// ObjectGroup include for Box2d collision
+// ObjectGroup and TileLayer include for
+//rendering and Box2d collision
 #include <tmxlite/ObjectGroup.hpp>
+#include <tmxlite/TileLayer.hpp>
 
 //ECS modules
 #include "ECSCore.h"
