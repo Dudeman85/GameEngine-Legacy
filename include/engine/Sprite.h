@@ -172,6 +172,8 @@ namespace engine
 	//Returns a vector of textures ordered left to right top to bottom 
 	vector<sf::Texture> SliceSpritesheet(sf::Image spritesheet, int width, int height)
 	{
+		assert(spritesheet.getSize().x > 0 && "Spritesheet not proper image!");
+
 		//Throw warning if spritesheet is not properly dimensioned
 		if (spritesheet.getSize().x % width != 0)
 			cout << "Warning: Spritesheet width is not a multiple of sprite width. Clipping may occur!\n";
@@ -204,6 +206,8 @@ namespace engine
 	//Return sliced texture
 	sf::Texture CustomSlice(sf::Image spritesheet, int x1, int y1, int x2, int y2)
 	{
+		assert(spritesheet.getSize().x > 0 && "Spritesheet not proper image!");
+
 		sf::Image slice;
 		slice.create(x2 - x1, y2 - y1);
 		slice.copy(spritesheet, 0, 0, sf::IntRect(x1, y1, x2, y2));
