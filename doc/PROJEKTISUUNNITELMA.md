@@ -9,11 +9,11 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 
 [Aleksi Anderson](https://repo.kamit.fi/aleksiand) [<img src="Email.png" width="30" height="30">](mailto:aleksianderson@kamk.fi)  **Sprite sheets, animations, architecture**
 
-[Lasse Autio](https://repo.kamit.fi/lasseaut) [<img src="Email.png" width="30" height="30">](mailto:lasseautio@kamk.fi)  **Audio, Test platform**
+[Lasse Autio](https://repo.kamit.fi/lasseaut) [<img src="Email.png" width="30" height="30">](mailto:lasseautio@kamk.fi)  **Audio**
 
 [Viksteri Käppi](https://repo.kamit.fi/viksterikap) [<img src="Email.png" width="30" height="30">](mailto:viksterikappi@kamk.fi) **Lead, Physics** 
 
-[Aaro Leskinen](https://repo.kamit.fi/aaroles) [<img src="Email.png" width="30" height="30">](mailto:aaroleskinen@kamk.fi) **Physics, Test platform** 
+[Aaro Leskinen](https://repo.kamit.fi/aaroles) [<img src="Email.png" width="30" height="30">](mailto:aaroleskinen@kamk.fi) **Tiled** 
 
 # Ohjelmat
 
@@ -35,6 +35,7 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 - [ ] Physics (Box2d) 
     - [ ] Gravity 
     - [ ] Collision
+    - [ ] Velocity
 
 - [ ] Audio 
     - [ ] general sounds
@@ -45,7 +46,7 @@ Aika ajoin pidämme esitelmän teamin kesken siitä, mitä olemme saaneet tehdyk
 
 - [ ] One or more examples 
     - [ ] Demo 1 (Side-scroller)
-    - [ ] Demo 2 (Top-down)
+
 
 - [ ] Getting started tutorial 
 
