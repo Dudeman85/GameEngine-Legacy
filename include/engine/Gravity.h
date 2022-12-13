@@ -10,6 +10,7 @@ namespace engine
 	struct Rigidbody
 	{
 		b2Body* body;
+		
 	};
 
 	//Physics system
@@ -65,38 +66,32 @@ namespace engine
 			rigidbody.body->CreateFixture(&fixtureDef);
 		}
 
-		/*
-		void Velocity(Entity entity, float vx, float vy)
+		
+		void Velocity(Entity entity, float vx, float vy, int moveState)
 		{
-
-			char moveState;
-			//Enumeration for movements
-			enum _moveState {
-				MS_STOP,
-				MS_LEFT,
-				MS_RIGHT,
-				MS_JUMP,
-			};
+			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
+			b2Vec2 velocity = rigidbody.body->GetLinearVelocity();
+			
 			//sets movement speed. Instant movement, no gradual acceleration
 			switch (moveState)
 			{
-			case MS_LEFT:  velocity.x = -vx; break;
-			case MS_STOP:  velocity.x = 0; break;
-			case MS_RIGHT: velocity.x = vx; break;
+			case 1:  velocity.x = -vx; break; //Left
+			case 2:  velocity.x = 0; break; //stop
+			case 3: velocity.x = vx; break; //right
 			//apply immediate force upwards
-			case MS_JUMP: body->ApplyLinearImpulse(b2Vec2(0, vy)); break;
+			case 4: rigidbody.body->ApplyLinearImpulseToCenter(b2Vec2(0, vy), true); break; //Jump
 			}
-			body->SetLinearVelocity(velocity);
+			rigidbody.body->SetLinearVelocity(velocity);
 
 
 		}
-		*/
+		
 
 	private:
 		b2Vec2 gravity = b2Vec2(0, 0);
 		b2World* world;
 		float timeStep = 1.0f / 60.0f;
 		const float SCALE = 1; //magic number
-		//b2Vec2 velocity = body->GetLinearVelocity();
+		
 	};
 }
