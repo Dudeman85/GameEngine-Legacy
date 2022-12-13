@@ -1,5 +1,5 @@
 #include "engine/Application.h"
-
+#include "PlayerController.h"
 //Create instances of the ECS controller and the standard engine library
 ECS ecs;
 
@@ -8,7 +8,14 @@ using namespace engine;
 int main()
 {
 	EngineLib lib;
-
+	ecs.registerComponent<Player>();
+	shared_ptr <PlayerControl>playerControlSystem = ecs.registerSystem<PlayerControl>();
+	Signature playerControlSystemSignature;
+	playerControlSystemSignature.set(ecs.getComponentId<Transform>());
+	playerControlSystemSignature.set(ecs.getComponentId<Rigidbody>());
+	playerControlSystemSignature.set(ecs.getComponentId<Player>());
+	ecs.setSystemSignature<PlayerControl>(playerControlSystemSignature);
+	playerControlSystem->lib = &lib;
 	lib.physicsSystem->Init(0.f, 9.81f);
 
 	//Create player
@@ -17,6 +24,7 @@ int main()
 	ecs.addComponent(player, Sprite());
 	ecs.addComponent(player, Animator());
 	ecs.addComponent(player, Rigidbody());
+	ecs.addComponent(player, Player());
 
 	//Load the player's spritesheet
 	sf::Image spritesheet = LoadImage("Knight Sprites.png");
@@ -74,6 +82,7 @@ int main()
 		lib.renderSystem->Update(window);
 		lib.animationSystem->Update();
 		lib.physicsSystem->Update();
+		playerControlSystem->Update();
 
 		//SFML display window
 		window.display();
