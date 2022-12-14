@@ -75,19 +75,19 @@ int main()
 
 	// Creating left wall
 	Entity wallLeft = ecs.newEntity();
-	ecs.addComponent(wallLeft, Transform{.x = 0, .y = 800 });
+	ecs.addComponent(wallLeft, Transform{.x = 10, .y = 160 });
 	ecs.addComponent(wallLeft, Rigidbody());
 
 	// Defining wallLeft's physics body
-	lib.physicsSystem->DefineBody(wallLeft, 16, 1600, true);
+	lib.physicsSystem->DefineBody(wallLeft, 16, 320, true);
 
 	// Creating floor
 	Entity floor = ecs.newEntity();
-	ecs.addComponent(floor, Transform{ .x = 120, .y = 300});
+	ecs.addComponent(floor, Transform{ .x = 400, .y = 314});
 	ecs.addComponent(floor, Rigidbody());
 
 	// Defining floor's physics body
-	lib.physicsSystem->DefineBody(floor, 240, 16, true);
+	lib.physicsSystem->DefineBody(floor, 800, 16, true);
 
 	// Creating platform1
 	Entity platform1 = ecs.newEntity();
