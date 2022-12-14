@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <chrono>
 #include <AL/al.h>
@@ -16,7 +17,7 @@ bool check_al_errors(/*const std::string& filename, const std::uint_fast32_t lin
     ALenum error = alGetError();
     if (error != AL_NO_ERROR)
     {
-       // std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n";
+        // std::cerr << "***ERROR*** (" << filename << ": " << line << ")\n";
         switch (error)
         {
         case AL_INVALID_NAME:
@@ -297,14 +298,14 @@ std::vector<char> load_wav(const std::string& filename,
         return soundData;
     }
 
-    
+
     soundData.resize(size);
     in.read(&soundData[0], size);
 
     return soundData;
 }
 
-int main()
+int playSoundfile(std::string sound)
 {
     ALCdevice* openALDevice = alcOpenDevice(nullptr);
     if (!openALDevice)
@@ -327,21 +328,21 @@ int main()
         std::cerr << "ERROR: Could not make audio context current" << std::endl;
         return 0;
     }*/
-    
+
     std::uint8_t channels;
     std::int32_t sampleRate;
     std::uint8_t bitsPerSample;
-  //  std::vector<char> soundData;
+    //  std::vector<char> soundData;
     ALsizei size;
-    std::vector<char> data = load_wav("spring-weather-1.wav", channels, sampleRate, bitsPerSample, size);
+    std::vector<char> data = load_wav(sound, channels, sampleRate, bitsPerSample, size);
 
-    if(data.size() == 0)
+    if (data.size() == 0)
     {
         std::cerr << "ERROR: Could not load wav" << std::endl;
         return 0;
     }
 
-  
+
     ALuint buffer;
     alGenBuffers(1, &buffer);
 
@@ -362,37 +363,39 @@ int main()
             << bitsPerSample << " bps" << std::endl;
         return 0;
     }
-    
+
     alBufferData(buffer, format, data.data(), data.size(), sampleRate);
     data.clear(); // erase the sound in RAM
 
     ALuint source;
-    alGenSources( 1, &source);
-    alSourcef( source, AL_PITCH, 1);
-    alSourcef( source, AL_GAIN, 1.0f);
-    alSource3f( source, AL_POSITION, 0, 0, 0);
-    alSource3f( source, AL_VELOCITY, 0, 0, 0);
+    alGenSources(1, &source);
+    alSourcef(source, AL_PITCH, 1);
+    alSourcef(source, AL_GAIN, 1.0f);
+    alSource3f(source, AL_POSITION, 0, 0, 0);
+    alSource3f(source, AL_VELOCITY, 0, 0, 0);
     alSourcei(source, AL_LOOPING, AL_FALSE);
-    alSourcei( source, AL_BUFFER, buffer);
+    alSourcei(source, AL_BUFFER, buffer);
 
-    alSourcePlay( source);
-
+    alSourcePlay(source);
+    
     ALint state = AL_PLAYING;
 
-    while (state == AL_PLAYING)
+    if (state == AL_PLAYING)
+        return 0;
+    /*
     {
         alGetSourcei(source, AL_SOURCE_STATE, &state);
     }
-
-    alDeleteSources( 1, &source);
-    alDeleteBuffers( 1, &buffer);
+    */
+    alDeleteSources(1, &source);
+    alDeleteBuffers(1, &buffer);
 
     alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, nullptr);
     alcCall(alcDestroyContext, openALDevice, openALContext);
 
     ALCboolean closed;
     alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
-    
+
     return 0;
 
 

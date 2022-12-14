@@ -79,7 +79,7 @@ namespace engine
 			case 2:  velocity.x = 0; break; //stop
 			case 3: velocity.x = vx; break; //right
 			//apply immediate force upwards
-			case 4: rigidbody.body->ApplyLinearImpulseToCenter(b2Vec2(0, vy), true); break; //Jump
+			case 4: velocity.y = -vy; break; //Jump
 			}
 			rigidbody.body->SetLinearVelocity(velocity);
 
