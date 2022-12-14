@@ -305,7 +305,7 @@ std::vector<char> load_wav(const std::string& filename,
     return soundData;
 }
 
-int playSoundfile(std::string sound); int playSoundfile2(std::string sound2)
+int playSoundfile(std::string sound)
 
 {
     ALCdevice* openALDevice = alcOpenDevice(nullptr);
