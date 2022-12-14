@@ -69,7 +69,7 @@ int main()
 	ecs.getComponent<Sprite>(ground).texture = woodTexture;
 
 	//Define ground's physics body
-	lib.physicsSystem->DefineBody(ground, 640, 16, false);
+	lib.physicsSystem->DefineBody(ground, 640, 16, true);
 
 
 	//Play the "Down" animation of player on repeat
