@@ -1,6 +1,6 @@
 #include "engine/Application.h"
 #include "Camera.cpp"
-
+#include "Sound.h"
 #include "PlayerController.h"
 //Create instances of the ECS controller and the standard engine library
 ECS ecs;
@@ -80,6 +80,8 @@ int main()
 
 	//SFML window
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "test");
+
+	 playSoundfile("spring-weather-1.wav");
 
 	//Main game loop
 	while (window.isOpen())
