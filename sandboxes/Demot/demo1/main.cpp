@@ -82,6 +82,8 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "test");
 
 	 playSoundfile("spring-weather-1.wav");
+	 playSoundfile2("jump.wav");
+	 
 
 	//Main game loop
 	while (window.isOpen())

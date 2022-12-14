@@ -305,7 +305,8 @@ std::vector<char> load_wav(const std::string& filename,
     return soundData;
 }
 
-int playSoundfile(std::string sound)
+int playSoundfile(std::string sound); int playSoundfile2(std::string sound2)
+
 {
     ALCdevice* openALDevice = alcOpenDevice(nullptr);
     if (!openALDevice)
@@ -373,7 +374,7 @@ int playSoundfile(std::string sound)
     alSourcef(source, AL_GAIN, 1.0f);
     alSource3f(source, AL_POSITION, 0, 0, 0);
     alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    alSourcei(source, AL_LOOPING, AL_FALSE);
+    alSourcei(source, AL_LOOPING, AL_TRUE);
     alSourcei(source, AL_BUFFER, buffer);
 
     alSourcePlay(source);
@@ -398,7 +399,7 @@ int playSoundfile(std::string sound)
 
     return 0;
 
+ 
 
-
-
+   
 }
