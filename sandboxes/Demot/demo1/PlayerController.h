@@ -6,8 +6,8 @@ using namespace engine;
 //player component
 struct Player 
 {
-	float moveSpeed = 5.f;
-	float jumpSpeed = 20.f;
+	float moveSpeed = 15.f;
+	float jumpSpeed = 30.f;
 	int moveState;
 	
 
