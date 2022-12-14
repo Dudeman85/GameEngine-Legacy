@@ -46,8 +46,15 @@ namespace engine
 	public:
 		void Update(sf::RenderWindow& window)
 		{
+			//Sort in order of z-axis to draw in proper order
+			vector<Entity> sortedEntities(entities.begin(), entities.end());
+			std::sort(sortedEntities.begin(), sortedEntities.end(), [](const Entity lhs, const Entity rhs)
+				{
+					return ecs.getComponent<Transform>(lhs).z > ecs.getComponent<Transform>(rhs).z;
+				});
+
 			//Goes through list of entities, sets textures to sprites and draws them to window
-			for (auto const& entity : entities)
+			for (auto const& entity : sortedEntities)
 			{
 				//Get relevant components
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
@@ -62,7 +69,6 @@ namespace engine
 				window.draw(sprite.sprite);
 			}
 		}
-
 	};
 
 	//Animator system
