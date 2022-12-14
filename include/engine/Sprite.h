@@ -57,7 +57,7 @@ namespace engine
 				sprite.sprite.setTexture(sprite.texture);
 				sprite.sprite.setPosition(sf::Vector2f(transform.x - sprite.texture.getSize().x * transform.xScale / 2, transform.y - sprite.texture.getSize().y * transform.yScale / 2));
 				sprite.sprite.setScale(sf::Vector2(transform.xScale, transform.yScale));
-					
+
 				//Draw the sprite to provided window
 				window.draw(sprite.sprite);
 			}
@@ -82,7 +82,7 @@ namespace engine
 				if (animator.playingAnimation)
 				{
 					//If enough time (defined by animation) has passed
-					if (animator.animationTimer.getElapsedTime().asMilliseconds() >= animator.animations[animator.currentAnimation].delays[animator.animationFrame])
+					if (animator.animationTimer.getElapsedTime().asMilliseconds() >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
 					{
 						AdvanceFrame(entity);
 					}
@@ -97,12 +97,6 @@ namespace engine
 			Animator& animator = ecs.getComponent<Animator>(entity);
 			Sprite& sprite = ecs.getComponent<Sprite>(entity);
 
-			//Change GameObject texture
-			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
-
-			animator.animationTimer.restart();
-			animator.animationFrame++;
-
 			//If end of animation has been reached go to start or end animation
 			if (animator.animationFrame >= animator.animations[animator.currentAnimation].length)
 			{
@@ -112,7 +106,14 @@ namespace engine
 					animator.playingAnimation = false;
 					animator.currentAnimation = "";
 				}
+				return;
 			}
+
+			//Change GameObject texture
+			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
+
+			animator.animationTimer.restart();
+			animator.animationFrame++;
 		}
 
 		//Add animations to entity, they will be accessible by given names
@@ -150,6 +151,8 @@ namespace engine
 			animator.repeatAnimation = repeat;
 			animator.playingAnimation = true;
 			animator.animationTimer.restart();
+
+			AdvanceFrame(entity);
 		}
 
 		//Stop an animation, optionally provide the specific animation to stop
@@ -261,7 +264,7 @@ namespace engine
 	}
 
 	//Create one animation from frames and delays in ms
-	Animation CreateAnimation(vector<sf::Texture> frames, vector<int> delays) 
+	Animation CreateAnimation(vector<sf::Texture> frames, vector<int> delays)
 	{
 		if (frames.size() != delays.size())
 			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
