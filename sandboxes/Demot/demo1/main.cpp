@@ -16,6 +16,7 @@ int main()
 	playerControlSystemSignature.set(ecs.getComponentId<Transform>());
 	playerControlSystemSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControlSystemSignature.set(ecs.getComponentId<Player>());
+	playerControlSystemSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerControl>(playerControlSystemSignature);
 	playerControlSystem->lib = &lib;
 	shared_ptr<CameraSystem> cameraSystem;
@@ -47,7 +48,7 @@ int main()
 	ecs.getComponent<Sprite>(player).texture = playerTexture;
 
 	//Add animations to player automatically sliced from the spritesheet
-	lib.animationSystem->AddAnimations(player, AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
+	lib.animationSystem->AddAnimations(player, AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 125)), vector<string>{"Down", "Left", "Up", "Right"});
 
 	//Define player's physics body
 	lib.physicsSystem->DefineBody(player, 16.f, 16.f);
@@ -58,7 +59,7 @@ int main()
 	ecs.addComponent(camera, Transform{.x = 100, .y = 100});
 	ecs.addComponent(camera, Camera{ .cam = sf::View(sf::FloatRect(0, 0, 1000, 1000)), .followDistance = 200, .target = player });
 
-
+	/*
 	//Create gound
 	Entity ground = ecs.newEntity();
 	ecs.addComponent(ground, Transform{ .x = 321, .y = 300, .xScale = 10, .yScale = .25 });
@@ -70,13 +71,39 @@ int main()
 
 	//Define ground's physics body
 	lib.physicsSystem->DefineBody(ground, 640, 16, true);
+	*/
+
+	// Creating left wall
+	Entity wallLeft = ecs.newEntity();
+	ecs.addComponent(wallLeft, Transform{.x = 0, .y = 800 });
+	ecs.addComponent(wallLeft, Rigidbody());
+
+	// Defining wallLeft's physics body
+	lib.physicsSystem->DefineBody(wallLeft, 16, 1600, true);
+
+	// Creating floor
+	Entity floor = ecs.newEntity();
+	ecs.addComponent(floor, Transform{ .x = 120, .y = 300});
+	ecs.addComponent(floor, Rigidbody());
+
+	// Defining floor's physics body
+	lib.physicsSystem->DefineBody(floor, 240, 16, true);
+
+	// Creating platform1
+	Entity platform1 = ecs.newEntity();
+	ecs.addComponent(platform1, Transform{ .x = 120, .y = 280 });
+	ecs.addComponent(platform1, Rigidbody());
+
+	// Defining platform1's physics body
+	lib.physicsSystem->DefineBody(platform1, 112, 16, true);
 
 
 	//Play the "Down" animation of player on repeat
 	//lib.animationSystem->PlayAnimation(player, "Down", true);
 
 	tmx::Map map;
-	map.load("assets/untitled.tmx");
+
+	map.load("assets/Demo1Tilemap.tmx");
 
 	//SFML window
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "test");

@@ -7,7 +7,7 @@ using namespace engine;
 struct Player 
 {
 	float moveSpeed = 15.f;
-	float jumpSpeed = 30.f;
+	float jumpSpeed = 40.f;
 	int moveState;
 	
 
@@ -23,16 +23,21 @@ public:
 		for (auto const& entity : entities)
 		{
 			Player& player = ecs.getComponent<Player>(entity);
-
+			Animator& anim = ecs.getComponent<Animator>(entity);
+			
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			{
 				lib->physicsSystem->Velocity(entity, player.moveSpeed,0,1);
+				if (anim.currentAnimation != "Left")
+					lib->animationSystem->PlayAnimation(entity, "Left");
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			{
 				lib->physicsSystem->Velocity(entity, player.moveSpeed, 0, 3);
+				if (anim.currentAnimation != "Right")
+					lib->animationSystem->PlayAnimation(entity, "Right");
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			if (prevJumped == false && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
 				lib->physicsSystem->Velocity(entity, 0, player.jumpSpeed, 4);
 			}
@@ -41,9 +46,9 @@ public:
 				lib->physicsSystem->Velocity(entity, player.moveSpeed, 0, 2);
 			}
 		}
-
+		prevJumped = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
 	}
-
+	bool prevJumped = false;
 
 
 
