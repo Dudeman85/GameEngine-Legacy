@@ -16,6 +16,7 @@ int main()
 	playerControlSystemSignature.set(ecs.getComponentId<Transform>());
 	playerControlSystemSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControlSystemSignature.set(ecs.getComponentId<Player>());
+	playerControlSystemSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerControl>(playerControlSystemSignature);
 	playerControlSystem->lib = &lib;
 	shared_ptr<CameraSystem> cameraSystem;
@@ -47,7 +48,7 @@ int main()
 	ecs.getComponent<Sprite>(player).texture = playerTexture;
 
 	//Add animations to player automatically sliced from the spritesheet
-	lib.animationSystem->AddAnimations(player, AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 250)), vector<string>{"Down", "Left", "Up", "Right"});
+	lib.animationSystem->AddAnimations(player, AnimationsFromSpritesheet(spritesheet, 16, 16, vector<int>(8, 125)), vector<string>{"Down", "Left", "Up", "Right"});
 
 	//Define player's physics body
 	lib.physicsSystem->DefineBody(player, 16.f, 16.f);
