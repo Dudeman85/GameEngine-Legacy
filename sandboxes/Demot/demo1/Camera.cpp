@@ -18,33 +18,37 @@ class CameraSystem : public System
 public:
 	void Update()
 	{
+		//For each entity
 		for (auto const& entity : entities)
 		{
+			//Get relevant components
 			Camera& camera = ecs.getComponent<Camera>(entity);
 			Transform& camPos = ecs.getComponent<Transform>(entity);
 			Transform& follow = ecs.getComponent<Transform>(camera.target);
 
+			//Move the camera so that it follows the entity at followDistance, the speed increases the farther away the camera is from the entity making smooth motion
+			//Left
 			if (camPos.x - follow.x > camera.followDistance)
 			{
-				std::cout << "go left";
-				camPos.x += -5 * ((abs(follow.x - follow.x) - 200) / 30);
+				camPos.x += -5 * ((abs(camPos.x - follow.x) - 200) / 30);
 			}
-			if (camPos.x - follow.x < camera.followDistance)
+			//Right
+			if (camPos.x - follow.x < -camera.followDistance)
 			{
-				std::cout << "go right";
-				camPos.x += 5 * ((abs(follow.x - follow.x) - 200) / 30);
+				camPos.x += 5 * ((abs(camPos.x - follow.x) - 200) / 30);
 			}
+			//Up
 			if (camPos.y - follow.y > camera.followDistance)
 			{
-				std::cout << "go Up";
-				camPos.y += -5 * ((abs(follow.y - follow.y) - 200) / 30);
+				camPos.y += -5 * ((abs(camPos.y - follow.y) - 200) / 30);;
 			}
-			if (camPos.y - follow.y < camera.followDistance)
+			//Down
+			if (camPos.y - follow.y < -camera.followDistance)
 			{
-				std::cout << "go down";
-				camPos.y += 5 * ((abs(follow.y - follow.y) - 200) / 30);
+				camPos.y += 5 * ((abs(camPos.y - follow.y) - 200) / 30);;
 			}
 
+			//Set the camera view's center
 			camera.cam.setCenter(camPos.x, camPos.y);
 		}
 	}
