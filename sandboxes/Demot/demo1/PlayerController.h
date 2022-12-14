@@ -37,7 +37,7 @@ public:
 				if (anim.currentAnimation != "Right")
 					lib->animationSystem->PlayAnimation(entity, "Right");
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			if (prevJumped == false && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
 				lib->physicsSystem->Velocity(entity, 0, player.jumpSpeed, 4);
 			}
@@ -46,9 +46,9 @@ public:
 				lib->physicsSystem->Velocity(entity, player.moveSpeed, 0, 2);
 			}
 		}
-
+		prevJumped = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
 	}
-
+	bool prevJumped = false;
 
 
 
