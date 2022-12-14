@@ -70,7 +70,6 @@ int main()
 
 	//Define ground's physics body
 	lib.physicsSystem->DefineBody(ground, 640, 16, true);
-<<<<<<< HEAD
 	*/
 
 	// Creating left wall
@@ -96,9 +95,6 @@ int main()
 
 	// Defining platform1's physics body
 	lib.physicsSystem->DefineBody(platform1, 112, 16, true);
-=======
->>>>>>> 701e771ec026f7073b96ae5934578cb6a2e14f97
-
 
 	//Play the "Down" animation of player on repeat
 	//lib.animationSystem->PlayAnimation(player, "Down", true);
