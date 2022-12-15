@@ -68,6 +68,14 @@ int main()
 	// Defining wallLeft's physics body
 	lib.physicsSystem->DefineBody(wallLeft, 16, 320, true);
 
+	// Creating wallRight
+	Entity wallRight = ecs.newEntity();
+	ecs.addComponent(wallRight, Transform{ .x = 794, .y = 160 });
+	ecs.addComponent(wallRight, Rigidbody());
+
+	// Defining wallLeft's physics body
+	lib.physicsSystem->DefineBody(wallRight, 16, 320, true);
+
 	// Creating floor
 	Entity floor = ecs.newEntity();
 	ecs.addComponent(floor, Transform{.x = 400, .y = 312});
@@ -75,6 +83,14 @@ int main()
 
 	// Defining floor's physics body
 	lib.physicsSystem->DefineBody(floor, 800, 16, true);
+
+	// Creating roof
+	Entity roof = ecs.newEntity();
+	ecs.addComponent(roof, Transform{ .x = 400, .y = 8 });
+	ecs.addComponent(roof, Rigidbody());
+
+	// Defining roof's physics body
+	lib.physicsSystem->DefineBody(roof, 800, 16, true);
 
 	// Creating platform1
 	Entity platform1 = ecs.newEntity();
