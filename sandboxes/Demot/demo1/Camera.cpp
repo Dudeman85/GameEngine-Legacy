@@ -30,22 +30,22 @@ public:
 			//Left
 			if (camPos.x - follow.x > camera.followDistance)
 			{
-				camPos.x += -5 * ((abs(camPos.x - follow.x) - 200) / 30);
+				camPos.x += -5 * ((abs(camPos.x - follow.x) - camera.followDistance) / 30);
 			}
 			//Right
 			if (camPos.x - follow.x < -camera.followDistance)
 			{
-				camPos.x += 5 * ((abs(camPos.x - follow.x) - 200) / 30);
+				camPos.x += 5 * ((abs(camPos.x - follow.x) - camera.followDistance) / 30);
 			}
 			//Up
 			if (camPos.y - follow.y > camera.followDistance)
 			{
-				camPos.y += -5 * ((abs(camPos.y - follow.y) - 200) / 30);;
+				camPos.y += -5 * ((abs(camPos.y - follow.y) - camera.followDistance) / 30);;
 			}
 			//Down
 			if (camPos.y - follow.y < -camera.followDistance)
 			{
-				camPos.y += 5 * ((abs(camPos.y - follow.y) - 200) / 30);;
+				camPos.y += 5 * ((abs(camPos.y - follow.y) - camera.followDistance) / 30);;
 			}
 
 			//Set the camera view's center

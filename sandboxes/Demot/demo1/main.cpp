@@ -57,22 +57,9 @@ int main()
 	//Create Camera
 	Entity camera = ecs.newEntity();
 	ecs.addComponent(camera, Transform{.x = 100, .y = 100});
-	ecs.addComponent(camera, Camera{ .cam = sf::View(sf::FloatRect(0, 0, 1000, 1000)), .followDistance = 200, .target = player });
-
-	/*
-	//Create gound
-	Entity ground = ecs.newEntity();
-	ecs.addComponent(ground, Transform{ .x = 321, .y = 300, .xScale = 10, .yScale = .25 });
-	ecs.addComponent(ground, Sprite());
-	ecs.addComponent(ground, Rigidbody());
-
-	sf::Texture woodTexture = LoadTexture("wood2.png");
-	ecs.getComponent<Sprite>(ground).texture = woodTexture;
-
-	//Define ground's physics body
-	lib.physicsSystem->DefineBody(ground, 640, 16, true);
-	*/
-
+	ecs.addComponent(camera, Camera{ .cam = sf::View(sf::FloatRect(0, 0, 1000, 1000)), .followDistance = 100, .target = player });
+	ecs.getComponent<Camera>(camera).cam.zoom(.45f);
+	
 	// Creating wallLeft
 	Entity wallLeft = ecs.newEntity();
 	ecs.addComponent(wallLeft, Transform{ .x = 10, .y = 160 });
@@ -107,8 +94,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "test");
 
 	// Audio
-	//playSoundfile("spring-weather-1.wav");
-	playSoundfile2("jump.wav");
+	playSoundfile("spring-weather-1.wav");
 
 	//Main game loop
 	while (window.isOpen())
