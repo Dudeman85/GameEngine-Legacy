@@ -29,7 +29,7 @@ int main()
 	cameraSystemSignature.set(ecs.getComponentId<Transform>());
 	ecs.setSystemSignature<CameraSystem>(cameraSystemSignature);
 
-	lib.physicsSystem->Init(0.f, 9.81f);
+	lib.physicsSystem->Init(-3.f, 9.81f);
 
 	//Create player
 	Entity player = ecs.newEntity();
@@ -62,7 +62,7 @@ int main()
 	
 	// Creating wallLeft
 	Entity wallLeft = ecs.newEntity();
-	ecs.addComponent(wallLeft, Transform{ .x = 10, .y = 160 });
+	ecs.addComponent(wallLeft, Transform{ .x = 7.5, .y = 160 });
 	ecs.addComponent(wallLeft, Rigidbody());
 
 	// Defining wallLeft's physics body
@@ -70,7 +70,7 @@ int main()
 
 	// Creating floor
 	Entity floor = ecs.newEntity();
-	ecs.addComponent(floor, Transform{.x = 400, .y = 314});
+	ecs.addComponent(floor, Transform{.x = 400, .y = 312});
 	ecs.addComponent(floor, Rigidbody());
 
 	// Defining floor's physics body
@@ -78,11 +78,43 @@ int main()
 
 	// Creating platform1
 	Entity platform1 = ecs.newEntity();
-	ecs.addComponent(platform1, Transform{ .x = 120, .y = 280 });
+	ecs.addComponent(platform1, Transform{ .x = 137, .y = 280 });
 	ecs.addComponent(platform1, Rigidbody());
 
 	// Defining platform1's physics body
-	lib.physicsSystem->DefineBody(platform1, 112, 16, true);
+	lib.physicsSystem->DefineBody(platform1, 78, 16, true);
+
+	// Creating platform2
+	Entity platform2 = ecs.newEntity();
+	ecs.addComponent(platform2, Transform{ .x = 249, .y = 248 });
+	ecs.addComponent(platform2, Rigidbody());
+
+	// Defining platform2's physics body
+	lib.physicsSystem->DefineBody(platform2, 78, 16, true, 1, 0.1);
+
+	// Creating platform3
+	Entity platform3 = ecs.newEntity();
+	ecs.addComponent(platform3, Transform{ .x = 377, .y = 216 });
+	ecs.addComponent(platform3, Rigidbody());
+
+	// Defining platform3's physics body
+	lib.physicsSystem->DefineBody(platform3, 78, 16, true);
+
+	// Creating platform4
+	Entity platform4 = ecs.newEntity();
+	ecs.addComponent(platform4, Transform{ .x = 489, .y = 184 });
+	ecs.addComponent(platform4, Rigidbody());
+
+	// Defining platform4's physics body
+	lib.physicsSystem->DefineBody(platform4, 78, 16, true);
+
+	// Creating platform5
+	Entity platform5 = ecs.newEntity();
+	ecs.addComponent(platform5, Transform{ .x = 617, .y = 168 });
+	ecs.addComponent(platform5, Rigidbody());
+
+	// Defining platform5's physics body
+	lib.physicsSystem->DefineBody(platform5, 78, 16, true);
 
 	//Play the "Down" animation of player on repeat
 	//lib.animationSystem->PlayAnimation(player, "Down", true);

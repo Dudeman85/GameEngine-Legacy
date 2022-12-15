@@ -44,6 +44,7 @@ public:
 			if (prevJumped == false && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
 				lib->physicsSystem->Velocity(entity, 0, player.jumpSpeed, 4);
+
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			{
