@@ -39,6 +39,7 @@ IF (WIN32)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox3/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo1/OpenAL32.dll" COPYONLY)
 ENDIF()
 
 #set(ENGINE_LIBS engine sfml-graphics)
