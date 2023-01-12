@@ -62,7 +62,7 @@ Aika ajoin pidämme esitelmän tiimin kesken siitä, mitä olemme saaneet tehdyk
 
 # Aikataulu
 
-min 200 h 
+min. 200 h 
 17 viikkoa * 16 h/ vko = 272 h
 
-<img src="ExcelCapture.PNG" width="700" height="400">
+<img src="springCapture.PNG" width="700" height="400">
