@@ -9,9 +9,9 @@ Aika ajoin pidämme esitelmän tiimin kesken siitä, mitä olemme saaneet tehdyk
 
 [Aleksi Anderson](https://repo.kamit.fi/aleksiand) [<img src="Email.png" width="30" height="30">](mailto:aleksianderson@kamk.fi)  **Sprite sheets, animations, architecture, OpenGL**
 
-[Lasse Autio](https://repo.kamit.fi/lasseaut) [<img src="Email.png" width="30" height="30">](mailto:lasseautio@kamk.fi)  **Audio**
+[Lasse Autio](https://repo.kamit.fi/lasseaut) [<img src="Email.png" width="30" height="30">](mailto:lasseautio@kamk.fi)  **Audio, Scene saving**
 
-[Viksteri Käppi](https://repo.kamit.fi/viksterikap) [<img src="Email.png" width="30" height="30">](mailto:viksterikappi@kamk.fi) **Lead, Physics** 
+[Viksteri Käppi](https://repo.kamit.fi/viksterikap) [<img src="Email.png" width="30" height="30">](mailto:viksterikappi@kamk.fi) **Lead, Physics, Scene saving** 
 
 [Aaro Leskinen](https://repo.kamit.fi/aaroles) [<img src="Email.png" width="30" height="30">](mailto:aaroleskinen@kamk.fi) **Tiled, OpenGL** 
 
