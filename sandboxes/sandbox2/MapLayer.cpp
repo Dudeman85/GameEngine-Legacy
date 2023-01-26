@@ -25,9 +25,9 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include <MapLayer.hpp>
-#include <OpenGL.hpp>
-#include <GLCheck.hpp>
+#include "MapLayer.hpp"
+#include "OpenGL.hpp"
+#include "GLCheck.hpp"
 
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>

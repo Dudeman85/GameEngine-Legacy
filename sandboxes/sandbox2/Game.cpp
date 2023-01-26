@@ -161,11 +161,14 @@ void Game::initGLStuff(const tmx::Map& map)
     glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_tileMap"), 0));
     glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_lookupMap"), 1));
     
+
+    /*
     const auto& tilesets = map.getTilesets();
     for(const auto& ts : tilesets)
     {
         loadTexture(ts.getImagePath());
-    }    
+    } 
+    */
     
     
     glCheck(glClearColor(0.6f, 0.8f, 0.92f, 1.f));
@@ -275,6 +278,11 @@ void Game::loadShader()
     glCheck(glDeleteShader(fragID));
 }
 
+
+/*
+
+SDL texture loading
+
 void Game::loadTexture(const std::string& path)
 {    
     auto img = IMG_Load(path.c_str());
@@ -307,9 +315,10 @@ void Game::loadTexture(const std::string& path)
     {
         std::cout << "Failed to load " << path << std::endl;
     }
+    
 }
 
-
+*/
 
 
 

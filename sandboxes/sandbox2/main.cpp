@@ -116,7 +116,7 @@ int main(void)
     glfwMakeContextCurrent(window);
 
     Game game;
-    game.loaDMap();
+    game.loadMap();
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
