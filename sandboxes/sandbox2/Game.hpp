@@ -56,7 +56,7 @@ private:
 	std::vector<unsigned> m_tileTextures;
 	void initGLStuff(const tmx::Map&);
 	void loadShader();
-	//void loadTexture(const std::string&);
+	void loadTexture(const std::string&);
 
 };
 

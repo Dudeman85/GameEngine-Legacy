@@ -37,7 +37,7 @@ target_include_directories(engine PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 add_library(engine2 ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL})
-target_link_libraries(engine2 glfw OpenAL tmxlite)
+target_link_libraries(engine2 glfw OpenAL tmxlite glm)
 target_include_directories(engine2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>

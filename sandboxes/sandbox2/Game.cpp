@@ -26,7 +26,6 @@ source distribution.
 *********************************************************************/
 
 #include "Game.hpp"
-#include "OpenGL.hpp"
 #include "GLCheck.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -161,14 +160,13 @@ void Game::initGLStuff(const tmx::Map& map)
     glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_tileMap"), 0));
     glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_lookupMap"), 1));
     
-
-    /*
+    
     const auto& tilesets = map.getTilesets();
     for(const auto& ts : tilesets)
     {
         loadTexture(ts.getImagePath());
-    } 
-    */
+    }
+    
     
     
     glCheck(glClearColor(0.6f, 0.8f, 0.92f, 1.f));
@@ -279,46 +277,14 @@ void Game::loadShader()
 }
 
 
-/*
 
-SDL texture loading
+// SDL texture loading
 
 void Game::loadTexture(const std::string& path)
 {    
-    auto img = IMG_Load(path.c_str());
-    if(img)
-    {
-        //TODO we should also check for tileset transparency here
-        // and process it if found
-        SDL_LockSurface(img);
-        
-        m_tileTextures.emplace_back(0);
-        auto& texture = m_tileTextures.back();
-                        
-        GLint format = (img->format->BitsPerPixel == 32) ? GL_RGBA : GL_RGB;
-                
-        glCheck(glGenTextures(1, &texture));
-        glCheck(glBindTexture(GL_TEXTURE_2D, texture));
-        glCheck(glTexImage2D(GL_TEXTURE_2D, 0, format, img->w, img->h, 0, format, GL_UNSIGNED_BYTE, img->pixels));
-
-        glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-        glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-        glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-        glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-        
-        SDL_UnlockSurface(img);
-        SDL_FreeSurface(img);
-        
-        std::cout << "Loaded " << path << std::endl;
-    }
-    else
-    {
-        std::cout << "Failed to load " << path << std::endl;
-    }
-    
+   // m_tileTextures.push_back(new Texture(...));    
 }
 
-*/
 
 
 

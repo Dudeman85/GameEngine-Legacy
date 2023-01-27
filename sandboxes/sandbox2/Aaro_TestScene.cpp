@@ -1,6 +1,9 @@
+#if 0
+
 #include "engine/Application.h"
 //Create one instance of the ecs manager
 ECS ecs;
+
 
 int main()
 {
@@ -122,3 +125,4 @@ int main()
     } // End - while()  
     return 0;
 }
+#endif

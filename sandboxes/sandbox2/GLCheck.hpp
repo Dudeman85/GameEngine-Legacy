@@ -27,6 +27,7 @@ source distribution.
 
 #include <string>
 #include <iostream>
+#include <glad/gl.h>
 
 #ifndef GL_CHECK_HPP_
 #define GL_CHECK_HPP_

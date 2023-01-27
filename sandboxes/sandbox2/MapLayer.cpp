@@ -26,7 +26,6 @@ source distribution.
 *********************************************************************/
 
 #include "MapLayer.hpp"
-#include "OpenGL.hpp"
 #include "GLCheck.hpp"
 
 #include <tmxlite/Map.hpp>

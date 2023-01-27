@@ -94,6 +94,7 @@ int main()
 
 #endif
 
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 int main(void)
@@ -114,6 +115,9 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    // Load GL functions using glad
+    gladLoadGL(glfwGetProcAddress);
+
 
     Game game;
     game.loadMap();
