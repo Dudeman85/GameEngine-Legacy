@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/Application.h"
+#include "Sound.h"
 
 using namespace engine;
 
@@ -44,7 +45,7 @@ public:
 			if (prevJumped == false && sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 			{
 				lib->physicsSystem->Velocity(entity, 0, player.jumpSpeed, 4);
-
+				playSoundfile1("jump.wav");
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			{
