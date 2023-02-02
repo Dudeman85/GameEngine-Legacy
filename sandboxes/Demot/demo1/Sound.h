@@ -402,3 +402,100 @@ int playSoundfile(std::string sound)
 
    
 }
+int playSoundfile1(std::string sound)
+{
+    ALCdevice* openALDevice = alcOpenDevice(nullptr);
+    if (!openALDevice)
+        return 0;
+
+    ALCcontext* openALContext = alcCreateContext(openALDevice, nullptr);
+
+    /*
+    {
+        std::cerr << "ERROR: Could not create audio context" << std::endl;
+        return 0;
+
+    }*/
+
+    ALCboolean contextMadeCurrent = false;
+    alcMakeContextCurrent(openALContext);
+    /*alcMakeContextCurrent(contextMadeCurrent, openALDevice, openALContext)
+        || contextMadeCurrent != ALC_TRUE)
+    {
+        std::cerr << "ERROR: Could not make audio context current" << std::endl;
+        return 0;
+    }*/
+
+    std::uint8_t channels;
+    std::int32_t sampleRate;
+    std::uint8_t bitsPerSample;
+    //  std::vector<char> soundData;
+    ALsizei size;
+    std::vector<char> data = load_wav(sound, channels, sampleRate, bitsPerSample, size);
+
+    if (data.size() == 0)
+    {
+        std::cerr << "ERROR: Could not load wav" << std::endl;
+        return 0;
+    }
+
+
+    ALuint buffer;
+    alGenBuffers(1, &buffer);
+
+    ALenum format;
+    if (channels == 1 && bitsPerSample == 8)
+        format = AL_FORMAT_MONO8;
+    else if (channels == 1 && bitsPerSample == 16)
+        format = AL_FORMAT_MONO16;
+    else if (channels == 2 && bitsPerSample == 8)
+        format = AL_FORMAT_STEREO8;
+    else if (channels == 2 && bitsPerSample == 16)
+        format = AL_FORMAT_STEREO16;
+    else
+    {
+        std::cerr
+            << "ERROR: unrecognised wave format: "
+            << channels << " channels, "
+            << bitsPerSample << " bps" << std::endl;
+        return 0;
+    }
+
+    alBufferData(buffer, format, data.data(), data.size(), sampleRate);
+    data.clear(); // erase the sound in RAM
+
+    ALuint source;
+    alGenSources(1, &source);
+    alSourcef(source, AL_PITCH, 1);
+    alSourcef(source, AL_GAIN, 1.0f);
+    alSource3f(source, AL_POSITION, 0, 0, 0);
+    alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    alSourcei(source, AL_LOOPING, 0);
+    alSourcei(source, AL_BUFFER, buffer);
+
+    alSourcePlay(source);
+
+    ALint state = AL_PLAYING;
+
+    if (state == AL_PLAYING)
+        return 0;
+    /*
+    {
+        alGetSourcei(source, AL_SOURCE_STATE, &state);
+    }
+    */
+    alDeleteSources(1, &source);
+    alDeleteBuffers(1, &buffer);
+
+    alcCall(alcMakeContextCurrent, contextMadeCurrent, openALDevice, nullptr);
+    alcCall(alcDestroyContext, openALDevice, openALContext);
+
+    ALCboolean closed;
+    alcCall(alcCloseDevice, closed, openALDevice, openALDevice);
+
+    return 0;
+
+
+
+
+}
