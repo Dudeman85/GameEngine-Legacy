@@ -27,7 +27,7 @@ add_subdirectory("ext/box2d-main")
 include_directories("ext/box2d-main/include")
 
 file(GLOB_RECURSE ENGINE_SOURCE_FILES "./src/*.cpp")
-file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h")
+file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/GL/*.h")
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
@@ -36,8 +36,8 @@ target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-add_library(engine2 ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL})
-target_link_libraries(engine2 glfw OpenAL tmxlite glm)
+add_library(engine2 ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
+target_link_libraries(engine2 glfw OpenAL tmxlite glm STB)
 target_include_directories(engine2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
