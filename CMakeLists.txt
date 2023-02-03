@@ -12,6 +12,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory("ext/SFML-2.5.1")
 include_directories("ext/SFML-2.5.1/include")
 include_directories("include")
+include_directories("ext/STB")
 # tmxlite-master library
 SET(TMXLITE_STATIC_LIB TRUE CACHE BOOL "")
 add_subdirectory("ext/tmxlite-master/tmxlite")
@@ -37,7 +38,7 @@ target_include_directories(engine PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 add_library(engine2 ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
-target_link_libraries(engine2 glfw OpenAL tmxlite glm STB)
+target_link_libraries(engine2 glfw OpenAL tmxlite glm)
 target_include_directories(engine2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
