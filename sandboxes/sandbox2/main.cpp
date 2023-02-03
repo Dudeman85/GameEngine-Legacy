@@ -94,6 +94,9 @@ int main()
 
 #endif
 
+
+#if 0
+
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
@@ -141,3 +144,4 @@ int main(void)
     glfwTerminate();
     return 0;
 }
+#endif // 0

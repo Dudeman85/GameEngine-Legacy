@@ -126,3 +126,17 @@ int main()
     return 0;
 }
 #endif
+
+#include "engine/Application.h"
+
+int main()
+{
+    // Tiled Map class
+    tmx::Map map;
+
+    // Download Tiled map from file
+    map.load("CollidersTestMap.tmx");
+
+    // Finding the collider-layer
+
+}
