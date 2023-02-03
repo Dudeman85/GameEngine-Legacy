@@ -129,14 +129,17 @@ int main()
 
 #include "engine/Application.h"
 
+//Create one instance of the ecs manager
+ECS ecs;
+
 int main()
 {
     // Tiled Map class
     tmx::Map map;
 
     // Download Tiled map from file
-    map.load("CollidersTestMap.tmx");
+    map.load("assets/Tiled/maps/CollidersTestMap.tmx");
 
     // Finding the collider-layer
-
+    const auto& layers = map.getLayers();
 }

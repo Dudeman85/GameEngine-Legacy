@@ -28,7 +28,7 @@ source distribution.
 #ifndef OGL_GAME_HPP_
 #define OGL_GAME_HPP_
 
-#include <glm/matrix.hpp>
+//#include <glm/matrix.hpp> Engine2
 
 #include "MapLayer.hpp"
 
@@ -50,7 +50,7 @@ private:
 	std::vector<std::unique_ptr<MapLayer>> m_mapLayers;
 
 	
-	glm::mat4 m_projectionMatrix;
+	//glm::mat4 m_projectionMatrix; Engine2
 	
 	unsigned m_shader;
 	std::vector<unsigned> m_tileTextures;

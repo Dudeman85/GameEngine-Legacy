@@ -28,7 +28,7 @@ source distribution.
 #include "Game.hpp"
 #include "GLCheck.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/matrix_transform.hpp> Engine2
 
 #include <tmxlite/Map.hpp>
 
@@ -149,11 +149,11 @@ void Game::loadMap()
 
 void Game::initGLStuff(const tmx::Map& map)
 {
-    m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f);
+    //m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f); Engine2
     
     loadShader();
     glCheck(glUseProgram(m_shader));
-    glCheck(glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0]));
+    //glCheck(glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0])); Engine2
     
     //we'll make sure the current tile texture is active in 0, 
     //and lookup texture is active in 1 in MapLayer::draw()
