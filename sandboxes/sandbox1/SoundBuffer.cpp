@@ -1,4 +1,4 @@
 #include "SoundBuffer.h"
-//#include <sndfile.h>
+#include "AudioFile.h"
 #include <inttypes.h>
 #include <AL\alext.h>
