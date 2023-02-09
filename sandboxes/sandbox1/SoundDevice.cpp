@@ -1,5 +1,5 @@
 #include "SoundDevice.h"
-#include <AL\al.h>
+#include <AL/al.h>
 #include <stdio.h>
 
 SoundDevice* SoundDevice::get()
