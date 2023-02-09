@@ -1,5 +1,5 @@
 #include "SoundDevice.h"
-#include <AL\al.h>
+#include <AL/al.h>
 #include <stdio.h>
 
 SoundDevice* SoundDevice::get()
@@ -32,12 +32,12 @@ SoundDevice::SoundDevice()
 SoundDevice::~SoundDevice()
 {
 	if (!alcMakeContextCurrent(nullptr))
-		throw("failed to set context to nullptr");
+		printf("failed to set context to nullptr");
 
 	alcDestroyContext(p_ALCContext);
 	if (p_ALCContext)
-		throw("failed to unset during close");
+		printf("failed to unset during close");
 
 	if (!alcCloseDevice(p_ALCDevice))
-		throw("failed to close sound device");
+		printf("failed to close sound device");
 }

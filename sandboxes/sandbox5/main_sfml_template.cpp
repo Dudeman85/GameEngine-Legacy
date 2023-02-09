@@ -2,6 +2,14 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include <cmath>
 
 #include <engine/GL/Shader.h>
 
@@ -52,10 +60,11 @@ int main()
 	
 	//Rectangle vertices start at top left and go clockwise to bottom left
 	float vertices[] = {
-		-0.5f,  0.5f, 0.0f, //Top Left
-		0.5f, 0.5f, 0.0f, //Top Right
-		0.5f, -0.5f, 0.0f, //Bottom Right
-		-0.5f, -0.5f, 0.0f, //Bottom Left
+		// positions          // colors           // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 	};
 	float textureCoords[]{
 		0, 1, //Top Left
@@ -86,16 +95,17 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	//This configures the vertex attribute at location 0 aka the vertex posistion. It takes its data from VBO since it was just bound
-	//layout (location = 0) in vertex shader, so first parameter is the vertex attribute in the shader, 
-	//second parameter is the size of the vertex attribute, so 3 for vec3
-	//vec3 is float so third parameter is the type
-	//Fourth is normalize integer data, we dont want this
-	//Fifth is the amount of bytes between the consecutive attributes
-	//Sixth is the offset of the data in the buffer, should be 0 so cast 0 to void*
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	//Enable attribute at location 0 aka position
+	//Configure Vertex attribute at location 0 aka position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	//Configure Vertex attribute at location 1 aka color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	//Configure Vertex attribute at location 2 aka texture coords
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -105,6 +115,28 @@ int main()
 	// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
 	glBindVertexArray(0);
+
+	//load image
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("ground.png", &width, &height, &nrChannels, 0);
+
+	//Genrerate and bind texture
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//Generate the texture using the image data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	//Image is no longer needed
+	stbi_image_free(data);
 
 	//Main Loop
 	while (!glfwWindowShouldClose(window))
@@ -117,11 +149,14 @@ int main()
 
 		shader.use();
 
-		float timeValue = glfwGetTime();
-		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shader.ID, "color");
-		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1));
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+		unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
