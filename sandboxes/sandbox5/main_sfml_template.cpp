@@ -9,6 +9,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <cmath>
+
 #include <engine/GL/Shader.h>
 
 //Resize window callback
