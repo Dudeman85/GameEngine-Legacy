@@ -1,4 +1,3 @@
-#pragma once
 #include "engine/ECSCore.h"
 #include "engine/Transform.h"
 #include <SFML/Graphics.hpp>
