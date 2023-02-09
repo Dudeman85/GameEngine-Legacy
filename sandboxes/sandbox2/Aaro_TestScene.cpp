@@ -140,6 +140,81 @@ int main()
     // Download Tiled map from file
     map.load("assets/Tiled/maps/CollidersTestMap.tmx");
 
-    // Finding the collider-layer
+    // Finding all the layers
     const auto& layers = map.getLayers();
+
+    // Creating Box2d-world
+    b2World world(b2Vec2(0.0f, 9.8f));
+
+    // Going through all the layers
+    for (const auto& layer : layers)
+    {
+        // See if we have found object layer
+        if (layer->getType() == tmx::Layer::Type::Object)
+        {
+            // Place Tiled layer objects address to object variable
+            const auto& objects = layer->getLayerAs<tmx::ObjectGroup>().getObjects();
+
+            // Go through the objects in object layer
+            for (const auto& object : objects)
+            {
+                // Check if the object is rectangle shaped
+                if (object.getShape() == tmx::Object::Shape::Rectangle)
+                {
+                    // Change the Tiled-Objects coordinats to Box2d: format
+                    sf::FloatRect rect;
+                    rect.left = object.getAABB().left;
+                    rect.top = object.getAABB().top;
+                    rect.width = object.getAABB().width;
+                    rect.height = object.getAABB().height;
+                    b2Vec2 pos(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    b2Vec2 size(rect.width / 2, rect.height / 2);
+
+                    // Creating Box2D body
+                    b2BodyDef bodyDef;
+                    bodyDef.position.Set(pos.x, pos.y);
+                    bodyDef.type = b2_staticBody;
+                    b2Body* body = world.CreateBody(&bodyDef);
+
+                    // Creating Box2D collider
+                    b2PolygonShape shape;
+                    shape.SetAsBox(size.x, size.y);
+                    b2FixtureDef fixtureDef;
+                    fixtureDef.shape = &shape;
+                    body->CreateFixture(&fixtureDef);
+
+                }
+            }
+        }
+        else if (layer->getType() == tmx::Layer::Type::Tile)
+        {
+
+        }
+
+    }
+
+    // SFML window creation
+    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+
+    // Game loop
+    // Run the program as long as the window is open
+    while (window.isOpen())
+    {
+        // Check all the window's events that were triggered since the last iteration of the loop
+        sf::Event event;
+
+        while (window.pollEvent(event))
+        {
+            // "Close requested" event: we close the window
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+        }
+        window.clear(sf::Color::Cyan);
+
+        // End the current frame (Swap buffers)
+        window.display();
+    } // End - while()
+    return 0;
 }
