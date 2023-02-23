@@ -1,17 +1,21 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <iostream>
+#include <fstream>
 #include <cmath>
 
 #include <engine/GL/Shader.h>
+#include <engine/GL/Camera.h>
+
+using namespace engine;
+
+Camera cam = Camera(800, 600);
 
 //Resize window callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -23,6 +27,20 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		cam.Translate(1, 0);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		cam.Translate(-1, 0);
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		cam.Translate(0, 1);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		cam.Translate(0, -1);
+
+	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
+		cam.Translate(0, 0, -1);
+	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
+		cam.Translate(0, 0, 1);
 }
 
 int main()
@@ -150,11 +168,19 @@ int main()
 		shader.use();
 
 		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1));
+		trans = glm::translate(trans, glm::vec3(0.f, 0.f, -10.f));
+		trans = glm::scale(trans, glm::vec3(100.5, 100.5, 1));
 		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-		unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+
+		unsigned int transformLoc = glGetUniformLocation(shader.ID, "model");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+		unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
+		glm::mat4 a = cam.GetProjectionMatrix();
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(a));
+
+		unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam.GetViewMatrix()));
 
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO);
