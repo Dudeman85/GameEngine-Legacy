@@ -3,8 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +10,7 @@
 
 #include <engine/GL/Shader.h>
 #include <engine/GL/Camera.h>
+#include <engine/GL/Texture.h>
 
 using namespace engine;
 
@@ -134,27 +133,7 @@ int main()
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
 	glBindVertexArray(0);
 
-	//load image
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("ground.png", &width, &height, &nrChannels, 0);
-
-	//Genrerate and bind texture
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	//Generate the texture using the image data
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	//Image is no longer needed
-	stbi_image_free(data);
+	Texture texture = Texture("strawberry.png");
 
 	//Main Loop
 	while (!glfwWindowShouldClose(window))
@@ -182,7 +161,7 @@ int main()
 		unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam.GetViewMatrix()));
 
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glBindTexture(GL_TEXTURE_2D, texture.GetID());
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
