@@ -9,10 +9,11 @@
 
 namespace engine
 {
+	//Abstraction class for OpenGL textures
 	class Texture
 	{
 	public:
-		Texture(const char* path)
+		Texture(const char* path, unsigned int filteringType = GL_LINEAR)
 		{
 			//Load image
 			int width, height, nrChannels;
@@ -37,12 +38,9 @@ namespace engine
 				glGenTextures(1, &ID);
 				glBindTexture(GL_TEXTURE_2D, ID);
 
-				//Set texture wrapping to repeat
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 				//Set texture filtering parameters
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filteringType);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filteringType);
 
 				//Generate the texture using the image data
 				glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, width, height, 0, colorFormat, GL_UNSIGNED_BYTE, imageData);
@@ -59,6 +57,17 @@ namespace engine
 		~Texture()
 		{
 			glDeleteTextures(1, &ID);
+		}
+
+		void SetScalingFilter(unsigned int type)
+		{
+			glBindTexture(GL_TEXTURE_2D, ID);
+
+			//Set texture filtering parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, type);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, type);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
 		//Get this textures OpenGL ID
