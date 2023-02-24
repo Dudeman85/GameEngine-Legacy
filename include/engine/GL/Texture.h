@@ -13,7 +13,7 @@ namespace engine
 	class Texture
 	{
 	public:
-		Texture(const char* path, unsigned int filteringType = GL_LINEAR)
+		Texture(const char* path, unsigned int filteringType = GL_NEAREST)
 		{
 			//Load image
 			int width, height, nrChannels;
@@ -46,6 +46,9 @@ namespace engine
 				glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, width, height, 0, colorFormat, GL_UNSIGNED_BYTE, imageData);
 				glGenerateMipmap(GL_TEXTURE_2D);
 
+				//Unbind texture
+				glBindTexture(GL_TEXTURE_2D, 0);
+
 				//Image data is no longer needed
 				stbi_image_free(imageData);
 			}
@@ -59,6 +62,7 @@ namespace engine
 			glDeleteTextures(1, &ID);
 		}
 
+		//Sets the OpenGL sampling type when up and downscaling the texture. Ex. GL_NEAREST, GL_LINEAR, etc.
 		void SetScalingFilter(unsigned int type)
 		{
 			glBindTexture(GL_TEXTURE_2D, ID);
@@ -67,6 +71,7 @@ namespace engine
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, type);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, type);
 
+			//Unbind texture
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 

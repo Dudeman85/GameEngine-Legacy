@@ -9,8 +9,8 @@ namespace engine
 	struct Transform
 	{
 		float x, y, z;
-		float xScale, yScale;
-		float rotation;
+		float xScale, yScale, zScale;
+		float xRotation, yRotation, zRotation;
 	};
 
 	// Transform system
