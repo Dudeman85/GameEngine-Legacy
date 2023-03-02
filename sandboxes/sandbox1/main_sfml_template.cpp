@@ -160,7 +160,7 @@ int main()
 		myMusic.Play();
 		myMusic.updateBufferStream();
 
-		mySpeaker.Play(sound1);
+		//mySpeaker.Play(sound1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
