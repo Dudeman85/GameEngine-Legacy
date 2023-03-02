@@ -34,7 +34,7 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/G
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
-target_link_libraries(engine sfml-graphics OpenAL tmxlite)
+target_link_libraries(engine sfml-graphics OpenAL tmxlite box2d)
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>

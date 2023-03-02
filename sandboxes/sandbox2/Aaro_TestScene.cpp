@@ -188,7 +188,8 @@ int main()
         }
         else if (layer->getType() == tmx::Layer::Type::Tile)
         {
-
+            // Place Tiled layer address to tile variable
+          //  const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>
         }
 
     }
