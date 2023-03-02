@@ -92,7 +92,8 @@ int main()
 	SoundSource mySpeaker;
 
 	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
-	MusicBuffer myMusic("assets/spring-weather-1.wav");
+	uint32_t sound2 = SoundBuffer::get()->addSoundEffect("assets/Jingle_Win_00.wav");
+	MusicBuffer myMusic("assets/forest.wav");
 	
 
 	//Create window object
@@ -150,22 +151,31 @@ int main()
 	//Add the gravity component and set it's direction
 	ecs.addComponent(sprite2, Sprite{ .texture = &texture });
 
+
+	myMusic.Play();
+		
+	
+
+
 	//Main Loop
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 
 		renderSystem->Update(&cam);
-		
-		myMusic.Play();
+
 		myMusic.updateBufferStream();
+		
+			
 
-		//mySpeaker.Play(sound1);
-
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			mySpeaker.Play(sound1);
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			mySpeaker.Play(sound2);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	
 	glfwTerminate();
 
 	return 0;
