@@ -10,7 +10,9 @@
 
 #include <engine/SpriteGL.h>
 
+#include <chrono>
 
+using namespace std;
 using namespace engine;
 
 ECS ecs;
@@ -106,13 +108,26 @@ int main()
 	//Add the gravity component and set it's direction
 	ecs.addComponent(sprite2, Sprite{ .texture = &texture});
 
+
+	float deltaTime;
+	chrono::time_point lastFrame = chrono::high_resolution_clock::now();
+
 	//Main Loop
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
 
 
+		chrono::time_point thisFrame = chrono::high_resolution_clock::now();
+		chrono::duration<double> duration = thisFrame - lastFrame;
+		lastFrame = thisFrame;
+		deltaTime = duration.count();
+
+		cout << deltaTime << endl;
+
 		renderSystem->Update(&cam);
+		
+
 
 
 		glfwSwapBuffers(window);

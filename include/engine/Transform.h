@@ -5,7 +5,7 @@ extern ECS ecs;
 
 namespace engine
 {
-	// Transform component
+	//Transform component
 	struct Transform
 	{
 		float x, y, z;
@@ -13,7 +13,8 @@ namespace engine
 		float xRotation, yRotation, zRotation;
 	};
 
-	// Transform system
+	//Transform system
+	//Requires Transform component
 	class TransformSystem : public System
 	{
 	public:
@@ -25,7 +26,7 @@ namespace engine
 			}
 		}
 
-		void move(Entity entity, float dx, float dy, float dz = 0)
+		void Move(Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x += dx;
@@ -34,7 +35,7 @@ namespace engine
 		}
 
 		//Set the absolute position of entity
-		void setPosition(Entity entity, float x, float y, float z = 0)
+		void SetPosition(Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x = x;

@@ -15,11 +15,16 @@
 #include <tmxlite/ObjectGroup.hpp>
 #include <tmxlite/TileLayer.hpp>
 
+#include <chrono>
+
 //ECS modules
 #include "ECSCore.h"
 #include "Sprite.h"
 #include "Transform.h"
 #include "Gravity.h"
+
+//Other engine libs
+#include <engine/GL/Camera.h>
 
 using namespace std;
 
@@ -27,6 +32,7 @@ extern ECS ecs;
 
 namespace engine 
 {
+	//A class to store all the default engine modules
 	class EngineLib
 	{
 	public:
@@ -37,6 +43,9 @@ namespace engine
 
 		EngineLib()
 		{
+			//Init time
+			lastFrame = chrono::high_resolution_clock::now();
+
 			//Register all default engine components here
 			ecs.registerComponent<Sprite>();
 			ecs.registerComponent<Transform>();
@@ -72,6 +81,26 @@ namespace engine
 			physicsSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
 		}
+
+		//Updates all default engine systems. Updates and returns delta time
+		double Update(Camera* cam)
+		{
+			//Update engine systems
+			
+
+			//Calculate Delta Time
+			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
+			chrono::duration<double> duration = thisFrame - lastFrame;
+			deltaTime = duration.count();
+			lastFrame = thisFrame;
+
+			return deltaTime;
+		}
+
+		double deltaTime;
+	
+	private:
+		chrono::time_point<chrono::high_resolution_clock> lastFrame;
 	};
 
 	//Engine Resource Variables
@@ -188,30 +217,5 @@ namespace engine
 
 		//If not in bounds return true
 		return true;
-	}
-
-	//integrating sound:
-
-	class soundAmbient {        // The class
-	public:              // Access specifier
-		
-		void playSound(string name);   // Method/function declaration
-		
-	};
-
-	// Method/function definition outside the class
-	void soundAmbient::playSound(string name) {
-			
-			cout << "Sound effect plays";
-
-			}
-
-	int main() {
-		soundAmbient myObj;     // Create an object of soundAmbient
-		myObj.playSound("spring-weather-1.wav");  // Call the method
-
-		 
-		return 0;
-	}
-	
+	}	
 }
