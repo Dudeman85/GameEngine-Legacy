@@ -1,9 +1,15 @@
+//OpenGL
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+//STL
+#include <map>
+#include <vector>
+
+//Engine
 #include <engine/ECSCore.h>
 #include <engine/Transform.h>
 #include <engine/GL/Shader.h>
@@ -12,6 +18,8 @@
 
 extern ECS ecs;
 
+using namespace std;
+
 namespace engine
 {
 	//Sprite component
@@ -19,6 +27,27 @@ namespace engine
 	{
 		Texture* texture;
 		Shader* shader = nullptr;
+	};
+
+	//Animation struct. Not a component
+	struct Animation
+	{
+		vector<Texture*> textures;
+		vector<int> delays;
+		unsigned int length;
+	};
+
+	//Animator component
+	struct Animator
+	{
+		map<string, Animation> animations;
+
+		string currentAnimation;
+		int animationFrame = 0;
+		bool repeatAnimation = false;
+		bool playingAnimation = false;
+
+		float animationTimer = 0;
 	};
 
 	//Render system
@@ -77,7 +106,7 @@ namespace engine
 			glEnableVertexAttribArray(1);
 		}
 
-		//Call this every frame
+		//Renders evrything. Call this every frame
 		void Update(Camera* cam)
 		{
 			//Clear the screen
@@ -121,8 +150,8 @@ namespace engine
 				unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
 				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
-				//Bing the texture
-				glBindTexture(GL_TEXTURE_2D, sprite.texture->GetID());
+				//Bind the texture
+				sprite.texture->Use();
 
 				//Draw the sprite
 				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -138,5 +167,120 @@ namespace engine
 	private:
 		unsigned int VAO, VBO, EBO;
 		Shader defaultShader;
+	};
+	
+	//Animator system
+	//Requires Animator and Sprite
+	class AnimationSystem : public System
+	{
+	public:
+		//Update every entity with relevant components
+		void Update(float deltaTime)
+		{
+			//Delta time in milliseconds
+			deltaTime *= 1000; 
+
+			//For each entity that has the required components
+			for (auto const& entity : entities)
+			{
+				//Get the relevant components from entity
+				Animator& animator = ecs.getComponent<Animator>(entity);
+
+				animator.animationTimer += deltaTime;
+
+				//If the entity is currently playing an animation
+				if (animator.playingAnimation)
+				{
+					//If enough time (defined by animation) has passed advance the animation frame
+					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
+					{
+						AdvanceFrame(entity);
+						animator.animationTimer = 0;
+					}
+				}
+			}
+		}
+
+		//Advance to the next animation frame of current animation
+		void AdvanceFrame(Entity entity)
+		{
+			//Get the relevant components from entity
+			Animator& animator = ecs.getComponent<Animator>(entity);
+			Sprite& sprite = ecs.getComponent<Sprite>(entity);
+
+			//If end of animation has been reached go to start or end animation
+			if (animator.animationFrame >= animator.animations[animator.currentAnimation].length)
+			{
+				animator.animationFrame = 0;
+
+				//End the animation if it is not set to repeat
+				if (!animator.repeatAnimation)
+				{
+					animator.playingAnimation = false;
+					animator.currentAnimation = "";
+				}
+				return;
+			}
+
+			//Change Sprites texture
+			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
+
+			animator.animationFrame++;
+		}
+
+		//Add animations to entity, they will be accessible by given names
+		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
+		{
+			if (animations.size() > names.size())
+				throw("Not enough names for each animation!");
+
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			//For each animation to add
+			for (size_t i = 0; i < animations.size(); i++)
+			{
+				animator.animations.insert({ names[i], animations[i] });
+			}
+		}
+
+		//Add an animation to entity, it will be accessibl by given name
+		void AddAnimation(Entity entity, Animation animation, string name)
+		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			//Add the animation indexed by given name or number order
+			animator.animations.insert({ name, animation });
+
+		}
+
+		//Play an animation, optionally set it to repeat
+		void PlayAnimation(Entity entity, string animation, bool repeat = false)
+		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			animator.currentAnimation = animation;
+			animator.animationFrame = 0;
+			animator.repeatAnimation = repeat;
+			animator.playingAnimation = true;
+			animator.animationTimer = 0;
+
+			AdvanceFrame(entity);
+		}
+
+		//Stop an animation, optionally provide the specific animation to stop
+		void StopAnimation(Entity entity, string animation = "")
+		{
+			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			//If trying to stop animation that is not playing, return without doing anything
+			if (animation != "")
+				if (animator.currentAnimation != animation)
+					return;
+
+			animator.currentAnimation = "";
+			animator.animationFrame = 0;
+			animator.animationTimer = 0;
+			animator.playingAnimation = false;
+		}
 	};
 }
