@@ -25,11 +25,11 @@ Aika ajoin pidämme esitelmän tiimin kesken siitä, mitä olemme saaneet tehdyk
 
 - [x] Architecture (ECS)
 
-- [ ] OpenGL rendering
+- [x] OpenGL rendering
     - [ ] Sprite batching
-    - [ ] GLFW input
+    - [x] GLFW input
 
-- [ ] Sprite sheet / animations 
+- [x] Sprite sheet / animations 
     - [x] Spire sheet slicing
     - [x] animation loading
     - [x] animation playing
@@ -37,12 +37,12 @@ Aika ajoin pidämme esitelmän tiimin kesken siitä, mitä olemme saaneet tehdyk
 
 - [ ] Physics (Box2d) 
     - [x] Gravity 
-    - [ ] Collision
     - [ ] Velocity
 
-- [ ] Audio 
-    - [ ] general sounds
-    - [ ] Ambient/background sounds
+- [x] Audio 
+    - [x] general sounds
+    - [x] Ambient/background sounds
+    - [ ] Multiple sounds
 
 - [ ] Tiled support 
     - [ ] OpenGL support
