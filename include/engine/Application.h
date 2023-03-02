@@ -2,14 +2,12 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <stdio.h>
 #include <vector>
 
 // tmxlite includes
 #include <tmxlite/Map.hpp>
-#include <engine/SFMLOrthogonalLayer.h>
 // ObjectGroup and TileLayer include for
 //rendering and Box2d collision
 #include <tmxlite/ObjectGroup.hpp>
@@ -107,15 +105,6 @@ namespace engine
 	string levelPath = "levels/";
 	string assetPath = "assets/";
 
-	//Draws each layer of the tilemap to the render window
-	void RenderTilemap(tmx::Map* tilemap, sf::RenderWindow* window)
-	{
-		for (size_t i = 0; i < tilemap->getLayers().size(); i++)
-		{
-			MapLayer mapLayer(*tilemap, i);
-			window->draw(mapLayer);
-		}
-	}
 
 	//Tilemap Variables
 	int scale = 50;
@@ -176,46 +165,4 @@ namespace engine
 		return tilemap;
 	}
 
-	//Load texture with error checking
-	sf::Texture LoadTexture(string name)
-	{
-		sf::Texture texture;
-		if (!texture.loadFromFile(assetPath + name))
-		{
-			printf("Load texture error");
-		}
-		return texture;
-	}
-
-	//Load texture with error checking
-	sf::Image LoadImage(string name)
-	{
-		sf::Image image;
-		if (!image.loadFromFile(assetPath + name))
-		{
-			printf("Load texture error");
-		}
-		return image;
-	}
-
-	//Returns true if any corner of sprite is overlapping a non zero position of the tilemap.
-	//Assumes origin of sprite is in the center. Optional offset for shifting the hitbox.
-	bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, sf::Vector2f offset = sf::Vector2f(0, 0))
-	{
-		//Get position(center) width and height of collision box
-		sf::Vector2f position = sprite.getPosition() + offset;
-		int width = sprite.getGlobalBounds().width / 2;
-		int height = sprite.getGlobalBounds().height / 2;
-
-		//Check if in bounds
-		if (position.x - width > 0 && position.x + width < mapWidth * scale && position.y + height < mapHeight * scale && position.y - height > 0)
-			//Check if any corner is within the tilemap by indexing the tilemap with each corner position divided by tilemap pixel scale
-			return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
-			(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
-			(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
-			(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
-
-		//If not in bounds return true
-		return true;
-	}	
 }

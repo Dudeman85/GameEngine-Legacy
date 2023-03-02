@@ -126,7 +126,7 @@ int main()
     return 0;
 }
 #endif
-
+/*
 #include "engine/Application.h"
 
 //Create one instance of the ecs manager
@@ -217,5 +217,9 @@ int main()
         // End the current frame (Swap buffers)
         window.display();
     } // End - while()
+    return 0;
+}*/
+int main()
+{
     return 0;
 }
