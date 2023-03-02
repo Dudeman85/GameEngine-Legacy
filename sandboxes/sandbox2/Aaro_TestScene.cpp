@@ -125,8 +125,8 @@ int main()
     } // End - while()  
     return 0;
 }
-#endif
 
+// TOIMIVA TILED!!!!
 #include "engine/Application.h"
 
 //Create one instance of the ecs manager
@@ -137,14 +137,40 @@ int main()
     // Tiled Map class
     tmx::Map map;
 
+    // SFML window creation
+    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
+
     // Download Tiled map from file
     map.load("assets/Tiled/maps/CollidersTestMap.tmx");
+
+    // Load tileset Texture
+    sf::Texture tilesetTexture;
+    tilesetTexture.loadFromFile("assets/Tiled/tilesets/FD_Dungeon_Free.png");
 
     // Finding all the layers
     const auto& layers = map.getLayers();
 
     // Creating Box2d-world
     b2World world(b2Vec2(0.0f, 9.8f));
+
+    // Game loop
+   // Run the program as long as the window is open
+    while (window.isOpen())
+    {
+
+        // Check all the window's events that were triggered since the last iteration of the loop
+        sf::Event event;
+
+        while (window.pollEvent(event))
+        {
+            // "Close requested" event: we close the window
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+        }
+
+        window.clear(sf::Color::Cyan);
 
     // Going through all the layers
     for (const auto& layer : layers)
@@ -189,33 +215,62 @@ int main()
         else if (layer->getType() == tmx::Layer::Type::Tile)
         {
             // Place Tiled layer address to tile variable
-          //  const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>
+            const auto& tileLayer = layer->getLayerAs<tmx::TileLayer>();
+
+            // Get all tiles in the layer
+            const auto& tiles = tileLayer.getTiles();
+
+            // Get the width and height of the tile layer
+            int width = tileLayer.getSize().x;
+            int height = tileLayer.getSize().y;
+
+            // Calculate tile size
+            int tileWidth = map.getTileSize().x;
+            int tileHeight = map.getTileSize().y;
+
+            // Loop through each tile in the layer
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    // Get the tile at the current position
+                     auto tileId = tiles[y * width + x].ID;
+
+                    // Calculate the position of the tile
+                    int posX = x * tileWidth;
+                    int posY = y * tileHeight;
+
+                    // Create sprite for the tile and set its texture
+                    sf::Sprite tileSprite(tilesetTexture);
+     
+                     // Set the texture rect for the sprite
+                    int tilesetWidth = tilesetTexture.getSize().x;
+                    int tilesetColumns = tilesetWidth / tileWidth;
+                    int tilesetX = (tileId % tilesetColumns) * tileWidth;
+                    int tilesetY = (tileId / tilesetColumns) * tileHeight;
+                    tileSprite.setTextureRect(sf::IntRect(tilesetX, tilesetY, tileWidth, tileHeight));
+
+                    // Set the position for the sprite
+                    tileSprite.setPosition(posX, posY);
+
+                    // Draw the tile sprite
+                    window.draw(tileSprite);
+
+                }
+            }
         }
 
     }
+    
+    // End the current frame (Swap buffers)
+    window.display();
 
-    // SFML window creation
-    sf::RenderWindow window(sf::VideoMode(800, 600), "My window");
-
-    // Game loop
-    // Run the program as long as the window is open
-    while (window.isOpen())
-    {
-        // Check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-
-        while (window.pollEvent(event))
-        {
-            // "Close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
-        window.clear(sf::Color::Cyan);
-
-        // End the current frame (Swap buffers)
-        window.display();
     } // End - while()
     return 0;
+}
+#endif
+
+int main()
+{
+
 }
