@@ -59,7 +59,7 @@ set (CPACK_PACKAGE_VERSION_FULL "${PROJECT_VERSION}${CPACK_PACKAGE_VERSION_STAGE
 include (GNUInstallDirs)
 include (FeatureSummary)
 include (CMakeDependentOption)
-include (CTest)
+enable_testing()
 include (CheckCCompilerFlag)
 
 #

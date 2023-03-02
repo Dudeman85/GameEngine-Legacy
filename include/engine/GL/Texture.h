@@ -35,8 +35,8 @@ namespace engine
 				}
 
 				//Generate and bind texture
-				glGenTextures(1, &ID);
-				glBindTexture(GL_TEXTURE_2D, ID);
+				glGenTextures(1, &id);
+				glBindTexture(GL_TEXTURE_2D, id);
 
 				//Set texture filtering parameters
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filteringType);
@@ -59,13 +59,13 @@ namespace engine
 		}
 		~Texture()
 		{
-			glDeleteTextures(1, &ID);
+			glDeleteTextures(1, &id);
 		}
 
 		//Sets the OpenGL sampling type when up and downscaling the texture. Ex. GL_NEAREST, GL_LINEAR, etc.
 		void SetScalingFilter(unsigned int type)
 		{
-			glBindTexture(GL_TEXTURE_2D, ID);
+			glBindTexture(GL_TEXTURE_2D, id);
 
 			//Set texture filtering parameters
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, type);
@@ -76,12 +76,18 @@ namespace engine
 		}
 
 		//Get this textures OpenGL ID
-		unsigned int GetID()
+		unsigned int ID()
 		{
-			return ID;
+			return id;
+		}
+
+		//Use this texture to draw the next sprite
+		void Use()
+		{
+			glBindTexture(GL_TEXTURE_2D, id);
 		}
 
 	private:
-		unsigned int ID = 0;
+		unsigned int id = 0;
 	};
 }

@@ -2,18 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <stdio.h>
 #include <vector>
-
-// tmxlite includes
-#include <tmxlite/Map.hpp>
-#include <engine/SFMLOrthogonalLayer.h>
-// ObjectGroup and TileLayer include for
-//rendering and Box2d collision
-#include <tmxlite/ObjectGroup.hpp>
-#include <tmxlite/TileLayer.hpp>
+#include <chrono>
 
 //ECS modules
 #include "ECSCore.h"
@@ -21,15 +13,21 @@
 #include "Transform.h"
 #include "Gravity.h"
 
+//Other engine libs
+#include <engine/GL/Window.h>
+
 using namespace std;
 
 extern ECS ecs;
 
 namespace engine 
 {
+	//A class to store all the default engine modules
 	class EngineLib
 	{
 	public:
+		double deltaTime = 0;
+
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
@@ -37,6 +35,12 @@ namespace engine
 
 		EngineLib()
 		{
+			//Make sure OpenGL context has been created
+			assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before initializing EngineLib!");
+
+			//Init time
+			lastFrame = chrono::high_resolution_clock::now();
+
 			//Register all default engine components here
 			ecs.registerComponent<Sprite>();
 			ecs.registerComponent<Transform>();
@@ -45,12 +49,11 @@ namespace engine
 
 			//Register all default engine systems here
 
-			//Animation System
-			animationSystem = ecs.registerSystem<AnimationSystem>();
-			Signature animationSystemSignature;
-			animationSystemSignature.set(ecs.getComponentId<Sprite>());
-			animationSystemSignature.set(ecs.getComponentId<Animator>());
-			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
+			//Transform System
+			transformSystem = ecs.registerSystem<TransformSystem>();
+			Signature transformSystemSignature;
+			transformSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
 
 			//Render System
 			renderSystem = ecs.registerSystem<RenderSystem>();
@@ -59,12 +62,13 @@ namespace engine
 			renderSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<RenderSystem>(renderSystemSignature);
 
-			//Transform System
-			transformSystem = ecs.registerSystem<TransformSystem>();
-			Signature transformSystemSignature;
-			transformSystemSignature.set(ecs.getComponentId<Transform>());
-			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
-			
+			//Animation System
+			animationSystem = ecs.registerSystem<AnimationSystem>();
+			Signature animationSystemSignature;
+			animationSystemSignature.set(ecs.getComponentId<Sprite>());
+			animationSystemSignature.set(ecs.getComponentId<Animator>());
+			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
+
 			//Physics System
 			physicsSystem = ecs.registerSystem<PhysicsSystem>();
 			Signature physicsSystemSignature;
@@ -72,21 +76,32 @@ namespace engine
 			physicsSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
 		}
+
+		//Updates all default engine systems, calculates and returns delta time
+		double Update(Camera* cam)
+		{
+			//Update engine systems
+			transformSystem->Update();
+			renderSystem->Update(cam);
+			animationSystem->Update(deltaTime);
+
+			//Calculate Delta Time
+			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
+			chrono::duration<double> duration = thisFrame - lastFrame;
+			deltaTime = duration.count();
+			lastFrame = thisFrame;
+
+			return deltaTime;
+		}
+	
+	private:
+		chrono::time_point<chrono::high_resolution_clock> lastFrame;
 	};
 
 	//Engine Resource Variables
 	string levelPath = "levels/";
 	string assetPath = "assets/";
 
-	//Draws each layer of the tilemap to the render window
-	void RenderTilemap(tmx::Map* tilemap, sf::RenderWindow* window)
-	{
-		for (size_t i = 0; i < tilemap->getLayers().size(); i++)
-		{
-			MapLayer mapLayer(*tilemap, i);
-			window->draw(mapLayer);
-		}
-	}
 
 	//Tilemap Variables
 	int scale = 50;
@@ -147,71 +162,4 @@ namespace engine
 		return tilemap;
 	}
 
-	//Load texture with error checking
-	sf::Texture LoadTexture(string name)
-	{
-		sf::Texture texture;
-		if (!texture.loadFromFile(assetPath + name))
-		{
-			printf("Load texture error");
-		}
-		return texture;
-	}
-
-	//Load texture with error checking
-	sf::Image LoadImage(string name)
-	{
-		sf::Image image;
-		if (!image.loadFromFile(assetPath + name))
-		{
-			printf("Load texture error");
-		}
-		return image;
-	}
-
-	//Returns true if any corner of sprite is overlapping a non zero position of the tilemap.
-	//Assumes origin of sprite is in the center. Optional offset for shifting the hitbox.
-	bool CheckTilemapCollision(sf::Sprite sprite, vector<vector<uint8_t>> tilemap, sf::Vector2f offset = sf::Vector2f(0, 0))
-	{
-		//Get position(center) width and height of collision box
-		sf::Vector2f position = sprite.getPosition() + offset;
-		int width = sprite.getGlobalBounds().width / 2;
-		int height = sprite.getGlobalBounds().height / 2;
-
-		//Check if in bounds
-		if (position.x - width > 0 && position.x + width < mapWidth * scale && position.y + height < mapHeight * scale && position.y - height > 0)
-			//Check if any corner is within the tilemap by indexing the tilemap with each corner position divided by tilemap pixel scale
-			return (tilemap[(position.y - height) / scale][(position.x - width) / scale] != 0) ||
-			(tilemap[(position.y - height) / scale][(position.x + width) / scale] != 0) ||
-			(tilemap[(position.y + height) / scale][(position.x - width) / scale] != 0) ||
-			(tilemap[(position.y + height) / scale][(position.x + width) / scale] != 0);
-
-		//If not in bounds return true
-		return true;
-	}
-
-	//integrating sound:
-
-	class soundAmbient {        // The class
-	public:              // Access specifier
-		
-		void playSound(string name);   // Method/function declaration
-		
-	};
-
-	// Method/function definition outside the class
-	void soundAmbient::playSound(string name) {
-			
-			cout << "Sound effect plays";
-
-			}
-
-	int main() {
-		soundAmbient myObj;     // Create an object of soundAmbient
-		myObj.playSound("spring-weather-1.wav");  // Call the method
-
-		 
-		return 0;
-	}
-	
 }

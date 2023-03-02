@@ -2,6 +2,7 @@
 #include <sndfile.h>
 #include <inttypes.h>
 #include <AL/alext.h>
+#include <climits>
 
 SoundBuffer* SoundBuffer::get()
 {

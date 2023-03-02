@@ -1,33 +1,43 @@
-#pragma once
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <cmath>
-#include "ECSCore.h"
-#include "Transform.h"
+//OpenGL
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-using namespace std;
+//STL
+#include <map>
+#include <vector>
+
+//Engine
+#include <engine/ECSCore.h>
+#include <engine/Transform.h>
+#include <engine/GL/Shader.h>
+#include <engine/GL/Texture.h>
+#include <engine/GL/Camera.h>
 
 extern ECS ecs;
+
+using namespace std;
 
 namespace engine
 {
 	//Sprite component
 	struct Sprite
 	{
-		sf::Texture texture;
-		int zOverride = 0;
-		sf::Sprite sprite;
+		Texture* texture;
+		Shader* shader = nullptr;
 	};
 
-	//Container for a single animation (not a component)
+	//Animation struct. Not a component
 	struct Animation
 	{
-		vector<sf::Texture> textures;
+		vector<Texture*> textures;
 		vector<int> delays;
-		uint64_t length = 0;
+		unsigned int length;
 	};
 
-	//Animator Component
+	//Animator component
 	struct Animator
 	{
 		map<string, Animation> animations;
@@ -37,58 +47,152 @@ namespace engine
 		bool repeatAnimation = false;
 		bool playingAnimation = false;
 
-		sf::Clock animationTimer;
+		float animationTimer = 0;
 	};
 
-	//Render System
-	class RenderSystem :public System
+	//Render system
+	//Requires Sprite and Transform
+	class RenderSystem : public System
 	{
 	public:
-		void Update(sf::RenderWindow& window)
+		RenderSystem()
 		{
-			//Sort in order of z-axis to draw in proper order
-			vector<Entity> sortedEntities(entities.begin(), entities.end());
-			std::sort(sortedEntities.begin(), sortedEntities.end(), [](const Entity lhs, const Entity rhs)
-				{
-					return ecs.getComponent<Transform>(lhs).z > ecs.getComponent<Transform>(rhs).z;
-				});
+			//Set the screen clear color to black
+			glClearColor(0, 0, 0, 1.0f);
 
-			//Goes through list of entities, sets textures to sprites and draws them to window
-			for (auto const& entity : sortedEntities)
+			//Enable transparency
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+
+			//Create the default shader
+			defaultShader = Shader();
+
+			//Rectangle vertices start at top left and go clockwise to bottom left
+			float vertices[] = {
+				//Positions		  Texture Coords
+				 1.f,  1.f, 0.0f, 1.0f, 1.0f, // top right
+				 1.f, -1.f, 0.0f, 1.0f, 0.0f, // bottom right
+				-1.f, -1.f, 0.0f, 0.0f, 0.0f, // bottom left
+				-1.f,  1.f, 0.0f, 0.0f, 1.0f, // top left 
+			};
+			//Indices to draw a rectangle from two triangles
+			unsigned int indices[] = {
+				0, 1, 2, //1st trangle
+				0, 2, 3, //2nd triangle
+			};
+
+			//Make the Vertex Array Object, Vertex Buffer Object, and Element Buffer Object
+			glGenVertexArrays(1, &VAO);
+			glGenBuffers(1, &VBO);
+			glGenBuffers(1, &EBO);
+
+			//Bind the Vertex Array Object
+			glBindVertexArray(VAO);
+
+			//Bind the Vertex Bufer Object and set vertices
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+			//Bind and set indices to EBO
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+			//Configure Vertex attribute at location 0 aka position
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+			glEnableVertexAttribArray(0);
+
+			//Configure Vertex attribute at location 1 aka texture coords
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(1);
+		}
+
+		//Renders evrything. Call this every frame
+		void Update(Camera* cam)
+		{
+			//Clear the screen
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			//Only need to bind the VAO once
+			glBindVertexArray(VAO);
+
+			for (auto const& entity : entities)
 			{
 				//Get relevant components
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
 				Transform& transform = ecs.getComponent<Transform>(entity);
 
-				//Set the sprite's texture, position, and scale
-				sprite.sprite.setTexture(sprite.texture);
-				sprite.sprite.setPosition(sf::Vector2f(transform.x - sprite.texture.getSize().x * transform.xScale / 2, transform.y - sprite.texture.getSize().y * transform.yScale / 2));
-				sprite.sprite.setScale(sf::Vector2(transform.xScale, transform.yScale));
+				//If a shader has been specified for this sprite use it, else use the default
+				Shader shader = defaultShader;
+				if (sprite.shader)
+					shader = *sprite.shader;
+				shader.use();
 
-				//Draw the sprite to provided window
-				window.draw(sprite.sprite);
+				//Create the model matrix
+				glm::mat4 model = glm::mat4(1.0f);
+				//Position
+				model = glm::translate(model, glm::vec3(transform.x, transform.y, transform.z));
+				//Scale
+				model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
+				//X, Y, Z euler rotations
+				model = glm::rotate(model, transform.xRotation, glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, transform.yRotation, glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::rotate(model, transform.zRotation, glm::vec3(0.0f, 0.0f, 1.0f));
+
+				//Give the shader the model matrix
+				unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+				//Give the shader the view matrix
+				unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+
+				//Give the shader the projection matrix
+				unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
+				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+
+				//Bind the texture
+				sprite.texture->Use();
+
+				//Draw the sprite
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			}
 		}
-	};
 
+		//Set the screens clear color to given normalized rgb
+		void SetBackgroundColor(float r, float g, float b)
+		{
+			glClearColor(r, g, b, 1.0f);
+		}
+
+	private:
+		unsigned int VAO, VBO, EBO;
+		Shader defaultShader;
+	};
+	
 	//Animator system
+	//Requires Animator and Sprite
 	class AnimationSystem : public System
 	{
 	public:
 		//Update every entity with relevant components
-		void Update()
+		void Update(float deltaTime)
 		{
+			//Delta time in milliseconds
+			deltaTime *= 1000; 
+
 			//For each entity that has the required components
 			for (auto const& entity : entities)
 			{
 				//Get the relevant components from entity
 				Animator& animator = ecs.getComponent<Animator>(entity);
 
+				animator.animationTimer += deltaTime;
+
 				//If the entity is currently playing an animation
 				if (animator.playingAnimation)
 				{
-					//If enough time (defined by animation) has passed
-					if (animator.animationTimer.getElapsedTime().asMilliseconds() >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
+					//If enough time (defined by animation) has passed advance the animation frame
+					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
 					{
 						AdvanceFrame(entity);
 					}
@@ -107,6 +211,8 @@ namespace engine
 			if (animator.animationFrame >= animator.animations[animator.currentAnimation].length)
 			{
 				animator.animationFrame = 0;
+
+				//End the animation if it is not set to repeat
 				if (!animator.repeatAnimation)
 				{
 					animator.playingAnimation = false;
@@ -115,18 +221,18 @@ namespace engine
 				return;
 			}
 
-			//Change GameObject texture
+			//Change Sprites texture
 			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
 
-			animator.animationTimer.restart();
 			animator.animationFrame++;
+			animator.animationTimer = 0;
 		}
 
 		//Add animations to entity, they will be accessible by given names
 		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
 		{
 			if (animations.size() > names.size())
-				throw("Not enough names for each animation!");
+				throw("Not enough names given for each animation!");
 
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
@@ -142,9 +248,8 @@ namespace engine
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
-			//Add the animation indexed by given name or number order
+			//Add the animation indexed by given name
 			animator.animations.insert({ name, animation });
-
 		}
 
 		//Play an animation, optionally set it to repeat
@@ -156,8 +261,9 @@ namespace engine
 			animator.animationFrame = 0;
 			animator.repeatAnimation = repeat;
 			animator.playingAnimation = true;
-			animator.animationTimer.restart();
+			animator.animationTimer = 0;
 
+			//Immediately advance to 1st frame of animation
 			AdvanceFrame(entity);
 		}
 
@@ -173,113 +279,8 @@ namespace engine
 
 			animator.currentAnimation = "";
 			animator.animationFrame = 0;
+			animator.animationTimer = 0;
 			animator.playingAnimation = false;
 		}
 	};
-
-	//Slices an image into equal sized textures of width and height in pixels.
-	//Returns a vector of textures ordered left to right top to bottom 
-	vector<sf::Texture> SliceSpritesheet(sf::Image spritesheet, int width, int height)
-	{
-		assert(spritesheet.getSize().x > 0 && "Spritesheet not proper image!");
-
-		//Throw warning if spritesheet is not properly dimensioned
-		if (spritesheet.getSize().x % width != 0)
-			cout << "Warning: Spritesheet width is not a multiple of sprite width. Clipping may occur!\n";
-		if (spritesheet.getSize().y % height != 0)
-			cout << "Warning: Spritesheet height is not a multiple of sprite height. Clipping may occur!\n";
-
-		vector<sf::Texture> slicedSpritesheet;
-		//Run through each full sprite in the spritesheet
-		//if the final row or column are not full, skip them
-		for (size_t y = 0; y < spritesheet.getSize().y - height + 1; y += height)
-		{
-			for (size_t x = 0; x < spritesheet.getSize().x - width + 1; x += width)
-			{
-				//Copy sector of spritesheet to new texture
-				sf::Image slice;
-				slice.create(width, height);
-				slice.copy(spritesheet, 0, 0, sf::IntRect(x, y, width, height));
-
-				sf::Texture slicedTexture;
-				slicedTexture.loadFromImage(slice);
-
-				slicedSpritesheet.push_back(slicedTexture);
-			}
-		}
-
-		return slicedSpritesheet;
-	}
-
-	//Gets a subregion of an image by pixel coordinates from top-left to bottom-right
-	//Return sliced texture
-	sf::Texture CustomSlice(sf::Image spritesheet, int x1, int y1, int x2, int y2)
-	{
-		assert(spritesheet.getSize().x > 0 && "Spritesheet not proper image!");
-
-		sf::Image slice;
-		slice.create(x2 - x1, y2 - y1);
-		slice.copy(spritesheet, 0, 0, sf::IntRect(x1, y1, x2, y2));
-
-		sf::Texture slicedTexture = sf::Texture();
-		slicedTexture.loadFromImage(slice);
-
-		return slicedTexture;
-	}
-
-	//Automatically slice and create animations from a spritesheet with delays in ms and optional names.
-	//Adds one animation per row of sprites in the spritesheet. You must provide one delay per sprite in the delays vector. 
-	//All sprites must have the same width and height.
-	vector<Animation> AnimationsFromSpritesheet(sf::Image spritesheet, int width, int height, vector<int> delays)
-	{
-		//Get a list of textures from the spritesheet
-		vector<sf::Texture> textures = SliceSpritesheet(spritesheet, width, height);
-
-		if (delays.size() < textures.size())
-			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
-
-		vector<Animation> newAnimations;
-
-		cout << floor(spritesheet.getSize().y / height);
-
-		//For each row in the spritesheet
-		for (size_t y = 0; y < floor(spritesheet.getSize().y / height); y++)
-		{
-			//Frame buffer to add to animation
-			vector<sf::Texture> animationSlice;
-			vector<int> delaySlice;
-
-			//For each column in the row
-			for (size_t x = 0; x < floor(spritesheet.getSize().x / width); x++)
-			{
-				int a = floor(spritesheet.getSize().x / width) * y + x;
-				//Add the next texture to the buffer 
-				animationSlice.push_back(textures[floor(spritesheet.getSize().x / width) * y + x]);
-				delaySlice.push_back(delays[floor(spritesheet.getSize().x / width)]);
-			}
-
-			Animation newAnimation{
-				.textures = animationSlice,
-				.delays = delaySlice,
-				.length = animationSlice.size()
-			};
-
-			newAnimations.push_back(newAnimation);
-		}
-		return newAnimations;
-	}
-
-	//Create one animation from frames and delays in ms
-	Animation CreateAnimation(vector<sf::Texture> frames, vector<int> delays)
-	{
-		if (frames.size() != delays.size())
-			throw("Not enough delays for amount of frames!\nYou must provide one delay after each frame (even the last one).\n");
-
-		Animation newAnimation{
-			.textures = frames,
-			.delays = delays,
-			.length = frames.size()
-		};
-		return newAnimation;
-	}
 }

@@ -6,19 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
 set(ALSOFT_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory("ext/OpenAL")
-# SFML: https://www.sfml-dev.org/
-# SFML Dokumentaatio: https://www.sfml-dev.org/documentation/2.5.1/
+
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-add_subdirectory("ext/SFML-2.5.1")
 add_subdirectory("ext/libsndfile-master")
-include_directories("ext/SFML-2.5.1/include")
 include_directories("include")
 include_directories("ext/STB")
 include_directories("ext/libsndfile-master/include")
 # tmxlite-master library
 SET(TMXLITE_STATIC_LIB TRUE CACHE BOOL "")
 add_subdirectory("ext/tmxlite-master/tmxlite")
-add_subdirectory("ext/tmxlite-master/SFMLExample")
 
 # OpenGL
 add_subdirectory("ext/glfw-3.3.2")
@@ -33,16 +29,9 @@ file(GLOB_RECURSE ENGINE_SOURCE_FILES "./src/*.cpp")
 file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/GL/*.h")
 
 # engine -library
-add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
-target_link_libraries(engine sfml-graphics OpenAL tmxlite box2d)
+add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
+target_link_libraries(engine glfw OpenAL tmxlite glm sndfile box2d)
 target_include_directories(engine PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
-
-add_library(engine2 ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
-target_link_libraries(engine2 glfw OpenAL tmxlite glm sndfile)
-target_include_directories(engine2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
@@ -56,7 +45,6 @@ IF (WIN32)
 	configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo1/OpenAL32.dll" COPYONLY)
 ENDIF()
 
-#set(ENGINE_LIBS engine sfml-graphics)
 
 # Sandboxes
 if(ENGINE_BUILD_SANDBOXES)
