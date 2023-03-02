@@ -18,6 +18,7 @@ namespace engine
 	class TransformSystem : public System
 	{
 	public:
+		//No update functionality yet
 		void Update()
 		{
 			for (auto const& entity : entities)
@@ -26,7 +27,8 @@ namespace engine
 			}
 		}
 
-		void Move(Entity entity, float dx, float dy, float dz = 0)
+		//Translate an entity by dx, dy, and dz
+		void Translate(Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x += dx;

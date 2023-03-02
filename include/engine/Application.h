@@ -5,14 +5,6 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-
-// tmxlite includes
-#include <tmxlite/Map.hpp>
-// ObjectGroup and TileLayer include for
-//rendering and Box2d collision
-#include <tmxlite/ObjectGroup.hpp>
-#include <tmxlite/TileLayer.hpp>
-
 #include <chrono>
 
 //ECS modules
@@ -22,7 +14,7 @@
 #include "Gravity.h"
 
 //Other engine libs
-#include <engine/GL/Camera.h>
+#include <engine/GL/Window.h>
 
 using namespace std;
 
@@ -34,6 +26,8 @@ namespace engine
 	class EngineLib
 	{
 	public:
+		double deltaTime = 0;
+
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
@@ -41,6 +35,9 @@ namespace engine
 
 		EngineLib()
 		{
+			//Make sure OpenGL context has been created
+			assert(OPENGL_INITIALIZED && "OpenGL has not been initialized! Create a window, or manually create the OpenGL context before initializing EngineLib!");
+
 			//Init time
 			lastFrame = chrono::high_resolution_clock::now();
 
@@ -52,12 +49,11 @@ namespace engine
 
 			//Register all default engine systems here
 
-			//Animation System
-			animationSystem = ecs.registerSystem<AnimationSystem>();
-			Signature animationSystemSignature;
-			animationSystemSignature.set(ecs.getComponentId<Sprite>());
-			animationSystemSignature.set(ecs.getComponentId<Animator>());
-			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
+			//Transform System
+			transformSystem = ecs.registerSystem<TransformSystem>();
+			Signature transformSystemSignature;
+			transformSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
 
 			//Render System
 			renderSystem = ecs.registerSystem<RenderSystem>();
@@ -66,12 +62,13 @@ namespace engine
 			renderSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<RenderSystem>(renderSystemSignature);
 
-			//Transform System
-			transformSystem = ecs.registerSystem<TransformSystem>();
-			Signature transformSystemSignature;
-			transformSystemSignature.set(ecs.getComponentId<Transform>());
-			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
-			
+			//Animation System
+			animationSystem = ecs.registerSystem<AnimationSystem>();
+			Signature animationSystemSignature;
+			animationSystemSignature.set(ecs.getComponentId<Sprite>());
+			animationSystemSignature.set(ecs.getComponentId<Animator>());
+			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
+
 			//Physics System
 			physicsSystem = ecs.registerSystem<PhysicsSystem>();
 			Signature physicsSystemSignature;
@@ -80,11 +77,13 @@ namespace engine
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
 		}
 
-		//Updates all default engine systems. Updates and returns delta time
+		//Updates all default engine systems, calculates and returns delta time
 		double Update(Camera* cam)
 		{
 			//Update engine systems
-			
+			transformSystem->Update();
+			renderSystem->Update(cam);
+			animationSystem->Update(deltaTime);
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
@@ -94,8 +93,6 @@ namespace engine
 
 			return deltaTime;
 		}
-
-		double deltaTime;
 	
 	private:
 		chrono::time_point<chrono::high_resolution_clock> lastFrame;

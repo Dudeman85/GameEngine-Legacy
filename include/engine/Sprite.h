@@ -195,7 +195,6 @@ namespace engine
 					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
 					{
 						AdvanceFrame(entity);
-						animator.animationTimer = 0;
 					}
 				}
 			}
@@ -226,13 +225,14 @@ namespace engine
 			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
 
 			animator.animationFrame++;
+			animator.animationTimer = 0;
 		}
 
 		//Add animations to entity, they will be accessible by given names
 		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
 		{
 			if (animations.size() > names.size())
-				throw("Not enough names for each animation!");
+				throw("Not enough names given for each animation!");
 
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
@@ -248,9 +248,8 @@ namespace engine
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
-			//Add the animation indexed by given name or number order
+			//Add the animation indexed by given name
 			animator.animations.insert({ name, animation });
-
 		}
 
 		//Play an animation, optionally set it to repeat
@@ -264,6 +263,7 @@ namespace engine
 			animator.playingAnimation = true;
 			animator.animationTimer = 0;
 
+			//Immediately advance to 1st frame of animation
 			AdvanceFrame(entity);
 		}
 
