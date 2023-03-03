@@ -32,9 +32,17 @@ namespace engine
 	//Animation struct. Not a component
 	struct Animation
 	{
+		Animation() {};
+		Animation(vector<Texture*> animationTextures, vector<int> animationDelays)
+		{
+			assert(animationTextures.size() == animationDelays.size() && "Failed to create animation! Number of frames and delays do not match!");
+			textures = animationTextures;
+			delays = animationDelays;
+			length = animationDelays.size();
+		};
 		vector<Texture*> textures;
 		vector<int> delays;
-		unsigned int length;
+		unsigned int length = 0;
 	};
 
 	//Animator component
@@ -186,13 +194,13 @@ namespace engine
 				//Get the relevant components from entity
 				Animator& animator = ecs.getComponent<Animator>(entity);
 
-				animator.animationTimer += deltaTime;
-
 				//If the entity is currently playing an animation
 				if (animator.playingAnimation)
 				{
+					animator.animationTimer += deltaTime;
+
 					//If enough time (defined by animation) has passed advance the animation frame
-					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame - 1])
+					if (animator.animationTimer >= animator.animations[animator.currentAnimation].delays[animator.animationFrame])
 					{
 						AdvanceFrame(entity);
 					}
@@ -207,25 +215,26 @@ namespace engine
 			Animator& animator = ecs.getComponent<Animator>(entity);
 			Sprite& sprite = ecs.getComponent<Sprite>(entity);
 
+			//Change Sprites texture
+			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
+
+			animator.animationFrame++;
+			animator.animationTimer = 0;
+
 			//If end of animation has been reached go to start or end animation
 			if (animator.animationFrame >= animator.animations[animator.currentAnimation].length)
 			{
 				animator.animationFrame = 0;
+				animator.animationTimer = 0;
 
 				//End the animation if it is not set to repeat
 				if (!animator.repeatAnimation)
 				{
 					animator.playingAnimation = false;
 					animator.currentAnimation = "";
+					return;
 				}
-				return;
 			}
-
-			//Change Sprites texture
-			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];
-
-			animator.animationFrame++;
-			animator.animationTimer = 0;
 		}
 
 		//Add animations to entity, they will be accessible by given names
@@ -256,6 +265,12 @@ namespace engine
 		void PlayAnimation(Entity entity, string animation, bool repeat = false)
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
+
+			if (animator.animations.find(animation) == animator.animations.end())
+			{
+				cout << "No animation named \"" << animation << "\" was found in this entity.";
+				return;
+			}
 
 			animator.currentAnimation = animation;
 			animator.animationFrame = 0;

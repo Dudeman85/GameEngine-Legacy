@@ -1,10 +1,4 @@
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <stdio.h>
-#include <vector>
 #include <chrono>
 
 //ECS modules
@@ -48,7 +42,6 @@ namespace engine
 			ecs.registerComponent<Rigidbody>();
 
 			//Register all default engine systems here
-
 			//Transform System
 			transformSystem = ecs.registerSystem<TransformSystem>();
 			Signature transformSystemSignature;
@@ -97,69 +90,4 @@ namespace engine
 	private:
 		chrono::time_point<chrono::high_resolution_clock> lastFrame;
 	};
-
-	//Engine Resource Variables
-	string levelPath = "levels/";
-	string assetPath = "assets/";
-
-
-	//Tilemap Variables
-	int scale = 50;
-	int mapWidth = 20;
-	int mapHeight = 54;
-
-	//Save 2D vector tilemap to file
-	void SaveTilemap(vector<vector<uint8_t>> tilemap, string file)
-	{
-		//Create a new directory and tilemap save file
-		filesystem::create_directory(levelPath);
-		ofstream tilemapSave(levelPath + file, ios_base::out);
-
-		//For each x and y of given tilemap
-		for (int x = 0; x < tilemap.size(); x++)
-		{
-			for (int y = 0; y < tilemap[0].size(); y++)
-			{
-				//Write tilemap tile id to file
-				tilemapSave << tilemap[x][y];
-			}
-			tilemapSave << endl;
-		}
-
-		cout << "Saved tilemap to " << levelPath + file << endl;
-		tilemapSave.close();
-	}
-
-	//Load 2D vector tilemap from file
-	vector<vector<uint8_t>> LoadTilemap(string file)
-	{
-		//Try to open a tilemap of given name
-		ifstream tilemapSave(levelPath + file);
-		//If failed, return blank tilemap
-		if (tilemapSave.fail())
-		{
-			cout << "Failed to load tilemap " + file << endl;
-			vector<vector<uint8_t>> tilemap(mapHeight, vector<uint8_t>(mapWidth, 1));
-			return tilemap;
-		}
-
-		//Create a new tilemap vector and iterate through each row and column of saved tilemap
-		vector<vector<uint8_t>> tilemap;
-		for (string sRow; getline(tilemapSave, sRow);)
-		{
-			vector<uint8_t> row;
-			for (int i = 0; i < sRow.length(); i++)
-			{
-				//Add tile to row
-				row.push_back(sRow[i]);
-			}
-			//Add row to tilemap
-			tilemap.push_back(row);
-		}
-
-		tilemapSave.close();
-		cout << "Loaded tilemap from " << levelPath + file << endl;
-		return tilemap;
-	}
-
 }

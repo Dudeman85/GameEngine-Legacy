@@ -19,10 +19,23 @@ int main()
 	//Load a new texture
 	Texture texture = Texture("strawberry.png");
 
+
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
 	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(sprite, Sprite{ .texture = &texture });
+	ecs.addComponent(sprite, Animator{});
+
+	//Define the test animation
+	vector<Texture*> animationTextures;
+	animationTextures.push_back(new Texture("wood1.png"));
+	animationTextures.push_back(new Texture("wood2.png"));
+	vector<int> animationDelays{ 1000, 100 };
+
+	Animation anim(animationTextures, animationDelays);
+	engine.animationSystem->AddAnimation(sprite, anim, "1");
+
+	engine.animationSystem->PlayAnimation(sprite, "1", true);
 
 	//Create a new entity
 	Entity sprite2 = ecs.newEntity();

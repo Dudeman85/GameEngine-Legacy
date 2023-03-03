@@ -64,6 +64,7 @@ public:
 };
 
 //Generic component array interface for component manager
+//Unfortunaly there is seemingly no way to do this without virtual inheritance
 class IComponentArray
 {
 public: virtual void removeComponent(Entity entity) = 0;
@@ -123,7 +124,7 @@ public:
 
 	T& getComponent(Entity entity)
 	{
-		assert((entityToIndex.count(entity) > 0) && "Entity does not have desired component component!");
+		assert((entityToIndex.count(entity) > 0) && "Entity does not have desired component!");
 
 		//Return a reference to entity's component
 		return componentArray[entityToIndex[entity]];
@@ -184,6 +185,7 @@ public:
 		getComponentArray<T>()->removeComponent(entity);
 	}
 
+	//Get a reference to a component of type T from entity
 	template<typename T>
 	T& getComponent(Entity entity)
 	{
