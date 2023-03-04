@@ -74,6 +74,19 @@ void MainWindow::on_actionOpen_triggered()
     spriteLabels.clear();
 
     //TODO Alogrithm
+	/*
+        //Calculate the number of rows and colums in the grid based on the number of items and ratio of cols to rows
+        cols = f32::sqrt(NUM_ITEMS as f32 * RATIO).ceil() as usize;
+        rows = round::ceil(NUM_ITEMS as f64 / cols as f64, 0) as usize;
+
+        //Create the grid and fill it with the items
+        itemsGrid = vec![vec![0; cols]; rows];
+        for i in 0..NUM_ITEMS
+        {
+            itemsGrid[i / cols][i % cols] = items[i];
+        }
+	*/	
+		
     int maxRows = 3 + sprites.size() * 0.2;
     //Display all the sprites in a grid
     for(uint i = 0; i < sprites.size(); i++)

@@ -19,7 +19,6 @@ int main()
 	//Load a new texture
 	Texture texture = Texture("strawberry.png");
 
-
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
 	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
