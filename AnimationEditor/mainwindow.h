@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QIntValidator>
 #include <QTimer>
+#include <QLineEdit>
 
 #include "clickablelabel.h"
 
@@ -24,10 +25,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void UpdateDisplay();
+    void UpdateTimeline();
     void AnimationLoop();
 
 private slots:
     void onSpriteClicked();
+    void onFrameDelayChanged();
+
     void on_actionOpen_triggered();
     void on_addFrame_clicked();
     void on_frameSlider_sliderMoved(int position);
@@ -36,12 +40,15 @@ private slots:
     void on_delay_editingFinished();
     void on_removeFrame_clicked();
     void on_play_clicked();
+    void on_actionRemove_All_triggered();
 
 private:
-    QTimer *timer;
+    QTimer *animationTimer;
     Ui::MainWindow *ui;
     std::vector<QPixmap> sprites;
     std::vector<ClickableLabel*> spriteLabels;
+    std::vector<QLabel*> timelineLabels;
+    std::vector<QLineEdit*> timelineDelays;
 
     bool playingAnimation;
     int animationMsElapsed;
