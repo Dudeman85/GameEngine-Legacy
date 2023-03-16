@@ -1,7 +1,5 @@
 #include <engine/Application.h>
 
-#include <engine/Image.h>
-
 using namespace std;
 using namespace engine;
 
@@ -15,19 +13,22 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	Image test = Image("strawberry.png");
+	//SliceSpritesheet("strawberry.png", 2, 2);
+	engine.physicsSystem->Init(0, -10);
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
 	//Load a new texture
-	Texture texture = Texture(test);
+	Texture texture = Texture("strawberry.png");
 
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
 	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(sprite, Sprite{ .texture = &texture });
 	ecs.addComponent(sprite, Animator{});
+	ecs.addComponent(sprite, Rigidbody{});
+	engine.physicsSystem->DefineBody(sprite, 16.f, 16.f);
 
 	//Define the test animation
 	vector<Texture*> animationTextures;
