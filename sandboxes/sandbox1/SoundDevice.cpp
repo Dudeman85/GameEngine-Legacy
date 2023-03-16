@@ -1,12 +1,68 @@
 #include "SoundDevice.h"
 #include <AL/al.h>
 #include <stdio.h>
+#include <vector>
+
+static SoundDevice* _instance = nullptr;
 
 SoundDevice* SoundDevice::get()
 {
 	static SoundDevice* snd_device = new SoundDevice();
 	return snd_device;
 }
+
+void SoundDevice::Init()
+{
+	if (_instance == nullptr)
+		_instance = new SoundDevice();
+}
+
+void SoundDevice::GetLocation(float& x, float& y, float& z)
+{
+	alGetListener3f(AL_POSITION, &x, &y, &z);
+}
+
+void SoundDevice::GetOrientation(float& ori)
+{
+	alGetListenerfv(AL_ORIENTATION, &ori);
+}
+
+float SoundDevice::GetGain()
+{
+	float curr_gain;
+	alGetListenerf(AL_GAIN, &curr_gain);
+	return curr_gain;
+}
+
+void SoundDevice::SetLocation(const float& x, const float& y, const float& z)
+{
+	alListener3f(AL_POSITION, x, y, z);
+}
+
+void SoundDevice::SetOrientation(const float& horx, const float& hory, const float& horz,
+	const float& verx, const float& very, const float& verz)
+{
+	std::vector<float> ori;
+	ori.push_back(horx);
+	ori.push_back(hory);
+	ori.push_back(horz);
+	ori.push_back(verx);
+	ori.push_back(very);
+	ori.push_back(verz);
+	alListenerfv(AL_ORIENTATION, ori.data());
+}
+
+void SoundDevice::SetGain(const float& val)
+{
+	float newVol = val;
+	if (newVol < 0.f)
+		newVol = 0.f;
+	else if (newVol > 5.f)
+		newVol = 5.f;
+
+	alListenerf(AL_GAIN, newVol);
+}
+
 
 SoundDevice::SoundDevice()
 {

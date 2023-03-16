@@ -3,31 +3,6 @@
 #include "MusicBuffer.h"
 #include "SoundSource.h"
 #include <iostream>
-/*
-int main()
-{
-	std::cout << "starting...\n";
-
-	SoundDevice* mysounddevice = SoundDevice::get();
-	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
-	
-
-	SoundSource mySpeaker;
-
-	mySpeaker.Play(sound1);
-
-	MusicBuffer myMusic("assets/spring-weather-1.wav");
-	myMusic.Play();
-
-	while (1)
-	{
-		myMusic.updateBufferStream();
-	}
-
-	std::cout << "got here\n";
-
-	return 0;
-}*/
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -61,9 +36,9 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		cam.Translate(1, 0);
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		cam.Translate(-1, 0);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		cam.Translate(1, 0);
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		cam.Translate(0, 1);
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
@@ -84,13 +59,14 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	SoundDevice* mysounddevice = SoundDevice::get();
-	//uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
 
 
-	SoundSource mySpeaker;
-
+	SoundDevice::Init();
+	//SoundDevice* mysounddevice = SoundDevice::get();
+	
+	static SoundSource mySpeaker1;
 	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
+	static SoundSource mySpeaker2;
 	uint32_t sound2 = SoundBuffer::get()->addSoundEffect("assets/Jingle_Win_00.wav");
 	MusicBuffer myMusic("assets/forest.wav");
 	
@@ -168,9 +144,9 @@ int main()
 			
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			mySpeaker.Play(sound1);
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			mySpeaker.Play(sound2);
+			mySpeaker1.Play(sound1);
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			mySpeaker2.Play(sound2);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
