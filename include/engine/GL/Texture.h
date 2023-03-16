@@ -4,8 +4,7 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <engine/Image.h>
 
 namespace engine
 {
@@ -13,6 +12,7 @@ namespace engine
 	class Texture
 	{
 	public:
+		//Load a texture from path
 		Texture(const char* path, unsigned int filteringType = GL_NEAREST)
 		{
 			//Load image
@@ -57,6 +57,40 @@ namespace engine
 				std::cout << "Error loading texture from " << path << std::endl;
 			}
 		}
+		//Create a texture from an image
+		Texture(Image image, unsigned int filteringType = GL_NEAREST)
+		{
+			//Convert the image to a 1D char array for OpenGL
+			unsigned char* imageData = new unsigned char[image.width * image.height * 4];
+			int i = 0;
+			for (size_t x = 0; x < image.width; x++)
+			{
+				for (size_t y = 0; y < image.height; y++)
+				{
+					imageData[i] = image[x][y].r;
+					imageData[i + 1] = image[x][y].g;
+					imageData[i + 2] = image[x][y].b;
+					imageData[i + 3] = image[x][y].a;
+					i += 4;
+				}
+			}
+
+			//Generate and bind texture
+			glGenTextures(1, &id);
+			glBindTexture(GL_TEXTURE_2D, id);
+
+			//Set texture filtering parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filteringType);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filteringType);
+
+			//Generate the texture using the image data
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+			//Unbind texture
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
 		~Texture()
 		{
 			glDeleteTextures(1, &id);

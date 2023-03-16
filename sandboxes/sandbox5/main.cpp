@@ -1,5 +1,7 @@
 #include <engine/Application.h>
 
+#include <engine/Image.h>
+
 using namespace std;
 using namespace engine;
 
@@ -13,11 +15,13 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
+	Image test = Image("strawberry.png");
+
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
 	//Load a new texture
-	Texture texture = Texture("strawberry.png");
+	Texture texture = Texture(test);
 
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
