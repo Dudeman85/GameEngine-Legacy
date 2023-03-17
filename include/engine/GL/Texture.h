@@ -9,10 +9,14 @@
 
 namespace engine
 {
+	//Forward declare Image class for second constructor
+	class Image;
+
 	//Abstraction class for OpenGL textures
 	class Texture
 	{
 	public:
+		//Load a texture from path
 		Texture(const char* path, unsigned int filteringType = GL_NEAREST)
 		{
 			//Load image
@@ -57,6 +61,9 @@ namespace engine
 				std::cout << "Error loading texture from " << path << std::endl;
 			}
 		}
+		//Declare the constuctor through image. It is defined in Image.h
+		Texture(Image image, unsigned int filteringType = GL_NEAREST);
+
 		~Texture()
 		{
 			glDeleteTextures(1, &id);

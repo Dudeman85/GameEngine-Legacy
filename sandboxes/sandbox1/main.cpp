@@ -12,8 +12,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <engine/Sprite.h>
-
+#include <engine/Application.h>
 
 using namespace engine;
 

@@ -9,6 +9,7 @@
 
 //Other engine libs
 #include <engine/GL/Window.h>
+#include <engine/Image.h>
 
 using namespace std;
 
@@ -77,6 +78,7 @@ namespace engine
 			transformSystem->Update();
 			renderSystem->Update(cam);
 			animationSystem->Update(deltaTime);
+			physicsSystem->Update();
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
