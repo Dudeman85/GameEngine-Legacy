@@ -287,7 +287,7 @@ void Game::loadShader()
 std::shared_ptr<engine::Texture> Game::loadTexture(const std::string& path)
 {    
     //m_tileTextures.push_back(new Texture(...));
-    return std::make_shared<engine::Texture>("assets/images/tilemap/tileset", GL_LINEAR);
+    return std::make_shared<engine::Texture>("assets/images/tilemap", GL_LINEAR);
 }
 
 

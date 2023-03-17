@@ -38,7 +38,7 @@ namespace tmx
 class MapLayer final
 {
 public:
-    MapLayer(const tmx::Map&, std::size_t, const std::vector<unsigned>&);
+    MapLayer(const tmx::Map&, std::size_t, /*const std::vector<unsigned>&*/std::vector < std::shared_ptr<engine::Texture> >);
     ~MapLayer();
     
     MapLayer(const MapLayer&) = delete;
@@ -48,7 +48,8 @@ public:
 
 private:
 
-    const std::vector<unsigned>& m_tilesetTextures;
+    //std::vector<unsigned> m_tilesetTextures;
+    std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 
     struct Subset final
     {

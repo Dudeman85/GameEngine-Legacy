@@ -54,7 +54,7 @@ private:
 	//glm::mat4 m_projectionMatrix; Engine2
 	
 	unsigned m_shader;
-	std::vector<unsigned> m_tileTextures;
+	//std::vector<unsigned> m_tileTextures;
 	void initGLStuff(const tmx::Map&);
 	void loadShader();
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);

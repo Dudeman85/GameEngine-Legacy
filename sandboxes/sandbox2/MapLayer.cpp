@@ -30,13 +30,14 @@ source distribution.
 
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
+#include "engine/GL/Texture.h"
 
-MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<unsigned>& textures)
-  : m_tilesetTextures   (textures)
+MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx,/* Ei käytössä const std::vector<unsigned>& textures*/ std::vector<std::shared_ptr<engine::Texture>> textures)
+    : m_allTextures(textures)
+    //: m_tilesetTextures(textures)
 {
     createSubsets(map, layerIdx);
 }
-
 
 MapLayer::~MapLayer()
 {
@@ -134,7 +135,13 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         if(tsUsed)
         {
             m_subsets.emplace_back();
+            /* Ei käytössä
             m_subsets.back().texture = m_tilesetTextures[i];
+            */
+            /*
+            * En oikein ymmärrä, miten saisi korjattua
+            m_subsets.back().texture = m_allTextures[i];
+            */
      
             glCheck(glGenBuffers(1, &m_subsets.back().vbo));
             glCheck(glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo));
