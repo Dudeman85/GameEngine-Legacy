@@ -18,8 +18,9 @@ namespace engine
 	public:
 		Image(const char* path)
 		{
+			//Dont flip the image when loading to an Image
+			stbi_set_flip_vertically_on_load(false);
 			//Load image
-			stbi_set_flip_vertically_on_load(true);
 			unsigned char* imageData = stbi_load(path, &width, &height, &channels, 4);
 
 			//If the image is loaded successfully
@@ -32,9 +33,9 @@ namespace engine
 
 				int i = 0;
 				//For each row and column
-				for (size_t x = 0; x < width; x++)
+				for (size_t y = 0; y < height; y++)
 				{
-					for (size_t y = 0; y < height; y++)
+					for (size_t x = 0; x < width; x++)
 					{
 						//Get the rgba values and put them in a nice to use 2D vector of Pixels
 						pixmap[x][y] = Pixel{ imageData[i], imageData[i + 1], imageData[i + 2], imageData[i + 3] };
@@ -63,31 +64,31 @@ namespace engine
 			return pixmap[i];
 		}
 
-		//Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right. Index starts at 0
+		//Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right (inclusive).
 		Image Slice(int x1, int y1, int x2, int y2)
 		{
-			assert(x1 < x2 && y1 < y2 && "x1 and y1 must be less than x2 and y2!");
-			assert(x1 >= 0 && y1 >= 0 && x2 < width && y2 < height && "Slice must be in bounds of original image!");
+			assert(x1 < x2&& y1 < y2 && "x1 and y1 must be less than x2 and y2!");
+			assert(x1 >= 0 && y1 >= 0 && x2 < width&& y2 < height && "Slice must be in bounds of original image!");
 
 			vector<vector<Pixel>> slice;
-			slice.resize(x2 - x1);
-			for (size_t i = 0; i < x2 - x1; i++)
+			slice.resize(x2 - x1 + 1);
+			for (size_t i = 0; i < x2 - x1 + 1; i++)
 			{
-				slice[i].resize(y2 - y1);
+				slice[i].resize(y2 - y1 + 1);
 			}
 
 			//For the region defined by parameters
 			int sliceX = 0;
-			int sliceY = 0;
 			for (size_t x = x1; x < x2; x++)
 			{
-				sliceX++;
+				int sliceY = 0;
 				for (size_t y = y1; y < y2; y++)
 				{
 					//Move the pixels from this pixmap to the sliced one
 					slice[sliceX][sliceY] = pixmap[x][y];
 					sliceY++;
 				}
+				sliceX++;
 			}
 
 			return Image(slice);
@@ -98,19 +99,19 @@ namespace engine
 		int channels;
 	private:
 		vector<vector<Pixel>> pixmap;
-
 	};
 
 	//Create a texture from an image
 	//Declared in Texture.h
-	Texture::Texture(Image image, unsigned int filteringType)
+	inline Texture::Texture(Image image, unsigned int filteringType)
 	{
 		//Convert the image to a 1D char array for OpenGL
 		unsigned char* imageData = new unsigned char[image.width * image.height * 4];
 		int i = 0;
-		for (size_t x = 0; x < image.width; x++)
+		//Make sure to flip the vertical for OpenGL
+		for (int y = image.height - 1; y >= 0; y--)
 		{
-			for (size_t y = 0; y < image.height; y++)
+			for (int x = 0; x < image.width; x++)
 			{
 				imageData[i] = image[x][y].r;
 				imageData[i + 1] = image[x][y].g;
@@ -138,30 +139,34 @@ namespace engine
 
 	//Slice spritesheet image to multiple textures.
 	//spritesWide is how many sprites wide the spritesheet is and spritesHigh is how many sprites tall the spritesheet is
-	vector<Texture> SliceSpritesheet(const char* path, int spritesWide, int spritesHigh)
+	vector<Texture*> SliceSpritesheet(const char* path, int spritesWide, int spritesHigh)
 	{
-		vector<Texture> slicedTextures;
+		vector<Texture*> slicedTextures;
 
 		//Load the spritesheet form path
 		Image spritesheet = Image(path);
 
 		//Get the size of each sprite
-		const int width = floor(spritesheet.width / spritesWide);
-		const int height = floor(spritesheet.height / spritesHigh);
+		const int width = floor((spritesheet.width - 1) / spritesWide);
+		const int height = floor((spritesheet.height - 1) / spritesHigh);
 
 		//Warn if the spritesheet is weirdly sized
-		if (width * spritesWide != spritesheet.width || height * spritesHigh != spritesheet.height)
+		if (spritesheet.width % spritesWide != 0 || spritesheet.height % spritesHigh != 0)
 			cout << "Spritesheet is not divisible by sprite count. Clipping may occur!";
 
 		//For each sprite to slice out
-		for (size_t col = 0; col < spritesWide; col++)
+		int paddingX = 0;
+		for (size_t row = 0; row < spritesHigh; row++)
 		{
-			for (size_t row = 0; row < spritesHigh; row++)
+			int paddingY = 0;
+			for (size_t col = 0; col < spritesWide; col++)
 			{
 				//Get the slice from the spritesheet
-				Image slice = spritesheet.Slice(col * width, row * height, col * width + width, row * height + height);
-				slicedTextures.push_back(Texture(slice));
+				Image slice = spritesheet.Slice(col * width + paddingX, row * height + paddingY, col * width + width + paddingX, row * height + height + paddingY);
+				slicedTextures.push_back(new Texture(slice));
+				paddingY++;
 			}
+			paddingX++;
 		}
 
 		return slicedTextures;

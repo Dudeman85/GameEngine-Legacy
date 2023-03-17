@@ -4,7 +4,6 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace engine
@@ -19,9 +18,10 @@ namespace engine
 		//Load a texture from path
 		Texture(const char* path, unsigned int filteringType = GL_NEAREST)
 		{
+			//Flip the image when loading into an OpenGL texture
+			stbi_set_flip_vertically_on_load(true);
 			//Load image
 			int width, height, nrChannels;
-			stbi_set_flip_vertically_on_load(true);
 			unsigned char* imageData = stbi_load(path, &width, &height, &nrChannels, 0);
 
 			if (imageData)
@@ -62,7 +62,7 @@ namespace engine
 			}
 		}
 		//Declare the constuctor through image. It is defined in Image.h
-		Texture(Image image, unsigned int filteringType = GL_NEAREST);
+		inline Texture(Image image, unsigned int filteringType = GL_NEAREST);
 
 		~Texture()
 		{

@@ -13,7 +13,10 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	//SliceSpritesheet("strawberry.png", 2, 2);
+	Image test("gradient.png");
+
+	vector<Texture*> testTexts = SliceSpritesheet("gradient.png", 2, 2);
+
 	engine.physicsSystem->Init(0, -10);
 
 	//Create the camera
@@ -25,16 +28,18 @@ int main()
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
 	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
-	ecs.addComponent(sprite, Sprite{ .texture = &texture });
+	ecs.addComponent(sprite, Sprite{});
 	ecs.addComponent(sprite, Animator{});
-	ecs.addComponent(sprite, Rigidbody{});
-	engine.physicsSystem->DefineBody(sprite, 16.f, 16.f);
+	//ecs.addComponent(sprite, Rigidbody{});
+	//engine.physicsSystem->DefineBody(sprite, 16.f, 16.f);
 
 	//Define the test animation
 	vector<Texture*> animationTextures;
-	animationTextures.push_back(new Texture("wood1.png"));
-	animationTextures.push_back(new Texture("wood2.png"));
-	vector<int> animationDelays{ 1000, 100 };
+	animationTextures.push_back(testTexts[0]);
+	animationTextures.push_back(testTexts[1]);
+	animationTextures.push_back(testTexts[3]);
+	animationTextures.push_back(testTexts[2]);
+	vector<int> animationDelays(4, 200);
 
 	Animation anim(animationTextures, animationDelays);
 	engine.animationSystem->AddAnimation(sprite, anim, "1");
