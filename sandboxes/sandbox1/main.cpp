@@ -63,7 +63,6 @@ int main()
 
 
 	SoundDevice::Init();
-	//SoundDevice* mysounddevice = SoundDevice::get();
 	
 	static SoundSource mySpeaker1;
 	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
