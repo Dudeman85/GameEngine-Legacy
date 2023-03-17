@@ -35,6 +35,7 @@ source distribution.
 #include <memory>
 #include <vector>
 #include<string>
+#include <engine/GL/Texture.h>
 
 class Game final
 {
@@ -48,15 +49,15 @@ private:
 
 	
 	std::vector<std::unique_ptr<MapLayer>> m_mapLayers;
-
+	std::vector< std::shared_ptr<engine::Texture> > m_allTextures;
 	
 	//glm::mat4 m_projectionMatrix; Engine2
 	
 	unsigned m_shader;
-	std::vector<unsigned> m_tileTextures;
+	//std::vector<unsigned> m_tileTextures;
 	void initGLStuff(const tmx::Map&);
 	void loadShader();
-	void loadTexture(const std::string&);
+	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 
 };
 

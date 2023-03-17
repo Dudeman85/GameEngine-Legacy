@@ -61,13 +61,15 @@ int main()
 
 
 
-	SoundDevice::Init();
-	//SoundDevice* mysounddevice = SoundDevice::get();
-	
+	//SoundDevice::Init();
+	SoundDevice* sd1 = SoundDevice::getDevice()->getDevice();
+	SoundDevice* sd2 = SoundDevice::getDevice()->getDevice();
 	static SoundSource mySpeaker1;
-	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 	static SoundSource mySpeaker2;
-	uint32_t sound2 = SoundBuffer::get()->addSoundEffect("assets/Jingle_Win_00.wav");
+	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
+	static SoundSource mySpeaker3;
+	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	MusicBuffer myMusic("assets/forest.wav");
 	
 
@@ -136,17 +138,28 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-
+		sd1->SetSourceLocation(0.f, 0.f, 0.f);
+		sd2->SetSourceLocation(2.f, 0.f, 0.f);
 		renderSystem->Update(&cam);
+		
 
 		myMusic.updateBufferStream();
+		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+			myMusic.Pause();
+		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+			myMusic.Resume();
 		
-			
 
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			mySpeaker1.Play(sound1);
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			mySpeaker2.Play(sound2);
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			mySpeaker1.Play(sound2);
+			sd1->SetLocation(1.f, 0.f, 0.f);
+			sd1->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			mySpeaker2.Play(sound3);
+			sd2->SetLocation(1.f, 0.f, 0.f);
+			sd2->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

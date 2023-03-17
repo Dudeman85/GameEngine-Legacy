@@ -31,6 +31,9 @@ source distribution.
 //#include <glm/gtc/matrix_transform.hpp> Engine2
 
 #include <tmxlite/Map.hpp>
+//#include "engine/GL/Texture.h"
+#include "engine/GL/Shader.h"
+#include "engine/GL/Texture.h"
 
 
 #include <cassert>
@@ -164,7 +167,8 @@ void Game::initGLStuff(const tmx::Map& map)
     const auto& tilesets = map.getTilesets();
     for(const auto& ts : tilesets)
     {
-        loadTexture(ts.getImagePath());
+        auto texture = loadTexture(ts.getImagePath());
+        m_allTextures.push_back(texture);
     }
     
     
@@ -280,9 +284,10 @@ void Game::loadShader()
 
 // SDL texture loading
 
-void Game::loadTexture(const std::string& path)
+std::shared_ptr<engine::Texture> Game::loadTexture(const std::string& path)
 {    
-   // m_tileTextures.push_back(new Texture(...));    
+    //m_tileTextures.push_back(new Texture(...));
+    return std::make_shared<engine::Texture>("assets/images/tilemap", GL_LINEAR);
 }
 
 

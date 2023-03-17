@@ -1,10 +1,10 @@
-#include "SoundBuffer.h"
+#include <engine/AL/SoundBuffer.h>
 #include <sndfile.h>
 #include <inttypes.h>
 #include <AL/alext.h>
 #include <climits>
 
-SoundBuffer* SoundBuffer::getFile()
+SoundBuffer* SoundBuffer::get()
 {
 	static SoundBuffer* sndbuf = new SoundBuffer();
 	return sndbuf;

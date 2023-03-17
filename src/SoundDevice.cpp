@@ -1,11 +1,11 @@
-#include "SoundDevice.h"
+#include <engine/AL/SoundDevice.h>
 #include <AL/al.h>
 #include <stdio.h>
 #include <vector>
 
 static SoundDevice* _instance = nullptr;
 
-SoundDevice* SoundDevice::getDevice()
+SoundDevice* SoundDevice::get()
 {
 	static SoundDevice* snd_device = new SoundDevice();
 	return snd_device;
@@ -22,11 +22,6 @@ void SoundDevice::GetLocation(float& x, float& y, float& z)
 	alGetListener3f(AL_POSITION, &x, &y, &z);
 }
 
-void SoundDevice::GetSourceLocation(float& x, float& y, float& z)
-{
-	alGetSource3f(0, AL_POSITION, &x, &y, &z);
-}
-
 void SoundDevice::GetOrientation(float& ori)
 {
 	alGetListenerfv(AL_ORIENTATION, &ori);
@@ -39,23 +34,9 @@ float SoundDevice::GetGain()
 	return curr_gain;
 }
 
-void SoundDevice::SetDistance(int key)
-{
-	if (key < 0xD001 || key > 0xD006)
-		throw("bad attunation key");
-
-	alDistanceModel(key);
-}
-
-
 void SoundDevice::SetLocation(const float& x, const float& y, const float& z)
 {
 	alListener3f(AL_POSITION, x, y, z);
-}
-
-void SoundDevice::SetSourceLocation(const float& x, const float& y, const float& z)
-{
-	alSource3f(0, AL_POSITION, x, y, z);
 }
 
 void SoundDevice::SetOrientation(const float& horx, const float& hory, const float& horz,
