@@ -13,11 +13,8 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	Image test("gradient.png");
-
-	vector<Texture*> testTexts = SliceSpritesheet("gradient.png", 2, 2);
-
 	engine.physicsSystem->Init(0, -10);
+
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
@@ -34,22 +31,18 @@ int main()
 	//engine.physicsSystem->DefineBody(sprite, 16.f, 16.f);
 
 	//Define the test animation
-	vector<Texture*> animationTextures;
-	animationTextures.push_back(testTexts[0]);
-	animationTextures.push_back(testTexts[1]);
-	animationTextures.push_back(testTexts[3]);
-	animationTextures.push_back(testTexts[2]);
-	vector<int> animationDelays(4, 200);
 
-	Animation anim(animationTextures, animationDelays);
-	engine.animationSystem->AddAnimation(sprite, anim, "1");
+	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
 
-	engine.animationSystem->PlayAnimation(sprite, "1", true);
+	engine.animationSystem->AddAnimation(sprite, testAnims[0], "1");
+	engine.animationSystem->AddAnimation(sprite, testAnims[1], "2");
+
+	engine.animationSystem->PlayAnimation(sprite, "2", true);
 
 	//Create a new entity
 	Entity sprite2 = ecs.newEntity();
 	ecs.addComponent(sprite2, Transform{ .x = 200, .y = 100, .xScale = 50, .yScale = 50 });
-	ecs.addComponent(sprite2, Sprite{ .texture = &texture });
+	ecs.addComponent(sprite2, Sprite{&texture});
 
 	engine.renderSystem->SetBackgroundColor(0, .5, .1);
 

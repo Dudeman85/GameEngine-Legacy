@@ -51,6 +51,7 @@ namespace engine
 				std::cout << "Error loading texture from " << path << std::endl;
 			}
 		}
+		//Construct an image from a 2D vector of pixels
 		Image(vector<vector<Pixel>> pixels)
 		{
 			width = pixels.size();
@@ -96,8 +97,8 @@ namespace engine
 
 		int width;
 		int height;
-		int channels;
 	private:
+		int channels;
 		vector<vector<Pixel>> pixmap;
 	};
 
@@ -170,5 +171,32 @@ namespace engine
 		}
 
 		return slicedTextures;
+	}
+
+	//Creates animations from a spritesheet.
+	//Each row of sprites on the spritesheet becomes one animation. 
+	//You must provide a vector of delays for each frame going from top-left to bottom-right
+	vector<Animation> AnimationsFromSpritesheet(const char* path, int spritesWide, int spritesHigh, vector<int> delays)
+	{
+		vector<Texture*> allFrames = SliceSpritesheet(path, spritesWide, spritesHigh);
+
+		vector<Animation> animations;
+
+		//For each animation (row in the spritesheet)
+		for (size_t i = 0; i < spritesHigh; i++)
+		{
+			//Slice the proper textures to a new vector
+			vector<Texture*> frames(spritesWide);
+			copy(allFrames.begin() + i * spritesWide, allFrames.begin() + (i + 1) * spritesWide, frames.begin());
+
+			//Slice the proper timings to a new vector
+			vector<int> slicedDelays(spritesWide);
+			copy(delays.begin() + i * spritesWide, delays.begin() + (i + 1) * spritesWide, slicedDelays.begin());
+
+			//Create a new animation out of the sliced data
+			animations.push_back(Animation(frames, slicedDelays));
+		}
+
+		return animations;
 	}
 }

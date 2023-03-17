@@ -33,7 +33,7 @@ Aika ajoin pidämme esitelmän tiimin kesken siitä, mitä olemme saaneet tehdyk
     - [x] Spire sheet slicing
     - [x] animation loading
     - [x] animation playing
-    - [ ] port to OpenGL
+    - [x] port to OpenGL
 
 - [ ] Physics (Box2d) 
     - [x] Gravity 
