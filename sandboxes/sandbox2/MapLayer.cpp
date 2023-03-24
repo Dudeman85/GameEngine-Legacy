@@ -32,7 +32,7 @@ source distribution.
 #include <tmxlite/TileLayer.hpp>
 #include "engine/GL/Texture.h"
 
-MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx,/* Ei käytössä const std::vector<unsigned>& textures*/ std::vector<std::shared_ptr<engine::Texture>> textures)
+MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx,/* Ei käytössä const std::vector<unsigned>& textures*/ const std::vector<std::shared_ptr<engine::Texture>>& textures)
     : m_allTextures(textures)
     //: m_tilesetTextures(textures)
 {
@@ -67,7 +67,7 @@ void ::MapLayer::draw()
     for(const auto& ss : m_subsets)
     {
         glCheck(glActiveTexture(GL_TEXTURE0));
-        glCheck(glBindTexture(GL_TEXTURE_2D, ss.texture));
+        glCheck(glBindTexture(GL_TEXTURE_2D, ss.texture->ID()));
         
         glCheck(glActiveTexture(GL_TEXTURE1));
         glCheck(glBindTexture(GL_TEXTURE_2D, ss.lookup));
@@ -138,10 +138,7 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
             /* Ei käytössä
             m_subsets.back().texture = m_tilesetTextures[i];
             */
-            /*
-            * En oikein ymmärrä, miten saisi korjattua
             m_subsets.back().texture = m_allTextures[i];
-            */
      
             glCheck(glGenBuffers(1, &m_subsets.back().vbo));
             glCheck(glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo));

@@ -29,6 +29,8 @@ source distribution.
 #define MAPLAYER_HPP_
 
 #include <vector>
+#include <memory>
+#include "engine/GL/Texture.h"
 
 namespace tmx
 {
@@ -38,7 +40,7 @@ namespace tmx
 class MapLayer final
 {
 public:
-    MapLayer(const tmx::Map&, std::size_t, /*const std::vector<unsigned>&*/std::vector < std::shared_ptr<engine::Texture> >);
+    MapLayer(const tmx::Map&, std::size_t, /*const std::vector<unsigned>&*/ const std::vector < std::shared_ptr<engine::Texture>>& textures);
     ~MapLayer();
     
     MapLayer(const MapLayer&) = delete;
@@ -54,7 +56,8 @@ private:
     struct Subset final
     {
         unsigned vbo = 0;
-        unsigned texture = 0;
+        /*unsigned texture = 0;*/
+        std::shared_ptr<engine::Texture> texture = 0;
         unsigned lookup = 0;
     };
     std::vector<Subset> m_subsets;

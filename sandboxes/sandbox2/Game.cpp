@@ -48,20 +48,15 @@ namespace
 }
 
 Game::Game()
-  : m_shader(0)
 {
-    
+    m_shader = engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
 }
 
 Game::~Game()
 {    
-    if(m_shader)
+    for(auto t : m_allTextures)
     {
-        glCheck(glDeleteProgram(m_shader));
-    }
-    for(const auto& t : m_tileTextures)
-    {
-        glCheck(glDeleteTextures(1, &t));
+        delete &t;
     }
 }
 /*
@@ -120,12 +115,8 @@ void Game::update(float dt)
 */
 void Game::draw()
 {
-    glCheck(glUseProgram(m_shader));
+    m_shader.use();
     
-    for(const auto& layer : m_mapLayers)
-    {
-        layer->draw();
-    }
 
 }
 
@@ -144,7 +135,7 @@ void Game::loadMap()
     {
         if(layers[i]->getType() == tmx::Layer::Type::Tile)
         {
-            m_mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, m_tileTextures));
+            m_mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, m_allTextures));
         }
     }
 }
@@ -154,14 +145,13 @@ void Game::initGLStuff(const tmx::Map& map)
 {
     //m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f); Engine2
     
-    loadShader();
-    glCheck(glUseProgram(m_shader));
+    m_shader.use();
     //glCheck(glUniformMatrix4fv(glGetUniformLocation(m_shader, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0])); Engine2
     
     //we'll make sure the current tile texture is active in 0, 
     //and lookup texture is active in 1 in MapLayer::draw()
-    glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_tileMap"), 0));
-    glCheck(glUniform1i(glGetUniformLocation(m_shader, "u_lookupMap"), 1));
+    glCheck(glUniform1i(glGetUniformLocation(m_shader.ID, "u_tileMap"), 0));
+    glCheck(glUniform1i(glGetUniformLocation(m_shader.ID, "u_lookupMap"), 1));
     
     
     const auto& tilesets = map.getTilesets();
@@ -178,109 +168,6 @@ void Game::initGLStuff(const tmx::Map& map)
     glCheck(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     glCheck(glBlendEquation(GL_FUNC_ADD));
 }
-
-void Game::loadShader()
-{
-    GLuint vertID = glCreateShader(GL_VERTEX_SHADER);
-    
-    //compile / check vert shader
-    auto srcPtr = vertexShader.c_str();
-    glCheck(glShaderSource(vertID, 1, &srcPtr, nullptr));
-    glCheck(glCompileShader(vertID));
-    
-    GLint result = GL_FALSE;
-    int resultLength = 0;
-    
-    glCheck(glGetShaderiv(vertID, GL_COMPILE_STATUS, &result));
-    glCheck(glGetShaderiv(vertID, GL_INFO_LOG_LENGTH, &resultLength));
-    if(result == GL_FALSE)
-    {
-        std::string str;
-        str.resize(resultLength + 1);
-        glCheck(glGetShaderInfoLog(vertID, resultLength, nullptr, &str[0]));
-        std::cout <<"Failed Compiling Vertex Shader, status: " << result << std::endl;
-        std::cout << str << std::endl;
-        
-        glCheck(glDeleteShader(vertID));
-        return; //m_shader is still 0 so we won't spam the console with gl errors
-    }
-    else
-    {
-        std::cout << "Compiled Vertex Shader" << std::endl;
-    }
-    
-    //compile / check frag shader
-    GLuint fragID = glCreateShader(GL_FRAGMENT_SHADER);    
-    srcPtr = fragmentShader.c_str();
-    glCheck(glShaderSource(fragID, 1, &srcPtr, nullptr));
-    glCheck(glCompileShader(fragID));
-    
-    result = GL_FALSE;
-    resultLength = 0;
-    
-    glCheck(glGetShaderiv(fragID, GL_COMPILE_STATUS, &result));
-    glCheck(glGetShaderiv(fragID, GL_INFO_LOG_LENGTH, &resultLength));
-    if(result == GL_FALSE)
-    {
-        std::string str;
-        str.resize(resultLength + 1);
-        glCheck(glGetShaderInfoLog(fragID, resultLength, nullptr, &str[0]));
-        std::cout <<"Failed Compiling Fragment Shader, status: " << result << std::endl;
-        std::cout << str << std::endl;
-        
-        glCheck(glDeleteShader(vertID));
-        glCheck(glDeleteShader(fragID));
-        return;
-    }
-    else
-    {
-        std::cout << "Compiled Fragment Shader" << std::endl;
-    }
-    
-    //link and assign vert attribs
-    m_shader = glCreateProgram();
-    glCheck(glAttachShader(m_shader, vertID));
-    glCheck(glAttachShader(m_shader, fragID));
-    
-    glCheck(glBindAttribLocation(m_shader, 0, "a_position"));
-    glCheck(glBindAttribLocation(m_shader, 1, "a_texCoord"));
-    
-    glCheck(glLinkProgram(m_shader));
-    
-    result = GL_FALSE;
-    resultLength = 0;
-    glCheck(glGetProgramiv(m_shader, GL_LINK_STATUS, &result));
-    glCheck(glGetProgramiv(m_shader, GL_INFO_LOG_LENGTH, &resultLength));
-    if(result == GL_FALSE)
-    {
-        std::string str;
-        str.resize(resultLength + 1);
-        glCheck(glGetProgramInfoLog(m_shader, resultLength, nullptr, &str[0]));
-        std::cout << "Failed to Link Shader Program, status: " << result << std::endl;
-        std::cout << str << std::endl;
-        
-        glCheck(glDetachShader(m_shader, vertID));
-        glCheck(glDetachShader(m_shader, fragID));
-        
-        glCheck(glDeleteShader(vertID));
-        glCheck(glDeleteShader(fragID));
-        glCheck(glDeleteProgram(m_shader));
-        m_shader = 0;
-        return;
-    }
-    else
-    {
-        std::cout << "Linked Shader Successfully" << std::endl;
-    }
-    
-    glCheck(glDetachShader(m_shader, vertID));
-    glCheck(glDetachShader(m_shader, fragID));
-    
-    glCheck(glDeleteShader(vertID));
-    glCheck(glDeleteShader(fragID));
-}
-
-
 
 // SDL texture loading
 
