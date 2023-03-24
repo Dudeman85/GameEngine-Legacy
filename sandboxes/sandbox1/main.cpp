@@ -64,6 +64,7 @@ int main()
 	//SoundDevice::Init();
 	SoundDevice* sd1 = SoundDevice::getDevice()->getDevice();
 	SoundDevice* sd2 = SoundDevice::getDevice()->getDevice();
+	SoundDevice* sd3 = SoundDevice::getDevice()->getDevice();
 	static SoundSource mySpeaker1;
 	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 	static SoundSource mySpeaker2;
@@ -138,8 +139,9 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
-		sd1->SetSourceLocation(0.f, 0.f, 0.f);
-		sd2->SetSourceLocation(2.f, 0.f, 0.f);
+		sd3->SetLocation(0.f, 0.f, 0.f);
+		sd3->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		//sd2->SetLocation(0.f, 0.f, 0.f);
 		renderSystem->Update(&cam);
 		
 
@@ -152,13 +154,13 @@ int main()
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			mySpeaker1.Play(sound2);
-			sd1->SetLocation(1.f, 0.f, 0.f);
-			sd1->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+			sd1->SetSourceLocation(1, -1.f, 0.f, 0.f);
+			
 		}
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			mySpeaker2.Play(sound3);
-			sd2->SetLocation(1.f, 0.f, 0.f);
-			sd2->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+			sd1->SetSourceLocation(1, 1.f, 0.f, 0.f);
+			//sd2->SetOrientation(0.f, -1.f, 0.f, 0.f, 0.f, 1.f);
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -182,6 +182,8 @@ namespace engine
 
 		vector<Animation> animations;
 
+		assert(allFrames.size() == delays.size() && "You must provide a delay for after each animation frame!");
+
 		//For each animation (row in the spritesheet)
 		for (size_t i = 0; i < spritesHigh; i++)
 		{

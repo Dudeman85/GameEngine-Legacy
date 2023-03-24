@@ -3,6 +3,7 @@
 
 SoundSource::SoundSource()
 {
+
 	alGenSources(1, &p_Source);
 	alSourcei(p_Source, AL_BUFFER, p_Buffer);
 }
