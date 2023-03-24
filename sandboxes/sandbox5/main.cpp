@@ -69,7 +69,7 @@ int main()
 			engine.transformSystem->Translate(player, 0, -5);
 
 		Transform playerTransform = ecs.getComponent<Transform>(player);
-		cam.SetPosition(playerTransform.x / 2, playerTransform.y / 2, playerTransform.z / 2);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
 		//Update all engine systems
 		engine.Update(&cam);

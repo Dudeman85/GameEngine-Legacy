@@ -17,17 +17,19 @@ namespace engine
 		//Sets the camera position in word space
 		void SetPosition(float x, float y, float z)
 		{
-			position.x = x;
-			position.y = y;
-			position.z = z;
+			//I really have no idea why these have to be divided by 2, but otherwise the coordinates don't match the sprites
+			position.x = x / 2;
+			position.y = y / 2;
+			position.z = z / 2;
 		}
 
 		//Move the camera in world space. Camera's origin is in its center
 		void Translate(float dx, float dy, float dz = 0.f)
 		{
-			position.x += dx;
-			position.y += dy;
-			position.z += dz;
+			//I really have no idea why these have to be divided by 2, but otherwise the coordinates don't match the sprites
+			position.x += dx / 2;
+			position.y += dy / 2;
+			position.z += dz / 2;
 		}
 
 		//Sets the width and height of the camera
