@@ -1,62 +1,11 @@
 #pragma once
 #include <engine/ECSCore.h>
+#include <engine/Vector.h>
 
 extern ECS ecs;
 
 namespace engine
 {
-	struct Vector2;
-
-	//Three floats in one
-	struct Vector3
-	{
-		Vector3() 
-		{
-			x = 0;
-			y = 0;
-			z = 0;
-		}
-		Vector3(float _x, float _y, float _z)
-		{
-			x = _x;
-			y = _y;
-			z = _z;
-		}
-		Vector3(Vector2 vec2, float _z = 0);
-
-		float x, y, z;
-	};
-
-	//Two floats in one
-	struct Vector2
-	{
-		Vector2()
-		{
-			x = 0;
-			y = 0;
-		}
-		Vector2(float _x, float _y)
-		{
-			x = _x;
-			y = _y;
-		}
-		Vector2(Vector3 vec3)
-		{
-			x = vec3.x;
-			y = vec3.y;
-		}
-
-		float x, y;
-	};
-
-	//I really should have used cpp files
-	Vector3::Vector3(Vector2 vec2, float _z)
-	{
-		x = vec2.x;
-		y = vec2.y;
-		z = _z;
-	}
-
 	//Transform component
 	struct Transform
 	{
