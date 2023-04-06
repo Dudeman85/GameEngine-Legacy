@@ -5,6 +5,8 @@ extern ECS ecs;
 
 namespace engine
 {
+	struct Vector2;
+
 	//Three floats in one
 	struct Vector3
 	{
@@ -20,12 +22,7 @@ namespace engine
 			y = _y;
 			z = _z;
 		}
-		Vector3(Vector2 vec2, float _z = 0)
-		{
-			x = vec2.x;
-			y = vec2.y;
-			z = _z;
-		}
+		Vector3(Vector2 vec2, float _z = 0);
 
 		float x, y, z;
 	};
@@ -52,6 +49,14 @@ namespace engine
 		float x, y;
 	};
 
+	//I really should have used cpp files
+	Vector3::Vector3(Vector2 vec2, float _z)
+	{
+		x = vec2.x;
+		y = vec2.y;
+		z = _z;
+	}
+
 	//Transform component
 	struct Transform
 	{
@@ -75,16 +80,24 @@ namespace engine
 		}
 
 		//Translate an entity by dx, dy, and dz
-		void Translate(Entity entity, float dx, float dy, float dz = 0)
+		static void Translate(Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x += dx;
 			transform.y += dy;
 			transform.z += dz;
 		}
+		//Translate an entity by dt
+		static void Translate(Entity entity, Vector3 dt)
+		{
+			Transform& transform = ecs.getComponent<Transform>(entity);
+			transform.x += dt.x;
+			transform.y += dt.y;
+			transform.z += dt.z;
+		}
 
 		//Set the absolute position of entity
-		void SetPosition(Entity entity, float x, float y, float z = 0)
+		static void SetPosition(Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x = x;

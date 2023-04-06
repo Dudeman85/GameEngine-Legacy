@@ -8,7 +8,9 @@ namespace engine
 	struct Rigidbody
 	{
 		Vector2 velocity;
+		float drag = 0;
 		bool enabled = true;
+		bool isStatic = false;
 	};
 
 	//Box collider component
@@ -20,7 +22,7 @@ namespace engine
 	};
 
 	//Physics System
-	//Requires Rigidbody and Transform components
+	//Requires Rigidbody, Transform, and BoxCollider components
 	class PhysicsSystem : public System
 	{
 	public:
@@ -34,7 +36,11 @@ namespace engine
 				//For each entity
 				for (auto const& entity : entities)
 				{
+					Transform& transform = ecs.getComponent<Transform>(entity);
+					Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
+					BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
+					TransformSystem::Translate(entity, rigidbody.velocity);
 				}
 			}
 		}
