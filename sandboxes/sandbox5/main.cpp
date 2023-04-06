@@ -13,7 +13,8 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->Init(0, -10);
+	engine.physicsSystem->gravity = Vector2(0, -200.81);
+	engine.physicsSystem->step = 4;
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
@@ -23,9 +24,11 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(player, Transform{ .x = 300, .y = 300, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
+	ecs.addComponent(player, Rigidbody{ .drag = 0.1 });
+	ecs.addComponent(player, BoxCollider{});
 
 	//Define the test animation
 	Animator animator = ecs.getComponent<Animator>(player);
@@ -36,20 +39,22 @@ int main()
 
 	//Create a new entity
 	Entity sprite2 = ecs.newEntity();
-	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite2, Sprite{&texture});
+	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 200, .yScale = 20 });
+	ecs.addComponent(sprite2, Sprite{ &texture });
+	ecs.addComponent(sprite2, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite2, BoxCollider{});
 	//Create a new entity
 	Entity sprite3 = ecs.newEntity();
 	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite3, Sprite{&texture});
+	ecs.addComponent(sprite3, Sprite{ &texture });
 	//Create a new entity
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -300, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite4, Sprite{&texture});
+	ecs.addComponent(sprite4, Sprite{ &texture });
 	//Create a new entity
 	Entity sprite5 = ecs.newEntity();
 	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite5, Sprite{&texture});
+	ecs.addComponent(sprite5, Sprite{ &texture });
 
 	engine.renderSystem->SetBackgroundColor(0, .5, .1);
 
@@ -59,21 +64,29 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
+		//test movement
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			engine.transformSystem->Translate(player, 5, 0);
+		{
+			engine.physicsSystem->Move(player, Vector2(5, 0));
+		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			engine.transformSystem->Translate(player, -5, 0);
+		{
+			engine.physicsSystem->Move(player, Vector2(-5, 0));
+		}
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			engine.transformSystem->Translate(player, 0, 5);
+		{
+			engine.physicsSystem->Move(player, Vector2(0, 5));
+		}
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			engine.transformSystem->Translate(player, 0, -5);
-
-		Transform playerTransform = ecs.getComponent<Transform>(player);
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+		{
+			engine.physicsSystem->Move(player, Vector2(0, -5));
+		}
 
 		//Update all engine systems
 		engine.Update(&cam);
 
+		Transform playerTransform = ecs.getComponent<Transform>(player);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

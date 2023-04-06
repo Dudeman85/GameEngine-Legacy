@@ -5,7 +5,8 @@
 #include "ECSCore.h"
 #include "Sprite.h"
 #include "Transform.h"
-#include "Gravity.h"
+//#include "Gravity.h"
+#include "Physics.h"
 
 //Other engine libs
 #include <engine/GL/Window.h>
@@ -41,6 +42,7 @@ namespace engine
 			ecs.registerComponent<Transform>();
 			ecs.registerComponent<Animator>();
 			ecs.registerComponent<Rigidbody>();
+			ecs.registerComponent<BoxCollider>();
 
 			//Register all default engine systems here
 			//Transform System
@@ -68,6 +70,7 @@ namespace engine
 			Signature physicsSystemSignature;
 			physicsSystemSignature.set(ecs.getComponentId<Rigidbody>());
 			physicsSystemSignature.set(ecs.getComponentId<Transform>());
+			physicsSystemSignature.set(ecs.getComponentId<BoxCollider>());
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
 		}
 
@@ -76,9 +79,9 @@ namespace engine
 		{
 			//Update engine systems
 			transformSystem->Update();
-			renderSystem->Update(cam);
+			physicsSystem->Update(deltaTime);
 			animationSystem->Update(deltaTime);
-			physicsSystem->Update();
+			renderSystem->Update(cam);
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();

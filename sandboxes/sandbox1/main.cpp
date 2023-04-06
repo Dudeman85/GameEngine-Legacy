@@ -26,7 +26,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->Init(0, -10);
+	//engine.physicsSystem->Init(0, -10);
 
 	//Create the camera
 	Camera cam = Camera(800, 600);

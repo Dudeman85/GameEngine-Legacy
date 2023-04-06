@@ -172,7 +172,7 @@ namespace engine
 		}
 
 		//Set the screens clear color to given normalized rgb
-		void SetBackgroundColor(float r, float g, float b)
+		static void SetBackgroundColor(float r, float g, float b)
 		{
 			glClearColor(r, g, b, 1.0f);
 		}
@@ -214,7 +214,7 @@ namespace engine
 		}
 
 		//Advance to the next animation frame of current animation
-		void AdvanceFrame(Entity entity)
+		static void AdvanceFrame(Entity entity)
 		{
 			//Get the relevant components from entity
 			Animator& animator = ecs.getComponent<Animator>(entity);
@@ -243,7 +243,7 @@ namespace engine
 		}
 
 		//Add animations to entity, they will be accessible by given names
-		void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
+		static void AddAnimations(Entity entity, vector<Animation> animations, vector<string> names)
 		{
 			if (animations.size() > names.size())
 				throw("Not enough names given for each animation!");
@@ -258,7 +258,7 @@ namespace engine
 		}
 
 		//Add an animation to entity, it will be accessibl by given name
-		void AddAnimation(Entity entity, Animation animation, string name)
+		static void AddAnimation(Entity entity, Animation animation, string name)
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
@@ -267,7 +267,7 @@ namespace engine
 		}
 
 		//Play an animation, optionally set it to repeat
-		void PlayAnimation(Entity entity, string animation, bool repeat = false)
+		static void PlayAnimation(Entity entity, string animation, bool repeat = false)
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
@@ -288,7 +288,7 @@ namespace engine
 		}
 
 		//Stop an animation, optionally provide the specific animation to stop
-		void StopAnimation(Entity entity, string animation = "")
+		static void StopAnimation(Entity entity, string animation = "")
 		{
 			Animator& animator = ecs.getComponent<Animator>(entity);
 
