@@ -25,6 +25,7 @@ void SoundDevice::GetLocation(float& x, float& y, float& z)
 void SoundDevice::GetSourceLocation(const ALuint &sourceID, float& x, float& y, float& z)
 {
 	alGetSource3f(sourceID, AL_POSITION, &x, &y, &z);
+	
 }
 
 void SoundDevice::GetOrientation(float& ori)
@@ -39,13 +40,12 @@ float SoundDevice::GetGain()
 	return curr_gain;
 }
 
-void SoundDevice::SetDistance(int key)
-{
-	if (key < 0xD001 || key > 0xD006)
-		throw("bad attunation key");
-
-	alDistanceModel(key);
-}
+///#define AL_INVERSE_DISTANCE                      0xD001
+///#define AL_INVERSE_DISTANCE_CLAMPED              0xD002
+///#define AL_LINEAR_DISTANCE                       0xD003
+///#define AL_LINEAR_DISTANCE_CLAMPED               0xD004
+///#define AL_EXPONENT_DISTANCE                     0xD005
+///#define AL_EXPONENT_DISTANCE_CLAMPED             0xD006
 
 
 void SoundDevice::SetLocation(const float& x, const float& y, const float& z)

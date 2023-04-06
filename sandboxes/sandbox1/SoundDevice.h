@@ -12,7 +12,6 @@ public:
 	void GetSourceLocation(const ALuint &sourceID, float& x, float& y, float& z);
 	void GetOrientation(float& ori);
 	float GetGain();
-	void SetDistance(int key);
 
 	void SetLocation(const float& x, const float& y, const float& z);
 	void SetSourceLocation(const ALuint &sourceID, const float& x, const float& y, const float& z);
@@ -26,5 +25,6 @@ private:
 
 	ALCdevice* p_ALCDevice;
 	ALCcontext* p_ALCContext;
-	//ALuint sourceID;
+	ALuint sourceID;
+
 }; 

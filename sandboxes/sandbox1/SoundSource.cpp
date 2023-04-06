@@ -48,10 +48,56 @@ void SoundSource::SetBufferToPlay(const ALuint& buffer_to_play)
 	}
 }
 
+
 void SoundSource::SetLooping(const bool& loop)
 {
 	alSourcei(p_Source, AL_LOOPING, (ALint)loop);
 }
+
+
+
+void SoundSource::setPitch(float pitch)
+{
+	alSourcef(sourceID, AL_PITCH, pitch);
+}
+
+//void SoundSource::DistanceModel(int key)
+//{
+//	if (key < 0xD001 || key > 0xD006)
+//		throw("bad attunation key");
+//
+//	alDistanceModel(key);
+//}
+void SoundSource::setVelocity(float x, float y, float z)
+{
+	alSource3f(sourceID, AL_VELOCITY, x, y, z);
+}
+
+void SoundSource::setInverseDistance(float distance)
+{
+	refDistance = distance;
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
+	alDistanceModel(AL_INVERSE_DISTANCE);
+}
+
+void SoundSource::setLinearDistance(float distance)
+{
+	maxDistance = distance;
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, 3);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
+	alDistanceModel(AL_LINEAR_DISTANCE);
+}
+
+void SoundSource::setExponentialDistance(float distance)
+{
+	maxDistance = distance;
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
+	alDistanceModel(AL_LINEAR_DISTANCE);
+}
+
 
 bool SoundSource::isPlaying()
 {

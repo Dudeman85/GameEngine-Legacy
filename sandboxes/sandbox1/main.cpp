@@ -41,7 +41,11 @@ int main()
 	static SoundSource mySpeaker3;
 	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	MusicBuffer myMusic("assets/forest.wav");
-	ALint Distancemodel = AL_LINEAR_DISTANCE_CLAMPED;
+	//ALint Distancemodel = AL_LINEAR_DISTANCE_CLAMPED;
+	//mySpeaker1.setReferenceDistance(2.0f);
+	mySpeaker1.setExponentialDistance(20.0f);
+
+	
 
 
 	//Load a new texture
@@ -85,6 +89,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		myMusic.updateBufferStream();
+		
 
 		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 			myMusic.Pause();
@@ -107,11 +112,13 @@ int main()
 		sd1->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
 		sd1->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		
+		
 		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound2);
 			sd1->SetSourceLocation(1, 0.f, 0.f, 0.f);
-			//sd1->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, sprite2Transform.z);
+
+			
 		}
 		//Update all engine systems
 		engine.Update(&cam);
