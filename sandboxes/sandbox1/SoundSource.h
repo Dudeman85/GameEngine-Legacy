@@ -15,6 +15,7 @@ public:
 	void SetLooping(const bool& loop);
 
 	void setPitch(float pitch);
+	void setVolume(float volume);
 	//void DistanceModel(int key);
 	void setVelocity(float x, float y, float z);
 	void setInverseDistance(float distance);

@@ -61,6 +61,11 @@ void SoundSource::setPitch(float pitch)
 	alSourcef(sourceID, AL_PITCH, pitch);
 }
 
+void SoundSource::setVolume(float volume) 
+{
+	alSourcef(sourceID, AL_GAIN, volume);
+}
+
 //void SoundSource::DistanceModel(int key)
 //{
 //	if (key < 0xD001 || key > 0xD006)
@@ -76,26 +81,31 @@ void SoundSource::setVelocity(float x, float y, float z)
 void SoundSource::setInverseDistance(float distance)
 {
 	refDistance = distance;
+	alSourcef(sourceID, AL_GAIN, 0.2f);
 	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
+	alSourcef(sourceID, AL_MAX_DISTANCE, 250.f);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.2f);
 	alDistanceModel(AL_INVERSE_DISTANCE);
 }
 
 void SoundSource::setLinearDistance(float distance)
 {
 	maxDistance = distance;
-	alSourcef(sourceID, AL_REFERENCE_DISTANCE, 3);
+	alSourcef(sourceID, AL_GAIN, 0.3f);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, 0.1f);
 	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.1f);
 	alDistanceModel(AL_LINEAR_DISTANCE);
+	
 }
 
 void SoundSource::setExponentialDistance(float distance)
 {
+	alDistanceModel(AL_EXPONENT_DISTANCE);
 	maxDistance = distance;
 	alSourcef(sourceID, AL_REFERENCE_DISTANCE, maxDistance);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 1.0f);
-	alDistanceModel(AL_LINEAR_DISTANCE);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.2f);
+	
 }
 
 

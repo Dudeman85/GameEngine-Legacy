@@ -41,10 +41,22 @@ int main()
 	static SoundSource mySpeaker3;
 	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	MusicBuffer myMusic("assets/forest.wav");
-	//ALint Distancemodel = AL_LINEAR_DISTANCE_CLAMPED;
-	//mySpeaker1.setReferenceDistance(2.0f);
-	mySpeaker1.setExponentialDistance(20.0f);
+	
+	alSourcef(1, AL_GAIN, 1.0f);
+	alSourcef(1, AL_REFERENCE_DISTANCE, 20.f);
+	alSourcef(1, AL_MAX_DISTANCE, 150.f);
+	alSourcef(1, AL_ROLLOFF_FACTOR, 0.4f);
 
+	alSourcef(2, AL_GAIN, 1.0f);
+	alSourcef(2, AL_REFERENCE_DISTANCE, 10);
+	alSourcef(2, AL_MAX_DISTANCE, 150.f);
+	alSourcef(2, AL_ROLLOFF_FACTOR, 0.5f);
+
+	alSourcef(3, AL_GAIN, 1.0f);
+	alSourcef(3, AL_REFERENCE_DISTANCE, 20.f);
+	alSourcef(3, AL_MAX_DISTANCE, 150.f);
+	alSourcef(3, AL_ROLLOFF_FACTOR, 0.4f);
+	alDistanceModel(AL_INVERSE_DISTANCE);
 	
 
 
@@ -108,17 +120,21 @@ int main()
 			engine.transformSystem->Translate(player, 0, -5);
 
 		Transform playerTransform = ecs.getComponent<Transform>(player);
-		cam.SetPosition(playerTransform.x / 2, playerTransform.y / 2, playerTransform.z / 2);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 		sd1->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
 		sd1->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		
+
 		
-		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound2);
-			sd1->SetSourceLocation(1, 0.f, 0.f, 0.f);
-
-			
+			sd2->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 0.f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
+			mySpeaker2.Play(sound2);
+			sd3->SetSourceLocation(3, sprite4Transform.x, sprite4Transform.y, 0.f);
 		}
 		//Update all engine systems
 		engine.Update(&cam);
