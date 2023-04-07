@@ -31,35 +31,23 @@ int main()
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
-	SoundDevice* sd1 = SoundDevice::getDevice()->getDevice();
-	SoundDevice* sd2 = SoundDevice::getDevice()->getDevice();
-	SoundDevice* sd3 = SoundDevice::getDevice()->getDevice();
+	float volume = 0.5f;
+
+	SoundDevice* sd = SoundDevice::getDevice()->getDevice();
 	static SoundSource mySpeaker1;
-	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 	static SoundSource mySpeaker2;
-	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	static SoundSource mySpeaker3;
+	static SoundSource mySpeaker4;
+	
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
+	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	MusicBuffer myMusic("assets/forest.wav");
 	
-	alSourcef(1, AL_GAIN, 1.0f);
-	alSourcef(1, AL_REFERENCE_DISTANCE, 20.f);
-	alSourcef(1, AL_MAX_DISTANCE, 150.f);
-	alSourcef(1, AL_ROLLOFF_FACTOR, 0.4f);
-
-	alSourcef(2, AL_GAIN, 1.0f);
-	alSourcef(2, AL_REFERENCE_DISTANCE, 10);
-	alSourcef(2, AL_MAX_DISTANCE, 150.f);
-	alSourcef(2, AL_ROLLOFF_FACTOR, 0.5f);
-
-	alSourcef(3, AL_GAIN, 1.0f);
-	alSourcef(3, AL_REFERENCE_DISTANCE, 20.f);
-	alSourcef(3, AL_MAX_DISTANCE, 150.f);
-	alSourcef(3, AL_ROLLOFF_FACTOR, 0.4f);
-	alDistanceModel(AL_INVERSE_DISTANCE);
-	
-
-
+	mySpeaker1.setInverseDistance(1, 1.f, 20.f, 200.f, 0.4f);
+	mySpeaker2.setInverseDistance(3, 1.f, 20.f, 200.f, 0.4f);
+	mySpeaker3.setInverseDistance(4, 1.f, 20.f, 200.f, 0.4f);
+	mySpeaker4.setInverseDistance(5, 1.f, 20.f, 200.f, 0.4f);
 	//Load a new texture
 	Texture texture = Texture("strawberry.png");
 
@@ -107,6 +95,19 @@ int main()
 			myMusic.Pause();
 		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 			myMusic.Resume();
+		if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+		{
+			volume -= 0.01f;
+			if (volume < 0.0f) volume = 0.0f; // Clamp the volume to a minimum of 0.0f
+			myMusic.SetVolume(volume);
+		}
+		if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		{
+			volume += 0.01f;
+			if (volume > 1.0f) volume = 1.0f; // Clamp the volume to a max 1.0f
+			myMusic.SetVolume(volume);
+		}
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
@@ -121,20 +122,26 @@ int main()
 
 		Transform playerTransform = ecs.getComponent<Transform>(player);
 		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-		sd1->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
-		sd1->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		sd->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		sd->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		
 
 		
 		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound2);
-			sd2->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 0.f);
+			sd->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 2.f); 
+			//Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
+			//sd->SetSourceLocation(4, sprite3Transform.x, sprite3Transform.y, 2.f);
+			//mySpeaker3.Play(sound2);
 		}
 		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 			mySpeaker2.Play(sound2);
-			sd3->SetSourceLocation(3, sprite4Transform.x, sprite4Transform.y, 0.f);
+			sd->SetSourceLocation(3, sprite4Transform.x, sprite4Transform.y, 0.f);
+			//Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
+			//sd->SetSourceLocation(5, sprite5Transform.x, sprite5Transform.y, 0.f);
+			//mySpeaker4.Play(sound2);
 		}
 		//Update all engine systems
 		engine.Update(&cam);

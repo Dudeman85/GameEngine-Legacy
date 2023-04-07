@@ -78,34 +78,47 @@ void SoundSource::setVelocity(float x, float y, float z)
 	alSource3f(sourceID, AL_VELOCITY, x, y, z);
 }
 
-void SoundSource::setInverseDistance(float distance)
+void SoundSource::setInverseDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
 {
-	refDistance = distance;
-	alSourcef(sourceID, AL_GAIN, 0.2f);
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
 	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
-	alSourcef(sourceID, AL_MAX_DISTANCE, 250.f);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.2f);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
 	alDistanceModel(AL_INVERSE_DISTANCE);
 }
 
-void SoundSource::setLinearDistance(float distance)
+void SoundSource::setLinearDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
 {
-	maxDistance = distance;
-	alSourcef(sourceID, AL_GAIN, 0.3f);
-	alSourcef(sourceID, AL_REFERENCE_DISTANCE, 0.1f);
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
 	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.1f);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
 	alDistanceModel(AL_LINEAR_DISTANCE);
 	
 }
 
-void SoundSource::setExponentialDistance(float distance)
+void SoundSource::setExponentialDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
 {
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
 	alDistanceModel(AL_EXPONENT_DISTANCE);
-	maxDistance = distance;
-	alSourcef(sourceID, AL_REFERENCE_DISTANCE, maxDistance);
-	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.2f);
-	
 }
 
 
