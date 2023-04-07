@@ -9,6 +9,7 @@ namespace engine
 	{
 		Vector2 velocity;
 		float drag = 0;
+		float gravityScale = 1;
 		bool enabled = true;
 		bool isStatic = false;
 	};
@@ -30,11 +31,9 @@ namespace engine
 		bool collided;
 		bool isTrigger;
 
-		//How much entity b has overlapped entity a
-		float topIntersect;
-		float bottomIntersect;
-		float leftIntersect;
-		float rightIntersect;
+		//How much entity b has overlapped entity a on each side
+		//Order is top, right, bottom, left
+		float intersects[4];
 	};
 
 	//Physics System
@@ -66,15 +65,13 @@ namespace engine
 						continue;
 
 					//Apply gravity
-					rigidbody.velocity += gravity / step * deltaTime;
+					rigidbody.velocity += gravity * rigidbody.gravityScale / step * deltaTime;
 
 					//Apply drag
 					rigidbody.velocity -= rigidbody.velocity * rigidbody.drag / step * deltaTime;
 
-					cout << rigidbody.velocity.y << endl;
-
 					//Move the entity
-					Move(entity, rigidbody.velocity / step * deltaTime);
+					Move(entity, rigidbody.velocity / step * deltaTime, 1);
 				}
 			}
 		}
@@ -104,37 +101,50 @@ namespace engine
 						continue;
 
 					//Get the smallest intersection amount 
-					//This can be done better
-					//TODO FIX BUG: when two intersects are the same nothing is moved
-					float maxIntersect = max(collision.topIntersect, max(collision.bottomIntersect, max(collision.leftIntersect, collision.rightIntersect)));
-					if (collision.topIntersect != maxIntersect && collision.topIntersect != 0)
+					float minIntersect = INFINITY;
+					int side = 0;
+					for (int i = 0; i < 4; i++)
 					{
-						//Move down
-						TransformSystem::Translate(entity, 0, -collision.topIntersect);
-						rigidbody.velocity.y = 0;
+						//0 means no intersection on that side
+						if (collision.intersects[i] == 0)
+							continue;
+
+						if (collision.intersects[i] < minIntersect)
+						{
+							minIntersect = collision.intersects[i];
+							side = i;
+						}
 					}
-					else if (collision.bottomIntersect != maxIntersect && collision.bottomIntersect != 0)
+
+					switch (side)
 					{
-						//Move up
-						TransformSystem::Translate(entity, 0, collision.bottomIntersect);
-						rigidbody.velocity.y = 0;
+					case 0:
+						//Collision on top, move down
+						TransformSystem::Translate(entity, 0, -collision.intersects[0]);
+						break;
+					case 1:
+						//Collision on right, move left
+						TransformSystem::Translate(entity, -collision.intersects[1], 0);
+						break;
+					case 2:
+						//Collision on bottom, move up
+						TransformSystem::Translate(entity, 0, collision.intersects[2]);
+						break;
+					case 3:
+						//Collision on left, move right
+						TransformSystem::Translate(entity, collision.intersects[3], 0);
+						break;
 					}
-					else if (collision.leftIntersect != maxIntersect && collision.leftIntersect != 0)
-					{
-						//Move right
-						TransformSystem::Translate(entity, collision.leftIntersect, 0);
-						rigidbody.velocity.x = 0;
-					}
-					else
-					{
-						//Move left
-						TransformSystem::Translate(entity, -collision.rightIntersect, 0);
-						rigidbody.velocity.x = 0;
-					}
+					//TODO maybe give rigidbodies variable friction instead of 100% friction
+					rigidbody.velocity.x = 0;
+					rigidbody.velocity.y = 0;
 				}
+
+				//If there was a collision don't process any more steps and return the current step
 				if (collisions.size() != 0)
 					return i + 1;
 			}
+			//No collision, return 0
 			return 0;
 		}
 
@@ -192,20 +202,20 @@ namespace engine
 				collision.isTrigger = aCollider.isTrigger || bCollider.isTrigger;
 
 				//Calculate the intersect amounts
-				collision.topIntersect = aMax.y - bMin.y;
-				collision.bottomIntersect = bMax.y - aMin.y;
-				collision.leftIntersect = bMax.x - aMin.x;
-				collision.rightIntersect = aMax.x - bMin.x;
+				collision.intersects[0] = aMax.y - bMin.y;
+				collision.intersects[1] = aMax.x - bMin.x;
+				collision.intersects[2] = bMax.y - aMin.y;
+				collision.intersects[3] = bMax.x - aMin.x;
 
 				//Cull the backwards intersects
-				if (collision.leftIntersect < collision.rightIntersect)
-					collision.rightIntersect = 0;
+				if (collision.intersects[3] < collision.intersects[1])
+					collision.intersects[1] = 0;
 				else
-					collision.leftIntersect = 0;
-				if (collision.topIntersect < collision.bottomIntersect)
-					collision.bottomIntersect = 0;
+					collision.intersects[3] = 0;
+				if (collision.intersects[0] < collision.intersects[2])
+					collision.intersects[2] = 0;
 				else
-					collision.topIntersect = 0;
+					collision.intersects[0] = 0;
 			}
 
 			return collision;
