@@ -18,9 +18,9 @@ public:
 	void setVolume(float volume);
 	//void DistanceModel(int key);
 	void setVelocity(float x, float y, float z);
-	void setInverseDistance(float distance);
-	void setLinearDistance(float distance);
-	void setExponentialDistance(float distance);
+	void setInverseDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff);
+	void setLinearDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff);
+	void setExponentialDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff);
 
 
 	bool isPlaying();
@@ -28,6 +28,8 @@ public:
 private:
 	ALuint p_Source;
 	ALuint p_Buffer = 0;
+	float Volume;
+	float RollOff;
 	float refDistance;
 	float maxDistance;
 	ALuint sourceID;
