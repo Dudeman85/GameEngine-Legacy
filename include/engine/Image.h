@@ -104,7 +104,7 @@ namespace engine
 
 	//Create a texture from an image
 	//Declared in Texture.h
-	inline Texture::Texture(Image image, unsigned int filteringType)
+	Texture::Texture(Image image, unsigned int filteringType)
 	{
 		//Convert the image to a 1D char array for OpenGL
 		unsigned char* imageData = new unsigned char[image.width * image.height * 4];

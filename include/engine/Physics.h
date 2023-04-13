@@ -4,13 +4,30 @@
 
 namespace engine
 {
+	//Collision struct, not a component
+	struct Collision
+	{
+		//The entity which instigated the collision
+		Entity a;
+		//The entity which was subject to the collision
+		Entity b;
+
+		bool collided;
+		bool isTrigger;
+
+		//How much entity b has overlapped entity a on each side
+		//Order is top, right, bottom, left
+		float intersects[4];
+	};
+
 	//Rigidbody component
 	struct Rigidbody
 	{
 		Vector2 velocity;
 		float drag = 0;
 		float gravityScale = 1;
-		bool enabled = true;
+		float friction = 1;
+		float elasticity = 0;
 		bool isStatic = false;
 	};
 
@@ -20,20 +37,7 @@ namespace engine
 		Vector2 scale = Vector2(1, 1);
 		Vector2 offset = Vector2(0, 0);
 		bool isTrigger = false;
-	};
-
-	//Collision struct, not a component
-	struct Collision
-	{
-		Entity a;
-		Entity b;
-
-		bool collided;
-		bool isTrigger;
-
-		//How much entity b has overlapped entity a on each side
-		//Order is top, right, bottom, left
-		float intersects[4];
+		vector<Collision> collisions;
 	};
 
 	//Physics System
@@ -59,6 +63,9 @@ namespace engine
 					Transform& transform = ecs.getComponent<Transform>(entity);
 					Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
 					BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
+
+					if (i == 0)
+						collider.collisions.clear();
 
 					//Dont process static rigidbodies
 					if (rigidbody.isStatic)
@@ -100,6 +107,8 @@ namespace engine
 					if (collision.isTrigger)
 						continue;
 
+					Rigidbody& collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
+
 					//Get the smallest intersection amount 
 					float minIntersect = INFINITY;
 					int side = 0;
@@ -121,23 +130,32 @@ namespace engine
 					case 0:
 						//Collision on top, move down
 						TransformSystem::Translate(entity, 0, -collision.intersects[0]);
+						//Apply friction and elasticity to appropriate axis
+						rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+						rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
 						break;
 					case 1:
 						//Collision on right, move left
 						TransformSystem::Translate(entity, -collision.intersects[1], 0);
+						//Apply friction and elasticity to appropriate axis
+						rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+						rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
 						break;
 					case 2:
 						//Collision on bottom, move up
 						TransformSystem::Translate(entity, 0, collision.intersects[2]);
+						//Apply friction and elasticity to appropriate axis
+						rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+						rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
 						break;
 					case 3:
 						//Collision on left, move right
 						TransformSystem::Translate(entity, collision.intersects[3], 0);
+						//Apply friction and elasticity to appropriate axis
+						rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+						rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
 						break;
 					}
-					//TODO maybe give rigidbodies variable friction instead of 100% friction
-					rigidbody.velocity.x = 0;
-					rigidbody.velocity.y = 0;
 				}
 
 				//If there was a collision don't process any more steps and return the current step
@@ -151,6 +169,8 @@ namespace engine
 		//Performs AABB collision detection between a and every other entity with a collider
 		vector<Collision> DetectCollision(Entity a)
 		{
+			BoxCollider& colliderA = ecs.getComponent<BoxCollider>(a);
+
 			vector<Collision> collisions;
 			//For each entity
 			for (auto const& b : entities)
@@ -158,13 +178,18 @@ namespace engine
 				if (a == b)
 					continue;
 
+				BoxCollider& colliderB = ecs.getComponent<BoxCollider>(b);
+
 				//Check the intersect, if it collided add it to the list
 				Collision collision = AABBIntersect(a, b);
 				if (collision.collided)
 				{
 					collisions.push_back(collision);
+					colliderA.collisions.push_back(collision);
+					colliderB.collisions.push_back(collision);
 				}
 			}
+
 			return collisions;
 		}
 
@@ -221,14 +246,14 @@ namespace engine
 			return collision;
 		}
 
-		int step = 4;
-		//Pixels/second^2
-		Vector2 gravity;
-
 		//Check if an entity is colliding with a tile in a tilemap
 		static bool CheckTilemapCollision(Entity entity)
 		{
 			return false;
 		}
+
+		int step = 4;
+		//Pixels/second^2
+		Vector2 gravity;
 	};
 }

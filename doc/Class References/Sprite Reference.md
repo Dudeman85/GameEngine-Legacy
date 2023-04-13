@@ -1,6 +1,6 @@
 # Sprite Reference
 
-<b><u>The default Animation and Render systems are members of the EngineLib class. All related components and functions are within the engine namespace</u></b>
+### ***The default Animation and Render systems are members of the EngineLib class! All related components and functions are within the engine namespace!***
 
 ## Images
 
@@ -85,7 +85,7 @@ ecs.addComponent(sprite, Sprite{&texture, &shader});
 ## Animations
 
 An animation is simply a list of textures to be used as frames and a list of ints to be used as delays in milliseconds.<br>
-You can manually create it from textures, or automatically create it from a spritesheet.
+You can manually create it from textures, or automatically create it from a spritesheet. <br>
 
 ```cpp
 //Create multiple textures from a spritesheet.
@@ -103,7 +103,7 @@ Animation anim = Animation(textures, delays);
 ecs.addComponent(sprite, Animator{});
 
 //Add the anim animation with the name "Animation 1" to the sprite entity
-engineLib.animationSystem->AddAnimation(sprite, anim, "Animation 1");
+AnimationSystem::AddAnimation(sprite, anim, "Animation 1");
 
 
 //Create animations from a spritesheet where one animation contains all the textures from one row of the spritesheet
@@ -112,7 +112,7 @@ std::vector<Animation> anims = AnimationsFromSpritesheet("spritesheet.png", 4, 6
 
 //Add the first animation, aka the first row, created from the spritesheet
 //This has essentially the same results as the above example
-engineLib.animationSystem->AddAnimation(sprite, anims[0], "Animation 2");
+AnimationSystem::AddAnimation(sprite, anims[0], "Animation 2");
 ```
 
 Animation control:
@@ -132,4 +132,11 @@ animator.animationFrame;
 animator.repeatAnimation;
 animator.playingAnimation;
 animator.animationTimer;
+```
+
+As with most ECS systems, Animator functions that operate upon only one entity don't usually need to be members of the system class. However here they are static members for the sake of organization.
+```cpp
+//These are equivalent
+AnimationSystem::AddAnimation(sprite, anim, "Animation 1");
+engine.animationSystem->AddAnimation(sprite, anim, "Animation 1");
 ```
