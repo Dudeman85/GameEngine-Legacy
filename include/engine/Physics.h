@@ -185,6 +185,7 @@ namespace engine
 				if (collision.collided)
 				{
 					collisions.push_back(collision);
+					//Log the collision in both entity a and b
 					colliderA.collisions.push_back(collision);
 					colliderB.collisions.push_back(collision);
 				}

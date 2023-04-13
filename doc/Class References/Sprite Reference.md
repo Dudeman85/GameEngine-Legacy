@@ -118,9 +118,9 @@ AnimationSystem::AddAnimation(sprite, anims[0], "Animation 2");
 Animation control:
 ```cpp
 //Start playing an animation named "Animation 1", without looping
-engineLib.animationSystem->PlayAnimation(sprite, "Animation 1", false);
+AnimationSystem::PlayAnimation(sprite, "Animation 1", false);
 //Stop playing the currently playing animation
-engineLib.animationSystem->StopAnimation(sprite);
+AnimationSystem::StopAnimation(sprite);
 
 //Get the sprite entity's Animator component
 Animator animator = ecs.getComponent<Animator>(sprite);
