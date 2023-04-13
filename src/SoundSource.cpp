@@ -3,6 +3,7 @@
 
 SoundSource::SoundSource()
 {
+
 	alGenSources(1, &p_Source);
 	alSourcei(p_Source, AL_BUFFER, p_Buffer);
 }
@@ -47,9 +48,121 @@ void SoundSource::SetBufferToPlay(const ALuint& buffer_to_play)
 	}
 }
 
+
 void SoundSource::SetLooping(const bool& loop)
 {
 	alSourcei(p_Source, AL_LOOPING, (ALint)loop);
+}
+
+
+
+void SoundSource::setPitch(float pitch)
+{
+	alSourcef(sourceID, AL_PITCH, pitch);
+}
+
+void SoundSource::setVolume(float volume) 
+{
+	alSourcef(sourceID, AL_GAIN, volume);
+}
+
+//void SoundSource::DistanceModel(int key)
+//{
+//	if (key < 0xD001 || key > 0xD006)
+//		throw("bad attunation key");
+//
+//	alDistanceModel(key);
+//}
+void SoundSource::setVelocity(float x, float y, float z)
+{
+	alSource3f(sourceID, AL_VELOCITY, x, y, z);
+}
+
+void SoundSource::setInverseDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alDistanceModel(AL_INVERSE_DISTANCE);
+}
+
+void SoundSource::setLinearDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alDistanceModel(AL_LINEAR_DISTANCE);
+	
+}
+
+void SoundSource::setExponentialDistance(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alDistanceModel(AL_EXPONENT_DISTANCE);
+}
+
+void SoundSource::setInverseDistanceClamped(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
+}
+
+void SoundSource::setExponentialDistanceClamped(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alDistanceModel(AL_EXPONENT_DISTANCE_CLAMPED);
+}
+
+void SoundSource::setLinearDistanceClamped(int sourceID, float volume, float refdistance, float maxdistance, float rolloff)
+{
+	Volume = volume;
+	refDistance = refdistance;
+	maxDistance = maxdistance;
+	RollOff = rolloff;
+
+	alSourcef(sourceID, AL_GAIN, Volume);
+	alSourcef(sourceID, AL_REFERENCE_DISTANCE, refDistance);
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, RollOff);
+	alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
+	
+	alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
+
 }
 
 bool SoundSource::isPlaying()

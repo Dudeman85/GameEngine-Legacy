@@ -51,6 +51,11 @@ void MusicBuffer::Resume()
 	alSourcePlay(p_Source);
 }
 
+void MusicBuffer::SetVolume(float volume)
+{
+	alSourcef(p_Source, AL_GAIN, volume);
+}
+
 void MusicBuffer::updateBufferStream()
 {
 	ALint processed, state;

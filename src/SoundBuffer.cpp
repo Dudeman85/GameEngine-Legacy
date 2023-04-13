@@ -4,7 +4,7 @@
 #include <AL/alext.h>
 #include <climits>
 
-SoundBuffer* SoundBuffer::get()
+SoundBuffer* SoundBuffer::getFile()
 {
 	static SoundBuffer* sndbuf = new SoundBuffer();
 	return sndbuf;
