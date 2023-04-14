@@ -32,7 +32,7 @@ int main()
 	ecs.addComponent(player, BoxCollider{});
 
 	//Define the test animation
-	Animator animator = ecs.getComponent<Animator>(player);
+	Animator& animator = ecs.getComponent<Animator>(player);
 	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
 	AnimationSystem::AddAnimation(player, testAnims[0], "1");
 	AnimationSystem::AddAnimation(player, testAnims[1], "2");
