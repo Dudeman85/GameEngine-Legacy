@@ -26,16 +26,11 @@ source distribution.
 *********************************************************************/
 
 #include <engine/Tilemap.h>
-
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <tmxlite/Map.hpp>
-//#include "engine/GL/Texture.h"
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/MapLayer.h>
-
-
 #include <cassert>
 #include <array>
 
@@ -117,11 +112,8 @@ void TileMap::initGLStuff(const tmx::Map& map)
     (glBlendEquation(GL_FUNC_ADD));
 }
 
-// SDL texture loading
-
 std::shared_ptr<engine::Texture> TileMap::loadTexture(const std::string& path)
 {    
-    //m_tileTextures.push_back(new Texture(...));
     return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);
 }
 

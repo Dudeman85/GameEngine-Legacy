@@ -26,13 +26,6 @@ source distribution.
 *********************************************************************/
 
 #include <engine/Tilemap.h>
-//#include "SDL.hpp"
-//#include "SDL_image.hpp"
-//#include <Game.hpp>
-
-//#include <SDL2/SDL.h>
-//#include <SDL2/SDL_image.h>
-
 #include <iostream>
 
 namespace
@@ -40,7 +33,6 @@ namespace
     const int WIDTH = 800;
     const int HEIGHT = 640;
 }
-
 
 //#if 0
 
@@ -75,10 +67,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-
-
         game.draw();
-
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

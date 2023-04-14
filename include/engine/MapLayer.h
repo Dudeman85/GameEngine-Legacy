@@ -30,7 +30,7 @@ source distribution.
 
 #include <vector>
 #include <memory>
-#include "engine/GL/Texture.h"
+#include <engine/GL/Texture.h>
 
 namespace tmx
 {
@@ -40,7 +40,7 @@ namespace tmx
 class MapLayer final
 {
 public:
-    MapLayer(const tmx::Map&, std::size_t, /*const std::vector<unsigned>&*/ const std::vector < std::shared_ptr<engine::Texture>>& textures);
+    MapLayer(const tmx::Map&, std::size_t, const std::vector < std::shared_ptr<engine::Texture>>& textures);
     ~MapLayer();
     
     MapLayer(const MapLayer&) = delete;
@@ -49,14 +49,11 @@ public:
     void draw();
 
 private:
-
-    //std::vector<unsigned> m_tilesetTextures;
     std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 
     struct Subset final
     {
         unsigned vbo = 0;
-        /*unsigned texture = 0;*/
         std::shared_ptr<engine::Texture> texture = 0;
         std::shared_ptr<engine::Texture> lookup = 0;
     };
