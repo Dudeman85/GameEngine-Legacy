@@ -113,6 +113,11 @@ namespace engine
 			//Configure Vertex attribute at location 1 aka texture coords
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 			glEnableVertexAttribArray(1);
+
+			//Unbind all buffers and arrays
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
 		//Renders evrything. Call this every frame
@@ -160,6 +165,7 @@ namespace engine
 				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
 				//Bind the texture
+				glActiveTexture(GL_TEXTURE0);
 				if(sprite.texture)
 					sprite.texture->Use();
 
@@ -169,6 +175,9 @@ namespace engine
 				//Unbind the texture
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
+
+			//Unbind vertex array
+			glBindVertexArray(0);
 		}
 
 		//Set the screens clear color to given normalized rgb

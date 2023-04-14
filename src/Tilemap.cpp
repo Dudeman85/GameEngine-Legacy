@@ -46,30 +46,25 @@ namespace
 
 }
 
-TileMap::TileMap()
+Tilemap::Tilemap()
 {
     m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
 }
 
-TileMap::~TileMap()
+Tilemap::~Tilemap()
 {    
 }
 
-void TileMap::draw()
+void Tilemap::draw()
 {
-    glClearColor(0.5, 0, 0.5, 1);
-    (glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT));
-
     m_shader->use();
     for (const auto& layer : m_mapLayers)
     {
         layer->draw();
     }
-  
-
 }
 
-void TileMap::loadMap()
+void Tilemap::loadMap()
 {
     tmx::Map map;
     map.load("assets/demo.tmx");    
@@ -81,6 +76,7 @@ void TileMap::loadMap()
     const auto& layers = map.getLayers();
     for(auto i = 0u; i < layers.size(); ++i)
     {
+
         if(layers[i]->getType() == tmx::Layer::Type::Tile)
         {
             m_mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, m_allTextures));
@@ -88,8 +84,7 @@ void TileMap::loadMap()
     }
 }
 
-
-void TileMap::initGLStuff(const tmx::Map& map)
+void Tilemap::initGLStuff(const tmx::Map& map)
 {
     auto m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f);
     
@@ -107,19 +102,14 @@ void TileMap::initGLStuff(const tmx::Map& map)
     {
         auto texture = loadTexture(ts.getImagePath());
         m_allTextures.push_back(texture);
-    }
+    }    
     
-    
-    
-    (glClearColor(0.6f, 0.8f, 0.92f, 1.f));
     (glEnable(GL_BLEND));
     (glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     (glBlendEquation(GL_FUNC_ADD));
 }
 
-// SDL texture loading
-
-std::shared_ptr<engine::Texture> TileMap::loadTexture(const std::string& path)
+std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
 {    
     //m_tileTextures.push_back(new Texture(...));
     return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);

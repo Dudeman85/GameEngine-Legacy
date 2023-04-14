@@ -53,6 +53,8 @@ private:
     //std::vector<unsigned> m_tilesetTextures;
     std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 
+    unsigned int VAO;
+
     struct Subset final
     {
         unsigned vbo = 0;

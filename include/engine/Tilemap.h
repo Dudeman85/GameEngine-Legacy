@@ -38,11 +38,11 @@ source distribution.
 #include <engine/GL/Texture.h>
 #include "engine/GL/Shader.h"
 
-class TileMap final
+class Tilemap final
 {
 public:
-	TileMap();
-	~TileMap();
+	Tilemap();
+	~Tilemap();
 	
 		void loadMap();
 	void draw();

@@ -1,6 +1,8 @@
 #include <engine/Application.h>
-#include <chrono> // std::chrono::microseconds
-#include <thread> // std::this_thread::sleep_for
+#include <engine/Tilemap.h>
+
+#include <chrono>
+#include <thread>
 using namespace std;
 using namespace engine;
 
@@ -30,6 +32,7 @@ int main()
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
+	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
@@ -65,7 +68,8 @@ int main()
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
-	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
+	Tilemap map;
+	map.loadMap();
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -98,15 +102,19 @@ int main()
 
 		if (collider.collisions.size() > 0)
 		{
-			for (Collision c : collider.collisions)
+			for (const Collision& c : collider.collisions)
 			{
 				cout << c.a << " " << c.b << endl;
 			}
 		}
 
+
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
+
+		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
+		map.draw();
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

@@ -35,6 +35,9 @@ MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx,/* Ei käytössä cons
     : m_allTextures(textures)
     //: m_tilesetTextures(textures)
 {
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
     createSubsets(map, layerIdx);
 }
 
@@ -44,39 +47,37 @@ MapLayer::~MapLayer()
     {
         if(ss.vbo)
         {
-            (glDeleteBuffers(1, &ss.vbo));
+            glDeleteBuffers(1, &ss.vbo);
         }
-      /*  if(ss.lookup)
-        {
-            glCheck(glDeleteTextures(1, &ss.lookup));
-        }*/
-        //don't delete the tileset textures as these are
-        //shared and deleted elsewhere
     }
 }
 
 //public
 void ::MapLayer::draw()
-{   
-    (glEnableVertexAttribArray(0));
-    (glEnableVertexAttribArray(1));
-    (glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0));
-    (glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+{
+    glBindVertexArray(VAO);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     
     for(const auto& ss : m_subsets)
     {
-        (glActiveTexture(GL_TEXTURE0));
-        (glBindTexture(GL_TEXTURE_2D, ss.texture->ID()));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ss.texture->ID());
         
-        (glActiveTexture(GL_TEXTURE1));
-        (glBindTexture(GL_TEXTURE_2D, ss.lookup->ID()));
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ss.lookup->ID());
         
-        (glBindBuffer(GL_ARRAY_BUFFER, ss.vbo));
-        (glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+        glBindBuffer(GL_ARRAY_BUFFER, ss.vbo);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+    
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 
-    (glDisableVertexAttribArray(0));
-    (glDisableVertexAttribArray(1));
+    glBindVertexArray(0);
 }
 
 //private
@@ -134,17 +135,13 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         if(tsUsed)
         {
             m_subsets.emplace_back();
-            /* Ei käytössä
-            m_subsets.back().texture = m_tilesetTextures[i];
-            */
 
             m_subsets.back().texture = m_allTextures[i];
             m_subsets.back().lookup = std::make_shared<engine::Texture>(mapSize.x, mapSize.y, pixelData);
      
-            (glGenBuffers(1, &m_subsets.back().vbo));
-            (glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo));
-            (glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
-
+            glGenBuffers(1, &m_subsets.back().vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
         }
     }    
 }

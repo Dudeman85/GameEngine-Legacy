@@ -26,6 +26,7 @@ source distribution.
 *********************************************************************/
 
 #include <engine/Tilemap.h>
+#include <engine/Application.h>
 //#include "SDL.hpp"
 //#include "SDL_image.hpp"
 //#include <Game.hpp>
@@ -47,29 +48,15 @@ namespace
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+ECS ecs;
+
 int main(void)
 {
-    GLFWwindow* window;
-
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    // Load GL functions using glad
-    gladLoadGL(glfwGetProcAddress);
+    //Create the window and OpenGL context before creating EngineLib
+    GLFWwindow* window = engine::CreateWindow(800, 600, "Window");
 
 
-    TileMap game;
+    Tilemap game;
     game.loadMap();
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
