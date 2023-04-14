@@ -25,8 +25,7 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include "MapLayer.hpp"
-#include "GLCheck.hpp"
+#include <engine/MapLayer.h>
 
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
@@ -45,12 +44,12 @@ MapLayer::~MapLayer()
     {
         if(ss.vbo)
         {
-            glCheck(glDeleteBuffers(1, &ss.vbo));
+            (glDeleteBuffers(1, &ss.vbo));
         }
-        if(ss.lookup)
+      /*  if(ss.lookup)
         {
             glCheck(glDeleteTextures(1, &ss.lookup));
-        }
+        }*/
         //don't delete the tileset textures as these are
         //shared and deleted elsewhere
     }
@@ -58,26 +57,26 @@ MapLayer::~MapLayer()
 
 //public
 void ::MapLayer::draw()
-{    
-    glCheck(glEnableVertexAttribArray(0));
-    glCheck(glEnableVertexAttribArray(1));
-    glCheck(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0));
-    glCheck(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
+{   
+    (glEnableVertexAttribArray(0));
+    (glEnableVertexAttribArray(1));
+    (glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0));
+    (glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
     
     for(const auto& ss : m_subsets)
     {
-        glCheck(glActiveTexture(GL_TEXTURE0));
-        glCheck(glBindTexture(GL_TEXTURE_2D, ss.texture->ID()));
+        (glActiveTexture(GL_TEXTURE0));
+        (glBindTexture(GL_TEXTURE_2D, ss.texture->ID()));
         
-        glCheck(glActiveTexture(GL_TEXTURE1));
-        glCheck(glBindTexture(GL_TEXTURE_2D, ss.lookup));
+        (glActiveTexture(GL_TEXTURE1));
+        (glBindTexture(GL_TEXTURE_2D, ss.lookup->ID()));
         
-        glCheck(glBindBuffer(GL_ARRAY_BUFFER, ss.vbo));
-        glCheck(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+        (glBindBuffer(GL_ARRAY_BUFFER, ss.vbo));
+        (glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
     }
 
-    glCheck(glDisableVertexAttribArray(0));
-    glCheck(glDisableVertexAttribArray(1));
+    (glDisableVertexAttribArray(0));
+    (glDisableVertexAttribArray(1));
 }
 
 //private
@@ -138,20 +137,14 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
             /* Ei käytössä
             m_subsets.back().texture = m_tilesetTextures[i];
             */
-            m_subsets.back().texture = m_allTextures[i];
-     
-            glCheck(glGenBuffers(1, &m_subsets.back().vbo));
-            glCheck(glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo));
-            glCheck(glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
-            
-            glCheck(glGenTextures(1, &m_subsets.back().lookup));
-            glCheck(glBindTexture(GL_TEXTURE_2D, m_subsets.back().lookup));
-            glCheck(glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16UI, mapSize.x, mapSize.y, 0, GL_RG_INTEGER, GL_UNSIGNED_SHORT, (void*)pixelData.data()));
 
-            glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-            glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-            glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-            glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+            m_subsets.back().texture = m_allTextures[i];
+            m_subsets.back().lookup = std::make_shared<engine::Texture>(mapSize.x, mapSize.y, pixelData);
+     
+            (glGenBuffers(1, &m_subsets.back().vbo));
+            (glBindBuffer(GL_ARRAY_BUFFER, m_subsets.back().vbo));
+            (glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW));
+
         }
     }    
 }

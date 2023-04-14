@@ -25,7 +25,7 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include "Game.hpp"
+#include <engine/Tilemap.h>
 //#include "SDL.hpp"
 //#include "SDL_image.hpp"
 //#include <Game.hpp>
@@ -38,61 +38,8 @@ source distribution.
 namespace
 {
     const int WIDTH = 800;
-    const int HEIGHT = 600;
+    const int HEIGHT = 640;
 }
-
-#if 0
-int main()
-{
-    SDL_Window* window = nullptr;
-    SDL_GLContext context = nullptr;
-    
-    if(SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        std::cout << "Failed to init SDL!" << std::endl;
-    }
-    else
-    {
-        window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
-        if(!window)
-        {
-            std::cout << "Failed to create window *sadface*" << std::endl;
-        }
-        else
-        {
-			context = SDL_GL_CreateContext(window);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-			
-			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-			
-			SDL_GL_SetSwapInterval(1); //vsync
-			
-			int value = 0;
-			SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &value);
-			std::cout << "Got context with OpenGL Version: " << value;
-			SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &value);
-			std::cout << "." << value << std::endl;
-			
-            IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-            
-			Game game;
-			game.run(window);
-		}
-    }
-    
-    IMG_Quit();
-    SDL_GL_DeleteContext(context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    
-    
-    return 0;
-}
-
-#endif
 
 
 //#if 0
@@ -109,7 +56,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -122,13 +69,12 @@ int main(void)
     gladLoadGL(glfwGetProcAddress);
 
 
-    Game game;
+    TileMap game;
     game.loadMap();
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
 
 
         game.draw();

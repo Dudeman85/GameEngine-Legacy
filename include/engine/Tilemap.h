@@ -25,44 +25,40 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef MAPLAYER_HPP_
-#define MAPLAYER_HPP_
+#ifndef OGL_GAME_HPP_
+#define OGL_GAME_HPP_
 
-#include <vector>
+//#include <glm/matrix.hpp> Engine2
+
+#include <engine/MapLayer.h>
+
 #include <memory>
-#include "engine/GL/Texture.h"
+#include <vector>
+#include<string>
+#include <engine/GL/Texture.h>
+#include "engine/GL/Shader.h"
 
-namespace tmx
-{
-    class Map;
-}
-
-class MapLayer final
+class TileMap final
 {
 public:
-    MapLayer(const tmx::Map&, std::size_t, /*const std::vector<unsigned>&*/ const std::vector < std::shared_ptr<engine::Texture>>& textures);
-    ~MapLayer();
-    
-    MapLayer(const MapLayer&) = delete;
-    MapLayer& operator = (const MapLayer&) = delete;
-
-    void draw();
-
+	TileMap();
+	~TileMap();
+	
+		void loadMap();
+	void draw();
 private:
 
-    //std::vector<unsigned> m_tilesetTextures;
-    std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
+	
+	std::vector<std::unique_ptr<MapLayer>> m_mapLayers;
+	std::vector< std::shared_ptr<engine::Texture> > m_allTextures;
+	
+	//glm::mat4 m_projectionMatrix; Engine2
+	
+	engine::Shader* m_shader;
+	//std::vector<unsigned> m_tileTextures;
+	void initGLStuff(const tmx::Map&);
+	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 
-    struct Subset final
-    {
-        unsigned vbo = 0;
-        /*unsigned texture = 0;*/
-        std::shared_ptr<engine::Texture> texture = 0;
-        unsigned lookup = 0;
-    };
-    std::vector<Subset> m_subsets;
-
-    void createSubsets(const tmx::Map&, std::size_t);
 };
 
-#endif //MAPLAYER_HPP_
+#endif //OGL_GAME_HPP_

@@ -14,12 +14,33 @@ namespace engine
 	//Abstraction class for OpenGL textures
 	class Texture
 	{
+	private:
+		Texture(const Texture&);
+		Texture operator=(const Texture&);
+
 	public:
+		Texture(int sx, int sy,const std::vector<std::uint16_t>& data) {
+
+			//Generate and bind texture
+			glGenTextures(1, &id);
+			glBindTexture(GL_TEXTURE_2D, id);
+
+			//glCheck(glGenTextures(1, &m_subsets.back().lookup));
+			//glCheck(glBindTexture(GL_TEXTURE_2D, m_subsets.back().lookup));
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16UI, sx, sy, 0, GL_RG_INTEGER, GL_UNSIGNED_SHORT, &data[0]);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+
+
 		//Load a texture from path
-		Texture(const char* path, unsigned int filteringType = GL_NEAREST)
+		Texture(const char* path, unsigned int filteringType = GL_NEAREST, bool flip = true)
 		{
 			//Flip the image when loading into an OpenGL texture
-			stbi_set_flip_vertically_on_load(true);
+			stbi_set_flip_vertically_on_load(flip);
 			//Load image
 			int width, height, nrChannels;
 			unsigned char* imageData = stbi_load(path, &width, &height, &nrChannels, 0);
