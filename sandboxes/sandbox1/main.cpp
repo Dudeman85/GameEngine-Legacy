@@ -1,7 +1,3 @@
-#include <engine/AL/SoundDevice.h>
-#include <engine/AL/SoundBuffer.h>
-#include <engine/AL/MusicBuffer.h>
-#include <engine/AL/SoundSource.h>
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>

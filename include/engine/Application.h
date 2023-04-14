@@ -11,7 +11,10 @@
 //Other engine libs
 #include <engine/GL/Window.h>
 #include <engine/Image.h>
-
+#include <engine/AL/SoundDevice.h>
+#include <engine/AL/SoundSource.h>
+#include <engine/AL/SoundBuffer.h>
+#include <engine/AL/MusicBuffer.h>
 using namespace std;
 
 extern ECS ecs;
