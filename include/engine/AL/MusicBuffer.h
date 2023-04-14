@@ -10,6 +10,7 @@ public:
 	void Pause();
 	void Stop();
 	void Resume();
+	void SetVolume(float volume);
 
 	void updateBufferStream();
 

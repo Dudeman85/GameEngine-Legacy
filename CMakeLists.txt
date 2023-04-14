@@ -26,7 +26,7 @@ add_subdirectory("ext/box2d-main")
 include_directories("ext/box2d-main/include")
 
 file(GLOB_RECURSE ENGINE_SOURCE_FILES "./src/*.cpp")
-file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/GL/*.h")
+file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/GL/*.h" "./include/engine/AL/*.h")
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})

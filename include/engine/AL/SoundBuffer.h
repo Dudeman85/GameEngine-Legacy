@@ -6,7 +6,7 @@
 class SoundBuffer
 {
 public:
-	static SoundBuffer* get();
+	static SoundBuffer* getFile();
 
 	ALuint addSoundEffect(const char* filename);
 	bool removeSoundEffect(const ALuint& buffer);

@@ -1,7 +1,3 @@
-#include "SoundDevice.h"
-#include "SoundBuffer.h"
-#include "MusicBuffer.h"
-#include "SoundSource.h"
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -33,7 +29,7 @@ int main()
 
 	float volume = 0.5f;
 
-	SoundDevice* sd = SoundDevice::getDevice()->getDevice();
+	
 	static SoundSource mySpeaker1;
 	static SoundSource mySpeaker2;
 	static SoundSource mySpeaker3;
@@ -43,13 +39,13 @@ int main()
 	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
 	MusicBuffer myMusic("assets/forest.wav");
-	
-	mySpeaker1.setInverseDistance(1, 1.f, 20.f, 200.f, 0.4f);
-	mySpeaker2.setInverseDistance(3, 1.f, 20.f, 200.f, 0.4f);
-	mySpeaker3.setInverseDistance(4, 1.f, 20.f, 200.f, 0.4f);
-	mySpeaker4.setInverseDistance(5, 1.f, 20.f, 200.f, 0.4f);
+	myMusic.SetVolume(0.5f);
+	mySpeaker1.setInverseDistanceClamped(1, 1.f, 100.f, 600.f, 2.5f);
+	mySpeaker2.setInverseDistanceClamped(2, 1.f, 20.f, 200.f, 2.5f);
+	//mySpeaker3.setInverseDistanceClamped(3, 1.f, 20.f, 200.f, 0.4f);
+	//mySpeaker4.setInverseDistanceClamped(4, 1.f, 20.f, 200.f, 0.4f);
 	//Load a new texture
-	Texture texture = Texture("strawberry.png");
+	Texture texture = Texture("assets/strawberry.png");
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
@@ -59,7 +55,7 @@ int main()
 
 	//Define the test animation
 	Animator animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
+	auto testAnims = AnimationsFromSpritesheet("assets/gradient.png", 2, 2, vector<int>(4, 200));
 	engine.animationSystem->AddAnimation(player, testAnims[0], "1");
 	engine.animationSystem->AddAnimation(player, testAnims[1], "2");
 	engine.animationSystem->PlayAnimation(player, "2", true);
@@ -84,6 +80,8 @@ int main()
 	engine.renderSystem->SetBackgroundColor(0, .5, .1);
 
 	myMusic.Play();
+	
+	
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -122,26 +120,27 @@ int main()
 
 		Transform playerTransform = ecs.getComponent<Transform>(player);
 		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-		sd->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
-		sd->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
-		
-
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		
 		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound2);
-			sd->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 2.f); 
-			//Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
-			//sd->SetSourceLocation(4, sprite3Transform.x, sprite3Transform.y, 2.f);
-			//mySpeaker3.Play(sound2);
+			engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
+			/*Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
+			sd->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
+			mySpeaker3.Play(sound2);*/
 		}
+		
+		
 		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 			mySpeaker2.Play(sound2);
-			sd->SetSourceLocation(3, sprite4Transform.x, sprite4Transform.y, 0.f);
-			//Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
-			//sd->SetSourceLocation(5, sprite5Transform.x, sprite5Transform.y, 0.f);
-			//mySpeaker4.Play(sound2);
+			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+			
+			/*Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
+			sd->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
+			mySpeaker4.Play(sound2);*/
 		}
 		//Update all engine systems
 		engine.Update(&cam);
