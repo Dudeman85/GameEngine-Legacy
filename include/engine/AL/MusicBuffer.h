@@ -11,7 +11,7 @@ public:
 	void Stop();
 	void Resume();
 	void SetVolume(float volume);
-
+	void SetLooping(const bool& loop);
 	void updateBufferStream();
 
 	ALint getSource();

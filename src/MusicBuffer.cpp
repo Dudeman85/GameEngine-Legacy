@@ -56,6 +56,11 @@ void MusicBuffer::SetVolume(float volume)
 	alSourcef(p_Source, AL_GAIN, volume);
 }
 
+void MusicBuffer::SetLooping(const bool& loop)
+{
+	alSourcei(p_Source, AL_LOOPING, (ALint)loop);
+}
+
 void MusicBuffer::updateBufferStream()
 {
 	ALint processed, state;
