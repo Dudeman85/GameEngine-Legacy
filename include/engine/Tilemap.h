@@ -28,15 +28,12 @@ source distribution.
 #ifndef OGL_GAME_HPP_
 #define OGL_GAME_HPP_
 
-//#include <glm/matrix.hpp> Engine2
-
 #include <engine/MapLayer.h>
-
 #include <memory>
 #include <vector>
-#include<string>
+#include <string>
 #include <engine/GL/Texture.h>
-#include "engine/GL/Shader.h"
+#include <engine/GL/Shader.h>
 
 class Tilemap final
 {
@@ -52,10 +49,7 @@ private:
 	std::vector<std::unique_ptr<MapLayer>> m_mapLayers;
 	std::vector< std::shared_ptr<engine::Texture> > m_allTextures;
 	
-	//glm::mat4 m_projectionMatrix; Engine2
-	
 	engine::Shader* m_shader;
-	//std::vector<unsigned> m_tileTextures;
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 

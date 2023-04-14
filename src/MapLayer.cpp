@@ -26,14 +26,12 @@ source distribution.
 *********************************************************************/
 
 #include <engine/MapLayer.h>
-
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
-#include "engine/GL/Texture.h"
+#include <engine/GL/Texture.h>
 
-MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx,/* Ei käytössä const std::vector<unsigned>& textures*/ const std::vector<std::shared_ptr<engine::Texture>>& textures)
+MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures)
     : m_allTextures(textures)
-    //: m_tilesetTextures(textures)
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -49,6 +47,11 @@ MapLayer::~MapLayer()
         {
             glDeleteBuffers(1, &ss.vbo);
         }
+        {
+            glCheck(glDeleteTextures(1, &ss.lookup));
+        }*/
+        //don't delete the tileset textures as these are
+        //shared and deleted elsewhere
     }
 }
 
@@ -135,6 +138,9 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         if(tsUsed)
         {
             m_subsets.emplace_back();
+            /* Ei käytössä
+            m_subsets.back().texture = m_tilesetTextures[i];
+            */
 
             m_subsets.back().texture = m_allTextures[i];
             m_subsets.back().lookup = std::make_shared<engine::Texture>(mapSize.x, mapSize.y, pixelData);

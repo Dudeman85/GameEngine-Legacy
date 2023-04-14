@@ -42,7 +42,6 @@ namespace
     const int HEIGHT = 640;
 }
 
-
 //#if 0
 
 #include <glad/gl.h>
@@ -62,10 +61,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-
-
         game.draw();
-
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
