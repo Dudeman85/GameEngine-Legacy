@@ -1,5 +1,8 @@
 #include <engine/Application.h>
+#include <engine/Tilemap.h>
 
+#include <chrono>
+#include <thread>
 using namespace std;
 using namespace engine;
 
@@ -13,6 +16,9 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
+	engine.physicsSystem->gravity = Vector2(0, -400);
+	engine.physicsSystem->step = 4;
+
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
@@ -20,54 +26,97 @@ int main()
 	Texture texture = Texture("strawberry.png");
 
 	//Create a new entity
-	Entity sprite = ecs.newEntity();
-	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
-	ecs.addComponent(sprite, Sprite{ .texture = &texture });
-	ecs.addComponent(sprite, Animator{});
+	Entity player = ecs.newEntity();
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(player, Sprite{});
+	ecs.addComponent(player, Animator{});
+	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
+	ecs.addComponent(player, BoxCollider{});
+	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 
 	//Define the test animation
-	vector<Texture*> animationTextures;
-	animationTextures.push_back(new Texture("wood1.png"));
-	animationTextures.push_back(new Texture("wood2.png"));
-	vector<int> animationDelays{ 1000, 100 };
+	Animator& animator = ecs.getComponent<Animator>(player);
+	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
+	AnimationSystem::AddAnimation(player, testAnims[0], "1");
+	AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	AnimationSystem::PlayAnimation(player, "2", true);
 
-	Animation anim(animationTextures, animationDelays);
-	engine.animationSystem->AddAnimation(sprite, anim, "1");
-
-	engine.animationSystem->PlayAnimation(sprite, "1", true);
-
-	//Create a new entity
+	//Top-Right
 	Entity sprite2 = ecs.newEntity();
-	ecs.addComponent(sprite2, Transform{ .x = 200, .y = 100, .xScale = 50, .yScale = 50 });
-	ecs.addComponent(sprite2, Sprite{ .texture = &texture });
+	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite2, Sprite{ &texture });
+	ecs.addComponent(sprite2, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
+	//Bottom-Left
+	Entity sprite3 = ecs.newEntity();
+	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite3, Sprite{ &texture });
+	ecs.addComponent(sprite3, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite3, BoxCollider{});
+	//Top-Left
+	Entity sprite4 = ecs.newEntity();
+	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite4, Sprite{ &texture });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, BoxCollider{});
+	//Bottom-Right
+	Entity sprite5 = ecs.newEntity();
+	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite5, Sprite{ &texture });
+	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite5, BoxCollider{});
 
-	engine.renderSystem->SetBackgroundColor(0, .5, .1);
+	RenderSystem::SetBackgroundColor(0, .5, .1);
+
+	Tilemap map;
+	map.loadMap();
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//std::this_thread::sleep_for(std::chrono::milliseconds{100});
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
+		//test movement
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			cam.Translate(1, 0);
+		{
+			engine.physicsSystem->Move(player, Vector2(500, 0) * engine.deltaTime);
+		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			cam.Translate(-1, 0);
+		{
+			engine.physicsSystem->Move(player, Vector2(-500, 0) * engine.deltaTime);
+		}
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			cam.Translate(0, 1);
+		{
+			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
+		}
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			cam.Translate(0, -1);
+		{
+			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
+		}
 
-		if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-			cam.Translate(0, 0, -1);
-		if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-			cam.Translate(0, 0, 1);
+		Transform playerTransform = ecs.getComponent<Transform>(player);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+
+		if (collider.collisions.size() > 0)
+		{
+			for (const Collision& c : collider.collisions)
+			{
+				cout << c.a << " " << c.b << endl;
+			}
+		}
 
 
-		//Update all engine systems
+		//Update all engine systems, this usually should go last in the game loop
+		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
+		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
+		map.draw();
 
+		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

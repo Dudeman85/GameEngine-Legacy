@@ -1,5 +1,6 @@
 #pragma once
-#include "ECSCore.h"
+#include <engine/ECSCore.h>
+#include <engine/Vector.h>
 
 extern ECS ecs;
 
@@ -28,16 +29,24 @@ namespace engine
 		}
 
 		//Translate an entity by dx, dy, and dz
-		void Translate(Entity entity, float dx, float dy, float dz = 0)
+		static void Translate(Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x += dx;
 			transform.y += dy;
 			transform.z += dz;
 		}
+		//Translate an entity by dt
+		static void Translate(Entity entity, Vector3 dt)
+		{
+			Transform& transform = ecs.getComponent<Transform>(entity);
+			transform.x += dt.x;
+			transform.y += dt.y;
+			transform.z += dt.z;
+		}
 
 		//Set the absolute position of entity
-		void SetPosition(Entity entity, float x, float y, float z = 0)
+		static void SetPosition(Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			transform.x = x;

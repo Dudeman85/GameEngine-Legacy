@@ -1,181 +1,196 @@
-#include "SoundDevice.h"
-#include "SoundBuffer.h"
-#include "MusicBuffer.h"
-#include "SoundSource.h"
 #include <iostream>
-/*
-int main()
-{
-	std::cout << "starting...\n";
-
-	SoundDevice* mysounddevice = SoundDevice::get();
-	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
-	
-
-	SoundSource mySpeaker;
-
-	mySpeaker.Play(sound1);
-
-	MusicBuffer myMusic("assets/spring-weather-1.wav");
-	myMusic.Play();
-
-	while (1)
-	{
-		myMusic.updateBufferStream();
-	}
-
-	std::cout << "got here\n";
-
-	return 0;
-}*/
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <chrono> // std::chrono::microseconds
+#include <thread> // std::this_thread::sleep_for
+
 #include <fstream>
 #include <cmath>
 
-#include <engine/Sprite.h>
+#include <engine/Application.h>
 
-
+using namespace std;
 using namespace engine;
 
 ECS ecs;
-
-Camera cam = Camera(800, 600);
-
-//Resize window callback
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow* window)
-{
-	
-
-
-	
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		cam.Translate(1, 0);
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		cam.Translate(-1, 0);
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		cam.Translate(0, 1);
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		cam.Translate(0, -1);
-		
-	}
-	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-		cam.Translate(0, 0, -1);
-	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-		cam.Translate(0, 0, 1);
-}
-
 int main()
 {
-	//Initialize GLFW and set it to require OpenGL 3
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	//Create the window and OpenGL context before creating EngineLib
+	GLFWwindow* window = CreateWindow(800, 600, "Window");
 
-	SoundDevice* mysounddevice = SoundDevice::get();
-	//uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
+	//Initialize the default engine library
+	EngineLib engine;
 
+	engine.physicsSystem->gravity = Vector2(0, -400);
+	engine.physicsSystem->step = 4;
 
-	SoundSource mySpeaker;
+	//Create the camera
+	Camera cam = Camera(800, 600);
 
-	uint32_t sound1 = SoundBuffer::get()->addSoundEffect("assets/jump.wav");
-	uint32_t sound2 = SoundBuffer::get()->addSoundEffect("assets/Jingle_Win_00.wav");
+	float volume=1.0f;
+
+	
+	static SoundSource mySpeaker1;
+	static SoundSource mySpeaker2;
+	static SoundSource mySpeaker3;
+	static SoundSource mySpeaker4;
+	
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
+	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
+	
 	MusicBuffer myMusic("assets/forest.wav");
-	
-
-	//Create window object
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Window", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	//Set the resize window callback function
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-	glViewport(0, 0, 800, 600);
-
-	//Load the shaders from files and use the compiled shader program
-	//Shader shader("VertexShader.glsl", "FragmentShader.glsl");
-	//shader.use();
-
-	Texture texture = Texture("strawberry.png");
-
-	ecs.registerComponent<Transform>();
-	ecs.registerComponent<Sprite>();
-
-	//Register the gravity system, it is accessible by this pointer
-	std::shared_ptr<RenderSystem> renderSystem = ecs.registerSystem<RenderSystem>();
-
-	//Add Position and Gravity components as requirements for GravitySys-tem
-	Signature signature;
-	signature.set(ecs.getComponentId<Transform>());
-	signature.set(ecs.getComponentId<Sprite>());
-	ecs.setSystemSignature<RenderSystem>(signature);
-
-	renderSystem->SetBackgroundColor(0, .5, .1);
+	myMusic.SetVolume(0.2f);
+	mySpeaker1.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+	mySpeaker2.setLinearDistanceClamped(2, 1.f, 20.f, 200.f, 1.f);
+	mySpeaker3.setLinearDistanceClamped(3, 1.f, 20.f, 200.f, 2.4f);
+	mySpeaker4.setLinearDistanceClamped(4, 1.f, 20.f, 300.f, 1.f);
+	//Load a new texture
+	Texture texture = Texture("assets/strawberry.png");
 
 	//Create a new entity
-	Entity sprite = ecs.newEntity();
-	//Add the position component and set it's starting position
-	ecs.addComponent(sprite, Transform{ .x = 0, .y = 0, .xScale = 50, .yScale = 50 });
-	//Add the gravity component and set it's direction
-	ecs.addComponent(sprite, Sprite{ .texture = &texture });
+	Entity player = ecs.newEntity();
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(player, Sprite{});
+	ecs.addComponent(player, Animator{});
+	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
+	ecs.addComponent(player, BoxCollider{});
 
-	//Create a new entity
+	//Define the test animation
+	Animator animator = ecs.getComponent<Animator>(player);
+	auto testAnims = AnimationsFromSpritesheet("assets/gradient.png", 2, 2, vector<int>(4, 200));
+	AnimationSystem::AddAnimation(player, testAnims[0], "1");
+	AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	AnimationSystem::PlayAnimation(player, "2", true);
+
+	//Top-Right
 	Entity sprite2 = ecs.newEntity();
-	//Add the position component and set it's starting position
-	ecs.addComponent(sprite2, Transform{ .x = 200, .y = 100, .xScale = 50, .yScale = 50 });
-	//Add the gravity component and set it's direction
-	ecs.addComponent(sprite2, Sprite{ .texture = &texture });
+	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite2, Sprite{ &texture });
+	ecs.addComponent(sprite2, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
+	//Bottom-Left
+	Entity sprite3 = ecs.newEntity();
+	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite3, Sprite{ &texture });
+	ecs.addComponent(sprite3, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite3, BoxCollider{});
+	//Top-Left
+	Entity sprite4 = ecs.newEntity();
+	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite4, Sprite{ &texture });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, BoxCollider{});
+	//Bottom-Right
+	Entity sprite5 = ecs.newEntity();
+	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite5, Sprite{ &texture });
+	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite5, BoxCollider{});
 
+	RenderSystem::SetBackgroundColor(0, .5, .1);
 
+	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 	myMusic.Play();
-		
 	
+	//play sound files
+	mySpeaker4.Play(sound1);
+	//sets sound to loop, value 1=true
+	mySpeaker4.SetLooping(1);
 
-
-	//Main Loop
+	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		processInput(window);
-
-		renderSystem->Update(&cam);
-
+		
 		myMusic.updateBufferStream();
 		
-			
 
+		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+			myMusic.Pause();
+			mySpeaker4.Pause();
+		}
+		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+			myMusic.Resume();
+			mySpeaker4.Resume();
+		}
+		if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+		{
+			volume -= 0.01f;
+			if (volume < 0.0f) volume = 0.0f; // Clamp the volume to a minimum of 0.0f
+			myMusic.SetVolume(volume);
+		}
+		if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		{
+			volume += 0.01f;
+			if (volume > 1.0f) volume = 1.0f; // Clamp the volume to a max 1.0f
+			myMusic.SetVolume(volume);
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+
+		//test movement
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		{
+			engine.physicsSystem->Move(player, Vector2(500, 0) * engine.deltaTime);
+		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			mySpeaker.Play(sound1);
+		{
+			engine.physicsSystem->Move(player, Vector2(-500, 0) * engine.deltaTime);
+		}
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			mySpeaker.Play(sound2);
+		{
+			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
+		}
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		{
+			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
+		}
+
+		Transform playerTransform = ecs.getComponent<Transform>(player);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		
+		if (collider.collisions.size() > 0)
+		{
+			for (Collision c : collider.collisions)
+			{
+				cout << c.a << " " << c.b << endl;
+			}
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
+			mySpeaker1.Play(sound2);
+			engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
+
+			Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
+			engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
+			mySpeaker3.Play(sound2);
+		}
+		
+		Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
+		engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
+		
+		
+		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
+			mySpeaker2.Play(sound2);
+			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+		}
+		//Update all engine systems
+		engine.Update(&cam);
+		
+
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-	
+
 	glfwTerminate();
 
 	return 0;

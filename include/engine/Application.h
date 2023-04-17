@@ -2,14 +2,19 @@
 #include <chrono>
 
 //ECS modules
-#include "ECSCore.h"
+#include <engine/ECSCore.h>	
 #include "Sprite.h"
 #include "Transform.h"
-#include "Gravity.h"
+//#include "Gravity.h"
+#include "Physics.h"
 
 //Other engine libs
 #include <engine/GL/Window.h>
-
+#include <engine/Image.h>
+#include <engine/AL/SoundDevice.h>
+#include <engine/AL/SoundSource.h>
+#include <engine/AL/SoundBuffer.h>
+#include <engine/AL/MusicBuffer.h>
 using namespace std;
 
 extern ECS ecs;
@@ -20,8 +25,8 @@ namespace engine
 	class EngineLib
 	{
 	public:
+		SoundDevice* soundDevice;
 		double deltaTime = 0;
-
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
@@ -40,6 +45,7 @@ namespace engine
 			ecs.registerComponent<Transform>();
 			ecs.registerComponent<Animator>();
 			ecs.registerComponent<Rigidbody>();
+			ecs.registerComponent<BoxCollider>();
 
 			//Register all default engine systems here
 			//Transform System
@@ -67,7 +73,10 @@ namespace engine
 			Signature physicsSystemSignature;
 			physicsSystemSignature.set(ecs.getComponentId<Rigidbody>());
 			physicsSystemSignature.set(ecs.getComponentId<Transform>());
+			physicsSystemSignature.set(ecs.getComponentId<BoxCollider>());
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
+
+			soundDevice = SoundDevice::getDevice()->getDevice();
 		}
 
 		//Updates all default engine systems, calculates and returns delta time
@@ -75,8 +84,9 @@ namespace engine
 		{
 			//Update engine systems
 			transformSystem->Update();
-			renderSystem->Update(cam);
+			physicsSystem->Update(deltaTime);
 			animationSystem->Update(deltaTime);
+			renderSystem->Update(cam);
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
