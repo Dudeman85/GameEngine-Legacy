@@ -13,7 +13,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//Updates all GUI elements
+//Updates some GUI elements
 void MainWindow::UpdateDisplay()
 {
     if(frames > 0)
