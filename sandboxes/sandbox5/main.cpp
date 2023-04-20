@@ -108,6 +108,7 @@ int main()
 			}
 		}
 
+		cout << map.checkCollision(playerTransform.x, playerTransform.y) << std::endl;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

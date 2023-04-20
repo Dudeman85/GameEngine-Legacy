@@ -35,7 +35,7 @@ source distribution.
 class MapLayer final
 {
 public:
-	MapLayer(const tmx::Map&, std::size_t, const std::vector < std::shared_ptr<engine::Texture>>& textures);
+	MapLayer(const tmx::Map&, std::size_t, const std::vector <std::shared_ptr<engine::Texture>>& textures);
 	~MapLayer();
 
 	MapLayer(const MapLayer&) = delete;

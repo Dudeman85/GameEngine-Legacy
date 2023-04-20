@@ -32,6 +32,8 @@ source distribution.
 #include <engine/GL/Texture.h>
 #include <engine/MapLayer.h>
 
+#include <tmxlite/TileLayer.hpp>
+
 Tilemap::Tilemap()
 {
 	shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
@@ -58,15 +60,58 @@ void Tilemap::loadMap()
 	//create shared resources, shader and tileset textures
 	initGLStuff(map);
 
+	bounds = map.getBounds();
+	tileSize = map.getTileSize();
+
 	//create a drawable object for each tile layer
 	const auto& layers = map.getLayers();
 	for (auto i = 0u; i < layers.size(); ++i)
 	{
 		if (layers[i]->getType() == tmx::Layer::Type::Tile)
 		{
-			mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+			//If the layer is a collision layer
+			if (layers[i]->getName() == "collider")
+			{
+				//Resize the collision map
+				collisionLayer.resize(map.getTileCount().x);
+				for (int i = 0; i < collisionLayer.size(); i++)
+				{
+					collisionLayer[i].resize(map.getTileCount().y);
+				}
+
+				//Get the tile IDs
+				auto& tiles = layers[i]->getLayerAs<tmx::TileLayer>().getTiles();
+				
+				//Transfer the tile IDs to the 2D collision vector
+				for (int y = 0; y < collisionLayer[0].size(); y++)
+				{
+					for (int x = 0; x < collisionLayer.size(); x++)
+					{
+						collisionLayer[x][y] = tiles[(y * collisionLayer.size()) + x].ID;
+					}
+				}
+
+				//Print for debug
+				for (int y = 0; y < collisionLayer[0].size(); y++)
+				{
+					for (int x = 0; x < collisionLayer.size(); x++)
+					{
+						printf("%d ", (int)collisionLayer[x][y]);
+					}
+					printf("\n");
+				}
+			}
+			else
+			{
+				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+			}
 		}
 	}
+}
+
+unsigned int Tilemap::checkCollision(float x, float y)
+{
+	return collisionLayer[x / tileSize.x][y / tileSize.y];
 }
 
 void Tilemap::initGLStuff(const tmx::Map& map)
