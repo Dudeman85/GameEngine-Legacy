@@ -97,8 +97,49 @@ Max distance is the limit for roll off factor to affect sound volume.
 Roll off dictates how fast volume decreases, larger value = faster drop.
 
 
-
-
+To set sound location in your application, use following:
 ```cpp
-koodilaatikon malli
+//sets source location.
+engine.soundDevice->SetSourceLocation(1, 0.f, 0.f, 0.f);
+```
+Given parameters are: SourceId, x, y, z values.
+Source id needs to be same as in distance model in order to work properly.
+If you want to bind sound to a moving object in application, you need to make definition inside game loop, for example:
+```cpp
+//sets source location to sprite2
+engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
+```
+Adding small z value balances sound orientation changes in very close ranges.
+
+
+
+## Additional functions
+
+Music and sound effects support pause and resume functions. use these in game loop.
+```cpp
+myMusic.Pause();
+mySpeaker1.Pause();
+
+myMusic.Resume();
+mySpeaker1.Resume();
+```
+
+You can create basic volume control with following commands
+```cpp
+//initialize volume at the beginning of main function
+float volume =0.2f;
+
+//inside game loop
+if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)//volume down when 'n' is pressed
+	{
+		volume -= 0.01f;
+		if (volume < 0.0f) volume = 0.0f; // Clamp the volume to a minimum of 0.0f
+		myMusic.SetVolume(volume);
+	}
+if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)//volume up when 'm' is pressed
+	{
+		volume += 0.01f;
+		if (volume > 1.0f) volume = 1.0f; // Clamp the volume to a max 1.0f
+		myMusic.SetVolume(volume);
+	}
 ```

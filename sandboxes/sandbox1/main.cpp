@@ -31,7 +31,7 @@ int main()
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
-	float volume=1.0f;
+	float volume =0.2f;
 
 	
 	static SoundSource mySpeaker1;
@@ -46,7 +46,7 @@ int main()
 	myMusic.SetVolume(0.2f);
 	mySpeaker1.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
 	mySpeaker2.setLinearDistanceClamped(2, 1.f, 20.f, 200.f, 1.f);
-	mySpeaker3.setLinearDistanceClamped(3, 1.f, 20.f, 200.f, 2.4f);
+	mySpeaker3.setLinearDistanceClamped(3, 1.f, 20.f, 400.f, 2.4f);
 	mySpeaker4.setLinearDistanceClamped(4, 1.f, 20.f, 300.f, 1.f);
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
@@ -167,7 +167,7 @@ int main()
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound2);
 			engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
-
+			mySpeaker1.SetLooping(1);
 			Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
 			engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
 			mySpeaker3.Play(sound2);
