@@ -31,11 +31,12 @@ source distribution.
 #include <engine/MapLayer.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Shader.h>
+#include <engine/GL/Camera.h>
 
 class Tilemap final
 {
 public:
-	Tilemap();
+	Tilemap(engine::Camera* cam);
 	~Tilemap();
 	
 	void loadMap();
@@ -55,5 +56,6 @@ private:
 	std::vector<std::unique_ptr<MapLayer>> mapLayers;
 	std::vector<std::shared_ptr<engine::Texture>> allTextures;
 	
-	engine::Shader* shader;
+	engine::Shader* m_shader;
+	engine::Camera* camera;
 };

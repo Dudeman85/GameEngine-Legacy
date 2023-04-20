@@ -66,13 +66,6 @@ void SoundSource::setVolume(float volume)
 	alSourcef(sourceID, AL_GAIN, volume);
 }
 
-//void SoundSource::DistanceModel(int key)
-//{
-//	if (key < 0xD001 || key > 0xD006)
-//		throw("bad attunation key");
-//
-//	alDistanceModel(key);
-//}
 void SoundSource::setVelocity(float x, float y, float z)
 {
 	alSource3f(sourceID, AL_VELOCITY, x, y, z);

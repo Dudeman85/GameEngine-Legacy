@@ -24,19 +24,27 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
-
+#define _USE_MATH_DEFINES
+#include <engine/Tilemap.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <tmxlite/Map.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <engine/Tilemap.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/MapLayer.h>
+#include <cassert>
+#include <array>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <cmath>
 
 #include <tmxlite/TileLayer.hpp>
 
-Tilemap::Tilemap()
+Tilemap::Tilemap(engine::Camera* cam)
 {
-	shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
+	m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
+	camera = cam;
 }
 
 Tilemap::~Tilemap()
@@ -45,7 +53,21 @@ Tilemap::~Tilemap()
 
 void Tilemap::draw()
 {
-	shader->use();
+	m_shader->use();
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, (float)M_PI , glm::vec3(1.0f, 0.0f, 0.0f));
+
+	unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "u_modelMatrix");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	unsigned int viewLoc = glGetUniformLocation(m_shader->ID, "u_viewMatrix");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
+
+	//Give the shader the projection matrix
+	unsigned int projLoc = glGetUniformLocation(m_shader->ID, "u_projectionMatrix");
+	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
+
 	for (const auto& layer : mapLayers)
 	{
 		layer->draw();
@@ -116,15 +138,12 @@ unsigned int Tilemap::checkCollision(float x, float y)
 
 void Tilemap::initGLStuff(const tmx::Map& map)
 {
-	auto m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f);
-
-	shader->use();
-	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0]);
+	m_shader->use();
 
 	//we'll make sure the current tile texture is active in 0, 
 	//and lookup texture is active in 1 in MapLayer::draw()
-	glUniform1i(glGetUniformLocation(shader->ID, "u_tileMap"), 0);
-	glUniform1i(glGetUniformLocation(shader->ID, "u_lookupMap"), 1);
+	glUniform1i(glGetUniformLocation(m_shader->ID, "u_tileMap"), 0);
+	glUniform1i(glGetUniformLocation(m_shader->ID, "u_lookupMap"), 1);
 
 
 	const auto& tilesets = map.getTilesets();

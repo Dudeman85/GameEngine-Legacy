@@ -68,7 +68,7 @@ int main()
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
-	Tilemap map;
+	Tilemap map(&cam);
 	map.loadMap();
 
 	//Game Loop
