@@ -29,6 +29,7 @@ source distribution.
 #define OGL_GAME_HPP_
 
 #include <engine/MapLayer.h>
+#include <engine/GL/Camera.h>
 #include <memory>
 #include <vector>
 #include <string>
@@ -38,7 +39,7 @@ source distribution.
 class Tilemap final
 {
 public:
-	Tilemap();
+	Tilemap(engine::Camera* cam);
 	~Tilemap();
 	
 		void loadMap();
@@ -52,6 +53,7 @@ private:
 	engine::Shader* m_shader;
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
+	engine::Camera* camera;
 
 };
 
