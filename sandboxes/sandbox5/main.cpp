@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <thread>
+
 using namespace std;
 using namespace engine;
 
@@ -71,6 +72,8 @@ int main()
 	Tilemap map(&cam);
 	map.loadMap();
 
+	engine.physicsSystem->SetTilemap(&map);
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -104,11 +107,14 @@ int main()
 		{
 			for (const Collision& c : collider.collisions)
 			{
-				cout << c.a << " " << c.b << endl;
+				if (c.tileID == 0)
+					cout << "Entity-Entity: " << c.a << " " << c.b << endl;
+				else
+					cout << "Entity-Tilemap: " << c.a << " " << c.tileID << endl;
 			}
 		}
-
-		cout << map.checkCollision(playerTransform.x, playerTransform.y) << std::endl;
+		
+		cout << engine.deltaTime << endl;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

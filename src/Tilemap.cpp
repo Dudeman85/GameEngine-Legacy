@@ -56,7 +56,7 @@ void Tilemap::draw()
 	m_shader->use();
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, (float)M_PI , glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "u_modelMatrix");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -103,7 +103,7 @@ void Tilemap::loadMap()
 
 				//Get the tile IDs
 				auto& tiles = layers[i]->getLayerAs<tmx::TileLayer>().getTiles();
-				
+
 				//Transfer the tile IDs to the 2D collision vector
 				for (int y = 0; y < collisionLayer[0].size(); y++)
 				{
@@ -131,9 +131,17 @@ void Tilemap::loadMap()
 	}
 }
 
+//Check if a point is colliding with this tilemap's collision layer
 unsigned int Tilemap::checkCollision(float x, float y)
 {
-	return collisionLayer[x / tileSize.x][y / tileSize.y];
+	if (collisionLayer.empty())
+		return 0;
+
+	//Check out of bounds
+	if (abs(x / tileSize.x) >= collisionLayer.size() || abs(y / tileSize.y) >= collisionLayer[0].size() || y > 0 || x < 0)
+		return 0;
+
+	return collisionLayer[x / tileSize.x][-y / tileSize.y];
 }
 
 void Tilemap::initGLStuff(const tmx::Map& map)
