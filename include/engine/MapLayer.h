@@ -25,43 +25,36 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#ifndef MAPLAYER_HPP_
-#define MAPLAYER_HPP_
+#pragma once
 
 #include <vector>
 #include <memory>
 #include <engine/GL/Texture.h>
-
-namespace tmx
-{
-    class Map;
-}
+#include <tmxlite/Map.hpp>
 
 class MapLayer final
 {
 public:
-    MapLayer(const tmx::Map&, std::size_t, const std::vector < std::shared_ptr<engine::Texture>>& textures);
-    ~MapLayer();
-    
-    MapLayer(const MapLayer&) = delete;
-    MapLayer& operator = (const MapLayer&) = delete;
+	MapLayer(const tmx::Map&, std::size_t, const std::vector < std::shared_ptr<engine::Texture>>& textures);
+	~MapLayer();
 
-    void draw();
+	MapLayer(const MapLayer&) = delete;
+	MapLayer& operator = (const MapLayer&) = delete;
+
+	void draw();
 
 private:
-    std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
+	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 
-    unsigned int VAO;
+	unsigned int VAO;
 
-    struct Subset final
-    {
-        unsigned vbo = 0;
-        std::shared_ptr<engine::Texture> texture = 0;
-        std::shared_ptr<engine::Texture> lookup = 0;
-    };
-    std::vector<Subset> m_subsets;
+	struct Subset final
+	{
+		unsigned vbo = 0;
+		std::shared_ptr<engine::Texture> texture = 0;
+		std::shared_ptr<engine::Texture> lookup = 0;
+	};
+	std::vector<Subset> m_subsets;
 
-    void createSubsets(const tmx::Map&, std::size_t);
+	void createSubsets(const tmx::Map&, std::size_t);
 };
-
-#endif //MAPLAYER_HPP_

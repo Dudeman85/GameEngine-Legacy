@@ -25,97 +25,76 @@ and must not be misrepresented as being the original software.
 source distribution.
 *********************************************************************/
 
-#include <engine/Tilemap.h>
-#include <glm/gtc/matrix_transform.hpp>
 #include <tmxlite/Map.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <engine/Tilemap.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/MapLayer.h>
-#include <cassert>
-#include <array>
-
-namespace
-{
-    bool running = true;
-    const float timePerFrame = 1.f / 60.f;
-
-}
 
 Tilemap::Tilemap()
 {
-    m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
+	shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
 }
 
 Tilemap::~Tilemap()
-{    
+{
 }
 
 void Tilemap::draw()
 {
-    m_shader->use();
-    for (const auto& layer : m_mapLayers)
-    {
-        layer->draw();
-    }
+	shader->use();
+	for (const auto& layer : mapLayers)
+	{
+		layer->draw();
+	}
 }
 
 void Tilemap::loadMap()
 {
-    tmx::Map map;
-    map.load("assets/demo.tmx");    
-    
-    //create shared resources, shader and tileset textures
-    initGLStuff(map);
+	tmx::Map map;
+	map.load("assets/demo.tmx");
 
-    //create a drawable object for each tile layer
-    const auto& layers = map.getLayers();
-    for(auto i = 0u; i < layers.size(); ++i)
-    {
+	//create shared resources, shader and tileset textures
+	initGLStuff(map);
 
-        if(layers[i]->getType() == tmx::Layer::Type::Tile)
-        {
-            m_mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, m_allTextures));
-        }
-    }
+	//create a drawable object for each tile layer
+	const auto& layers = map.getLayers();
+	for (auto i = 0u; i < layers.size(); ++i)
+	{
+		if (layers[i]->getType() == tmx::Layer::Type::Tile)
+		{
+			mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+		}
+	}
 }
 
 void Tilemap::initGLStuff(const tmx::Map& map)
 {
-    auto m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f);
-    
-    m_shader->use();
-    glUniformMatrix4fv(glGetUniformLocation(m_shader->ID, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0]);
-    
-    //we'll make sure the current tile texture is active in 0, 
-    //and lookup texture is active in 1 in MapLayer::draw()
-    (glUniform1i(glGetUniformLocation(m_shader->ID, "u_tileMap"), 0));
-    (glUniform1i(glGetUniformLocation(m_shader->ID, "u_lookupMap"), 1));
-    
-    
-    const auto& tilesets = map.getTilesets();
-    for(const auto& ts : tilesets)
-    {
-        auto texture = loadTexture(ts.getImagePath());
-        m_allTextures.push_back(texture);
-    }    
-    
-    (glEnable(GL_BLEND));
-    (glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-    (glBlendEquation(GL_FUNC_ADD));
+	auto m_projectionMatrix = glm::ortho(0.f, 800.f, 600.f, 0.f, -0.1f, 100.f);
+
+	shader->use();
+	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_projectionMatrix"), 1, GL_FALSE, &m_projectionMatrix[0][0]);
+
+	//we'll make sure the current tile texture is active in 0, 
+	//and lookup texture is active in 1 in MapLayer::draw()
+	glUniform1i(glGetUniformLocation(shader->ID, "u_tileMap"), 0);
+	glUniform1i(glGetUniformLocation(shader->ID, "u_lookupMap"), 1);
+
+
+	const auto& tilesets = map.getTilesets();
+	for (const auto& ts : tilesets)
+	{
+		auto texture = loadTexture(ts.getImagePath());
+		allTextures.push_back(texture);
+	}
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
 }
 
 std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
-{    
-    return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);
+{
+	return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);
 }
-
-
-
-
-
-
-
-
-
-
-

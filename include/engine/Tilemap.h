@@ -24,14 +24,11 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
+#pragma once
 
-#ifndef OGL_GAME_HPP_
-#define OGL_GAME_HPP_
-
-#include <engine/MapLayer.h>
-#include <memory>
 #include <vector>
 #include <string>
+#include <engine/MapLayer.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Shader.h>
 
@@ -41,18 +38,16 @@ public:
 	Tilemap();
 	~Tilemap();
 	
-		void loadMap();
+	void loadMap();
 	void draw();
-private:
 
-	
-	std::vector<std::unique_ptr<MapLayer>> m_mapLayers;
-	std::vector< std::shared_ptr<engine::Texture> > m_allTextures;
-	
-	engine::Shader* m_shader;
+private:
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 
+	std::vector<std::unique_ptr<MapLayer>> mapLayers;
+	std::shared_ptr<MapLayer> collisionLayer;
+	std::vector<std::shared_ptr<engine::Texture>> allTextures;
+	
+	engine::Shader* shader;
 };
-
-#endif //OGL_GAME_HPP_

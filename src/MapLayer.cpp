@@ -30,8 +30,7 @@ source distribution.
 #include <tmxlite/TileLayer.hpp>
 #include <engine/GL/Texture.h>
 
-MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures)
-    : m_allTextures(textures)
+MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures) : m_allTextures(textures)
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -53,7 +52,7 @@ MapLayer::~MapLayer()
 }
 
 //public
-void ::MapLayer::draw()
+void MapLayer::draw()
 {
     glBindVertexArray(VAO);
 
@@ -135,9 +134,6 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         if(tsUsed)
         {
             m_subsets.emplace_back();
-            /* Ei käytössä
-            m_subsets.back().texture = m_tilesetTextures[i];
-            */
 
             m_subsets.back().texture = m_allTextures[i];
             m_subsets.back().lookup = std::make_shared<engine::Texture>(mapSize.x, mapSize.y, pixelData);
