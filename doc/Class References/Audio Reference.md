@@ -1,5 +1,7 @@
 # Audio Reference
 
+***This engine uses OpenAL. You might need to download OpenAL 1.1 Windows Installer from their website***
+
 ***All audio functions are included through Application.h. No other includes needed***
 ```cpp
 #include <engine/Application.h>
