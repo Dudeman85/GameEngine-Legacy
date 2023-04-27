@@ -109,6 +109,7 @@ Source id needs to be same as in distance model in order to work properly.
 If you want to bind sound to a moving object in application, you need to make definition inside game loop, for example:
 ```cpp
 //sets source location to sprite2
+Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
 ```
 Adding small z value balances sound orientation changes in very close ranges.
