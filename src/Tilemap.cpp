@@ -74,13 +74,15 @@ void Tilemap::draw()
 	}
 }
 
-void Tilemap::loadMap()
+void Tilemap::loadMap(const std::string ownMap)
 {
 	tmx::Map map;
-	map.load("assets/demo.tmx");
+	//map.load("assets/demo.tmx");
+	map.load(ownMap);
 
 	//create shared resources, shader and tileset textures
 	initGLStuff(map);
+	
 
 	bounds = map.getBounds();
 	tileSize = map.getTileSize();
