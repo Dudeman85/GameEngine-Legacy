@@ -2,24 +2,27 @@
 #include <engine/ECSCore.h>
 #include <engine/Transform.h>
 #include <engine/Tilemap.h>
+#include <vector>
 
 namespace engine
 {
 	//Collision struct, not a component
 	struct Collision
 	{
+		enum Type { entity, tilemap, trigger, miss };
+
+		Type type;
+
 		//The entity which instigated the collision
 		Entity a;
 		//The entity which was subject to the collision
 		Entity b;
 
-		bool collided;
-		bool isTrigger;
 		unsigned int tileID;
 
-		//How much entity b has overlapped entity a on each side
+		//How much collider b has overlapped collider a on each side
 		//Order is top, right, bottom, left
-		float intersects[4];
+		std::array<float, 4> intersects;
 	};
 
 	//Rigidbody component
@@ -106,10 +109,16 @@ namespace engine
 				//Move the entity back so it is no longer colliding
 				for (const Collision& collision : collisions)
 				{
-					if (collision.isTrigger)
+					//Don't process triggers or misses
+					if (collision.type == Collision::trigger || collision.type == Collision::miss)
 						continue;
 
-					Rigidbody& collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
+					Rigidbody collisionRigidbody;
+					//Fake the Rigidbody of a tilemap to get friction and elasticity values
+					if (collision.type == Collision::tilemap)
+						collisionRigidbody = Rigidbody{ .friction = 0, .elasticity = 0 };
+					else
+						collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
 
 					//Get the smallest intersection amount 
 					float minIntersect = INFINITY;
@@ -168,7 +177,7 @@ namespace engine
 			return 0;
 		}
 
-		//Performs AABB collision detection between a and every other entity with a collider as well as the tilemap
+		//Performs AABB collision detection between a and every other entity with a collider as well as the tilemap if it exists
 		vector<Collision> DetectCollision(Entity a)
 		{
 			Transform& aTransform = ecs.getComponent<Transform>(a);
@@ -185,7 +194,7 @@ namespace engine
 
 				//Check the intersect, if it collided add it to the list
 				Collision collision = AABBIntersect(a, b);
-				if (collision.collided)
+				if (collision.type != Collision::miss)
 				{
 					collisions.push_back(collision);
 					//Log the collision in both entity a and b
@@ -194,25 +203,50 @@ namespace engine
 				}
 			}
 
-			//Tilemap
-			vector<float> bounds = GetBounds(a);
-			vector<unsigned int> tilemapCollisions;
-			//Top-Right
-			tilemapCollisions.push_back(tilemap->checkCollision(bounds[1], bounds[0]));
-			//Bottom-Right
-			tilemapCollisions.push_back(tilemap->checkCollision(bounds[1], bounds[2]));
-			//Bottom-Left
-			tilemapCollisions.push_back(tilemap->checkCollision(bounds[3], bounds[2]));
-			//Top-Left
-			tilemapCollisions.push_back(tilemap->checkCollision(bounds[3], bounds[0]));
-			/*
-			//TODO make more checks if collider is bigger than tile
-			if (tilemapCollision != 0)
-			{
-				Collision collision{ .a = a, .b = 0, .collided = true, .isTrigger = false, .tileID = tilemapCollision };
+			//Tilemap collision checking
+			if (!tilemap)
+				return collisions;
 
-				aCollider.collisions.push_back(collision);
-			}*/
+			std::array<float, 4> bounds = GetBounds(a);
+
+			//TODO automate making more checks if collider is bigger than tile
+			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
+			vector<Vector2> checkPoints{ Vector2(bounds[1], bounds[0]), Vector2(bounds[1], bounds[2]), Vector2(bounds[3], bounds[2]), Vector2(bounds[3], bounds[0]) };
+
+			//Containers to store the necessary information only from hits
+			vector<Vector2> collisionPoints;
+			vector<Vector2> loggedTiles;
+
+			//Check every point for a collision
+			for (int i = 0; i < checkPoints.size(); i++)
+			{
+				unsigned int result = tilemap->checkCollision(checkPoints[i].x, checkPoints[i].y);
+
+				//If the collision was a hit
+				if (result != 0)
+				{
+					//Get the collision tile index
+					Vector2 tileIndex(floor(checkPoints[i].x / tilemap->tileSize.x), floor(-checkPoints[i].y / tilemap->tileSize.y));
+
+					//If that tile has not yet been logged as a collision
+					if (find(loggedTiles.begin(), loggedTiles.end(), tileIndex) == loggedTiles.end())
+					{
+						Collision collision{ .type = Collision::tilemap, .a = a, .tileID = result };
+
+						//Calculate the bounds for the collided tile
+						std::array<float, 4> tileBounds{
+							-tileIndex.y * tilemap->tileSize.y,
+							(tileIndex.x + 1) * tilemap->tileSize.x,
+							-(tileIndex.y + 1) * tilemap->tileSize.y,
+							tileIndex.x * tilemap->tileSize.x };
+
+						collision.intersects = GetIntersects(bounds, tileBounds);
+
+						aCollider.collisions.push_back(collision);
+						collisions.push_back(collision);
+					}
+				}
+			}
 
 			return collisions;
 		}
@@ -226,39 +260,18 @@ namespace engine
 			Transform& bTransform = ecs.getComponent<Transform>(b);
 			BoxCollider& bCollider = ecs.getComponent<BoxCollider>(b);
 
-			//Get the min and max bounds for entity a
-			vector<float> aBounds = GetBounds(a);
-			Vector2 aMax(aBounds[1], aBounds[0]);
-			Vector2 aMin(aBounds[3], aBounds[2]);
+			//Get the min and max bounds for entities a and b
+			std::array<float, 4> aBounds = GetBounds(a);
+			std::array<float, 4> bBounds = GetBounds(b);
 
-			//Get the min and max bounds for entity b
-			vector<float> bBounds = GetBounds(b);
-			Vector2 bMax(bBounds[1], bBounds[0]);
-			Vector2 bMin(bBounds[3], bBounds[2]);
-
-			Collision collision{ .a = a, .b = b, .collided = false };
+			Collision collision{ .type = Collision::miss, .a = a, .b = b };
 
 			//Perform AABB intersect
-			if (aMin.x < bMax.x && aMax.x > bMin.x && aMin.y < bMax.y && aMax.y > bMin.y)
+			if (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2])
 			{
-				collision.collided = true;
-				collision.isTrigger = aCollider.isTrigger || bCollider.isTrigger;
-
-				//Calculate the intersect amounts
-				collision.intersects[0] = aMax.y - bMin.y;
-				collision.intersects[1] = aMax.x - bMin.x;
-				collision.intersects[2] = bMax.y - aMin.y;
-				collision.intersects[3] = bMax.x - aMin.x;
-
-				//Cull the backwards intersects
-				if (collision.intersects[3] < collision.intersects[1])
-					collision.intersects[1] = 0;
-				else
-					collision.intersects[3] = 0;
-				if (collision.intersects[0] < collision.intersects[2])
-					collision.intersects[2] = 0;
-				else
-					collision.intersects[0] = 0;
+				//Set the collision data
+				collision.type = aCollider.isTrigger || bCollider.isTrigger ? Collision::trigger : Collision::entity;
+				collision.intersects = GetIntersects(aBounds, bBounds);
 			}
 
 			return collision;
@@ -266,23 +279,46 @@ namespace engine
 
 		//Get the bounds of the entity's collider
 		//Order is top, right, bottom, left. Aka yMax, xMax, yMin, xMin
-		static vector<float> GetBounds(Entity entity)
+		static std::array<float, 4> GetBounds(Entity entity)
 		{
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
 
-			vector<float> bounds;
+			std::array<float, 4> bounds;
 
 			//Top
-			bounds.push_back(transform.y + transform.yScale * collider.scale.y + collider.offset.y);
+			bounds[0] = transform.y + transform.yScale * collider.scale.y + collider.offset.y;
 			//Right
-			bounds.push_back(transform.x + transform.xScale * collider.scale.x + collider.offset.x);
+			bounds[1] = transform.x + transform.xScale * collider.scale.x + collider.offset.x;
 			//Bottom
-			bounds.push_back(transform.y - transform.yScale * collider.scale.y + collider.offset.y);
+			bounds[2] = transform.y - transform.yScale * collider.scale.y + collider.offset.y;
 			//Right
-			bounds.push_back(transform.x - transform.xScale * collider.scale.x + collider.offset.x);
+			bounds[3] = transform.x - transform.xScale * collider.scale.x + collider.offset.x;
 
 			return bounds;
+		}
+
+		//Returns the amount of intersect between box a and box b
+		//The order is top, right, bottom, left
+		static std::array<float, 4> GetIntersects(std::array<float, 4> aBounds, std::array<float, 4> bBounds)
+		{
+			std::array<float, 4> intersects{
+				aBounds[0] - bBounds[2],
+				aBounds[1] - bBounds[3],
+				bBounds[0] - aBounds[2],
+				bBounds[1] - aBounds[3] };
+
+			//Cull the backwards intersects
+			if (intersects[3] < intersects[1])
+				intersects[1] = 0;
+			else
+				intersects[3] = 0;
+			if (intersects[0] < intersects[2])
+				intersects[2] = 0;
+			else
+				intersects[0] = 0;
+
+			return intersects;
 		}
 
 		//Set a tilmap to check collision with
@@ -296,6 +332,6 @@ namespace engine
 		Vector2 gravity;
 
 	private:
-		Tilemap* tilemap;
+		Tilemap* tilemap = nullptr;
 	};
 }

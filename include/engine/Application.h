@@ -3,10 +3,9 @@
 
 //ECS modules
 #include <engine/ECSCore.h>	
-#include "Sprite.h"
-#include "Transform.h"
-//#include "Gravity.h"
-#include "Physics.h"
+#include <engine/Sprite.h>
+#include <engine/Transform.h>
+#include <engine/Physics.h>
 
 //Other engine libs
 #include <engine/GL/Window.h>

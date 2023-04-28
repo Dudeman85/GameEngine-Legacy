@@ -12,6 +12,8 @@ namespace engine
 		Vector2(float _x, float _y);
 		Vector2(Vector3 vec3);
 
+		bool operator==(const Vector2& rhs);
+
 		Vector2 operator+(float add);
 		Vector2 operator+(Vector2 add);
 		Vector2& operator+=(const Vector2& add);

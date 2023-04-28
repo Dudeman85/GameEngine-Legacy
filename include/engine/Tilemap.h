@@ -43,6 +43,8 @@ public:
 	void draw();
 
 	unsigned int checkCollision(float x, float y);
+
+	tmx::Vector2u tileSize;
 private:
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
@@ -51,7 +53,6 @@ private:
 	std::vector<std::vector<unsigned int>> collisionLayer;
 
 	tmx::FloatRect bounds;
-	tmx::Vector2u tileSize;
 
 	std::vector<std::unique_ptr<MapLayer>> mapLayers;
 	std::vector<std::shared_ptr<engine::Texture>> allTextures;

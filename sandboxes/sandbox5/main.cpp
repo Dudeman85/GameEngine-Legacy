@@ -28,7 +28,7 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
@@ -64,7 +64,7 @@ int main()
 	Entity sprite5 = ecs.newEntity();
 	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite5, Sprite{ &texture });
-	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
+	//ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
@@ -73,6 +73,8 @@ int main()
 	map.loadMap();
 
 	engine.physicsSystem->SetTilemap(&map);
+
+	cout << map.checkCollision(32, -32);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -107,20 +109,17 @@ int main()
 		{
 			for (const Collision& c : collider.collisions)
 			{
-				if (c.tileID == 0)
+				if (c.type == Collision::entity)
 					cout << "Entity-Entity: " << c.a << " " << c.b << endl;
 				else
 					cout << "Entity-Tilemap: " << c.a << " " << c.tileID << endl;
 			}
 		}
-		
-		cout << engine.deltaTime << endl;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
 		map.draw();
 
 		//OpenGL stuff, goes very last

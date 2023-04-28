@@ -18,6 +18,11 @@ namespace engine
 		y = vec3.y;
 	}
 
+	bool Vector2::operator==(const Vector2& rhs)
+	{
+		return x == rhs.x && y == rhs.y;
+	}
+
 	Vector2 Vector2::operator+(float add)
 	{
 		return Vector2(x + add, y + add);

@@ -45,6 +45,7 @@ Tilemap::Tilemap(engine::Camera* cam)
 {
 	m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
 	camera = cam;
+	collisionLayer = std::vector<std::vector<unsigned int>>();
 }
 
 Tilemap::~Tilemap()
@@ -131,17 +132,20 @@ void Tilemap::loadMap()
 	}
 }
 
-//Check if a point is colliding with this tilemap's collision layer
+//Returns the collision layers tile ID at x and y
 unsigned int Tilemap::checkCollision(float x, float y)
 {
 	if (collisionLayer.empty())
 		return 0;
 
+	int xIndex = floor(x / tileSize.x);
+	int yIndex = floor(-y / tileSize.y);
+
 	//Check out of bounds
-	if (abs(x / tileSize.x) >= collisionLayer.size() || abs(y / tileSize.y) >= collisionLayer[0].size() || y > 0 || x < 0)
+	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y > 0 || x < 0)
 		return 0;
 
-	return collisionLayer[x / tileSize.x][-y / tileSize.y];
+	return collisionLayer[xIndex][yIndex];
 }
 
 void Tilemap::initGLStuff(const tmx::Map& map)
