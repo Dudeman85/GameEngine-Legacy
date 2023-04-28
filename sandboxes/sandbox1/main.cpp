@@ -90,7 +90,7 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
 	engine.physicsSystem->SetTilemap(&map);
-	map.loadMap();
+	map.loadMap("assets/demo.tmx");
 
 	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 	myMusic.Play();
