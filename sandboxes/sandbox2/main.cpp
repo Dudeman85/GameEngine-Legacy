@@ -67,10 +67,11 @@ int main()
 	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
-
 	Tilemap map(&cam);
-	map.loadMap();
+	map.loadMap("assets/demo.tmx");
 
+
+	engine.physicsSystem->SetTilemap(&map);
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{

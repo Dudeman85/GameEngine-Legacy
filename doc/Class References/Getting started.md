@@ -13,7 +13,7 @@ First add filepath to source, and then define path to build folder, for example 
 It is recommended to create build folder into your source folder, for example C:/....filepath.../tiimi4/build
 After defining filepaths, you can first configure the project. CMake asks you to specify the generator for the project. select visual studio compiler you are using. Leave other fields empty or default.
 Once configuration is completed, generate build files and you can open project.
-
+***This engine uses OpenAL. You might need to download OpenAL 1.1 Windows Installer from their website***
 
 
 ## Creating window and game loop
@@ -24,6 +24,7 @@ Create new .cpp file for your game and add following lines at the beginning:
 
 using namespace std;
 using namespace engine;
+ECS ecs;
 ```
 
 In your main function:
@@ -46,7 +47,7 @@ Once window is created, you can create game loop
 //Game Loop
 while (!glfwWindowShouldClose(window))
 {
-	//
+	//Close window when Esc is pressed
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 		
@@ -61,9 +62,4 @@ while (!glfwWindowShouldClose(window))
 }
 glfwTerminate();
 
-```
-
-
-```cpp
-koodilaatikon malli
 ```

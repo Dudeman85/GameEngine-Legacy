@@ -39,7 +39,7 @@ public:
 	Tilemap(engine::Camera* cam);
 	~Tilemap();
 	
-	void loadMap();
+	void loadMap(const std::string ownMap);
 	void draw();
 
 	unsigned int checkCollision(float x, float y);
