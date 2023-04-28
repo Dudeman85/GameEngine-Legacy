@@ -1,9 +1,5 @@
 #include <iostream>
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <engine/Tilemap.h>
 
 #include <chrono> // std::chrono::microseconds
 #include <thread> // std::this_thread::sleep_for
@@ -92,6 +88,9 @@ int main()
 	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
+	Tilemap map(&cam);
+	engine.physicsSystem->SetTilemap(&map);
+	map.loadMap();
 
 	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 	myMusic.Play();
