@@ -231,6 +231,8 @@ namespace engine
 					//If that tile has not yet been logged as a collision
 					if (find(loggedTiles.begin(), loggedTiles.end(), tileIndex) == loggedTiles.end())
 					{
+						loggedTiles.push_back(tileIndex);
+
 						Collision collision{ .type = Collision::tilemap, .a = a, .tileID = result };
 
 						//Calculate the bounds for the collided tile

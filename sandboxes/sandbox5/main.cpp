@@ -74,8 +74,6 @@ int main()
 
 	engine.physicsSystem->SetTilemap(&map);
 
-	cout << map.checkCollision(32, -32);
-
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
