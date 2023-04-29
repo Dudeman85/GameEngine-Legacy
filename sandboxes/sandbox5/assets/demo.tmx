@@ -5,12 +5,12 @@
  </tileset>
  <layer id="1" name="Tile Layer 1" width="15" height="8">
   <data encoding="base64" compression="zlib">
-   eJwTYxj6gBeIeZAwH5H6OIFYBQvmooEbBwoAABbvAR0=
+   eJwTYyAPiKHRAwl4gZgHCfMRqY8TiFWwYC4auJESQG4Yg/QBAGSfAXU=
   </data>
  </layer>
  <layer id="4" name="collider" width="15" height="8">
   <data encoding="base64" compression="zlib">
-   eJwTYxi5QAwPHi4AAK0QALE=
+   eJwTYyAPiKHRQxGI4cGDCZDrHpA+APrAAQk=
   </data>
  </layer>
  <layer id="2" name="Tile Layer 2" width="15" height="8">

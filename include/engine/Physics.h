@@ -106,7 +106,10 @@ namespace engine
 				//Perform collision detection
 				vector<Collision> collisions = DetectCollision(entity);
 
-				//Move the entity back so it is no longer colliding
+				//Keep track of which sides have already been processes, so we don't move the entity too much
+				vector<int> sidesCollided;
+
+				//If the entity collided with something, move it back so it is no longer colliding
 				for (const Collision& collision : collisions)
 				{
 					//Don't process triggers or misses
@@ -120,9 +123,9 @@ namespace engine
 					else
 						collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
 
-					//Get the smallest intersection amount 
+					//Get the smallest intersection amount, this will determine which side actually collided
 					float minIntersect = INFINITY;
-					int side = 0;
+					int side = -1;
 					for (int i = 0; i < 4; i++)
 					{
 						//0 means no intersection on that side
@@ -136,6 +139,13 @@ namespace engine
 						}
 					}
 
+					//Don't process collision on the same side twice
+					if (find(sidesCollided.begin(), sidesCollided.end(), side) != sidesCollided.end())
+						continue;
+
+					sidesCollided.push_back(side);
+
+					//Top, right, bottom, left
 					switch (side)
 					{
 					case 0:
@@ -213,8 +223,7 @@ namespace engine
 			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
 			vector<Vector2> checkPoints{ Vector2(bounds[1], bounds[0]), Vector2(bounds[1], bounds[2]), Vector2(bounds[3], bounds[2]), Vector2(bounds[3], bounds[0]) };
 
-			//Containers to store the necessary information only from hits
-			vector<Vector2> collisionPoints;
+			//Log each tile collision index, so it will only be counted once
 			vector<Vector2> loggedTiles;
 
 			//Check every point for a collision
@@ -235,12 +244,13 @@ namespace engine
 
 						Collision collision{ .type = Collision::tilemap, .a = a, .tileID = result };
 
+						//TODO figure out the actual fix for this instead of the +0.0001 hack
 						//Calculate the bounds for the collided tile
 						std::array<float, 4> tileBounds{
-							-tileIndex.y * tilemap->tileSize.y,
+							-tileIndex.y * tilemap->tileSize.y + 0.0001,
 							(tileIndex.x + 1) * tilemap->tileSize.x,
 							-(tileIndex.y + 1) * tilemap->tileSize.y,
-							tileIndex.x * tilemap->tileSize.x };
+							tileIndex.x * tilemap->tileSize.x - 0.0001 };
 
 						collision.intersects = GetIntersects(bounds, tileBounds);
 

@@ -144,7 +144,7 @@ unsigned int Tilemap::checkCollision(float x, float y)
 	int yIndex = floor(-y / tileSize.y);
 
 	//Check out of bounds
-	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y > 0 || x < 0)
+	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= 0 || x <= 0)
 		return 0;
 
 	return collisionLayer[xIndex][yIndex];

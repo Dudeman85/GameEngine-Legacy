@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -400);
+	engine.physicsSystem->gravity = Vector2(0, -981);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -54,6 +54,11 @@ int main()
 	ecs.addComponent(sprite3, Sprite{ &texture });
 	ecs.addComponent(sprite3, Rigidbody{ .isStatic = true });
 	ecs.addComponent(sprite3, BoxCollider{});
+	Entity sprite6 = ecs.newEntity();
+	ecs.addComponent(sprite6, Transform{ .x = -320, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite6, Sprite{ &texture });
+	ecs.addComponent(sprite6, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite6, BoxCollider{});
 	//Top-Left
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
@@ -64,7 +69,7 @@ int main()
 	Entity sprite5 = ecs.newEntity();
 	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite5, Sprite{ &texture });
-	//ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 2000), .drag = 0.25, .elasticity = 0.625, .isStatic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
