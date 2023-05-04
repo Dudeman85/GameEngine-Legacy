@@ -6,10 +6,12 @@
 
 namespace engine
 {
+	enum Direction { up = 0, right = 1, down = 2, left = 3 };
+
 	//Collision struct, not a component
 	struct Collision
 	{
-		enum Type { entity, tilemap, trigger, miss };
+		enum class Type { entity, tilemap, trigger, miss };
 
 		Type type;
 
@@ -23,6 +25,9 @@ namespace engine
 		//How much collider b has overlapped collider a on each side
 		//Order is top, right, bottom, left
 		std::array<float, 4> intersects;
+
+		//The side which collided aka the minimum intersect
+		int side;
 	};
 
 	//Rigidbody component
@@ -113,40 +118,24 @@ namespace engine
 				for (const Collision& collision : collisions)
 				{
 					//Don't process triggers or misses
-					if (collision.type == Collision::trigger || collision.type == Collision::miss)
+					if (collision.type == Collision::Type::trigger || collision.type == Collision::Type::miss)
 						continue;
 
 					Rigidbody collisionRigidbody;
 					//Fake the Rigidbody of a tilemap to get friction and elasticity values
-					if (collision.type == Collision::tilemap)
+					if (collision.type == Collision::Type::tilemap)
 						collisionRigidbody = Rigidbody{ .friction = 0, .elasticity = 0 };
 					else
 						collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
 
-					//Get the smallest intersection amount, this will determine which side actually collided
-					float minIntersect = INFINITY;
-					int side = -1;
-					for (int i = 0; i < 4; i++)
-					{
-						//0 means no intersection on that side
-						if (collision.intersects[i] == 0)
-							continue;
-
-						if (collision.intersects[i] < minIntersect)
-						{
-							minIntersect = collision.intersects[i];
-							side = i;
-						}
-					}
-
 					//Don't process collision on the same side twice
-					if (find(sidesCollided.begin(), sidesCollided.end(), side) != sidesCollided.end())
+					if (find(sidesCollided.begin(), sidesCollided.end(), collision.side) != sidesCollided.end())
 						continue;
 
-					sidesCollided.push_back(side);
+					sidesCollided.push_back(collision.side);
 
 					//Top, right, bottom, left
-					switch (side)
+					switch (collision.side)
 					{
 					case 0:
 						//Collision on top, move down
@@ -187,6 +176,13 @@ namespace engine
 			return 0;
 		}
 
+		//Add an impulse to entity
+		static void Impulse(Entity entity, Vector2 velocity)
+		{
+			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
+			rigidbody.velocity += velocity;
+		}
+
 		//Performs AABB collision detection between a and every other entity with a collider as well as the tilemap if it exists
 		vector<Collision> DetectCollision(Entity a)
 		{
@@ -204,58 +200,77 @@ namespace engine
 
 				//Check the intersect, if it collided add it to the list
 				Collision collision = AABBIntersect(a, b);
-				if (collision.type != Collision::miss)
+				if (collision.type != Collision::Type::miss)
 				{
 					collisions.push_back(collision);
-					//Log the collision in both entity a and b
 					aCollider.collisions.push_back(collision);
+
+					//Calculate the collision from the perspective of b, but still keep a as the main collider
+					Collision reverseCollision = AABBIntersect(b, a);
+					reverseCollision.a = a;
+					reverseCollision.b = b;
 					bCollider.collisions.push_back(collision);
 				}
 			}
 
 			//Tilemap collision checking
-			if (!tilemap)
-				return collisions;
-
-			std::array<float, 4> bounds = GetBounds(a);
-
-			//TODO automate making more checks if collider is bigger than tile
-			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
-			vector<Vector2> checkPoints{ Vector2(bounds[1], bounds[0]), Vector2(bounds[1], bounds[2]), Vector2(bounds[3], bounds[2]), Vector2(bounds[3], bounds[0]) };
-
-			//Log each tile collision index, so it will only be counted once
-			vector<Vector2> loggedTiles;
-
-			//Check every point for a collision
-			for (int i = 0; i < checkPoints.size(); i++)
+			if (tilemap)
 			{
-				unsigned int result = tilemap->checkCollision(checkPoints[i].x, checkPoints[i].y);
+				std::array<float, 4> bounds = GetBounds(a);
 
-				//If the collision was a hit
-				if (result != 0)
+				//TODO automate making more checks if collider is bigger than tile
+				//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
+				vector<Vector2> checkPoints{ Vector2(bounds[1], bounds[0]), Vector2(bounds[1], bounds[2]), Vector2(bounds[3], bounds[2]), Vector2(bounds[3], bounds[0]) };
+
+				//Log each tile collision index, so it will only be counted once
+				vector<Vector2> loggedTiles;
+
+				//Check every point for a collision
+				for (int i = 0; i < checkPoints.size(); i++)
 				{
-					//Get the collision tile index
-					Vector2 tileIndex(floor(checkPoints[i].x / tilemap->tileSize.x), floor(-checkPoints[i].y / tilemap->tileSize.y));
+					unsigned int result = tilemap->checkCollision(checkPoints[i].x, checkPoints[i].y);
 
-					//If that tile has not yet been logged as a collision
-					if (find(loggedTiles.begin(), loggedTiles.end(), tileIndex) == loggedTiles.end())
+					//If the collision was a hit
+					if (result != 0)
 					{
-						loggedTiles.push_back(tileIndex);
+						//Get the collision tile index
+						Vector2 tileIndex(floor(checkPoints[i].x / tilemap->tileSize.x), floor(-checkPoints[i].y / tilemap->tileSize.y));
 
-						Collision collision{ .type = Collision::tilemap, .a = a, .tileID = result };
+						//If that tile has not yet been logged as a collision
+						if (find(loggedTiles.begin(), loggedTiles.end(), tileIndex) == loggedTiles.end())
+						{
+							loggedTiles.push_back(tileIndex);
 
-						//TODO figure out the actual fix for this instead of the +0.0001 hack
-						//Calculate the bounds for the collided tile
-						std::array<float, 4> tileBounds{
-							-tileIndex.y * tilemap->tileSize.y + 0.0001,
-							(tileIndex.x + 1) * tilemap->tileSize.x,
-							-(tileIndex.y + 1) * tilemap->tileSize.y,
-							tileIndex.x * tilemap->tileSize.x - 0.0001 };
+							Collision collision{ .type = Collision::Type::tilemap, .a = a, .tileID = result };
 
-						collision.intersects = GetIntersects(bounds, tileBounds);
+							//TODO figure out the actual fix for this instead of the +0.0001 hack
+							//Calculate the bounds for the collided tile
+							std::array<float, 4> tileBounds{
+								-tileIndex.y * tilemap->tileSize.y + 0.0001,
+								(tileIndex.x + 1) * tilemap->tileSize.x,
+								-(tileIndex.y + 1) * tilemap->tileSize.y,
+								tileIndex.x * tilemap->tileSize.x - 0.0001 };
 
-						aCollider.collisions.push_back(collision);
-						collisions.push_back(collision);
+							collision.intersects = GetIntersects(bounds, tileBounds);
+
+							//Get the smallest intersection amount, this will determine which side actually collided
+							float minIntersect = INFINITY;
+							for (int i = 0; i < 4; i++)
+							{
+								//0 means no intersection on that side
+								if (collision.intersects[i] == 0)
+									continue;
+
+								if (collision.intersects[i] < minIntersect)
+								{
+									minIntersect = collision.intersects[i];
+									collision.side = i;
+								}
+							}
+
+							aCollider.collisions.push_back(collision);
+							collisions.push_back(collision);
+						}
 					}
 				}
 			}
@@ -276,14 +291,30 @@ namespace engine
 			std::array<float, 4> aBounds = GetBounds(a);
 			std::array<float, 4> bBounds = GetBounds(b);
 
-			Collision collision{ .type = Collision::miss, .a = a, .b = b };
+			Collision collision{ .type = Collision::Type::miss, .a = a, .b = b };
 
 			//Perform AABB intersect
 			if (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2])
 			{
 				//Set the collision data
-				collision.type = aCollider.isTrigger || bCollider.isTrigger ? Collision::trigger : Collision::entity;
+				collision.type = aCollider.isTrigger || bCollider.isTrigger ? Collision::Type::trigger : Collision::Type::entity;
 				collision.intersects = GetIntersects(aBounds, bBounds);
+
+				//Get the smallest intersection amount, this will determine which side actually collided
+				float minIntersect = INFINITY;
+				for (int i = 0; i < 4; i++)
+				{
+					//0 means no intersection on that side
+					if (collision.intersects[i] == 0)
+						continue;
+
+					if (collision.intersects[i] < minIntersect)
+					{
+						minIntersect = collision.intersects[i];
+						collision.side = i;
+					}
+				}
+				
 			}
 
 			return collision;

@@ -74,10 +74,12 @@ Shader shader = Shader("vertexShader.glsl", "fragmentShader.glsl");
 
 The sprite component only contains a pointer to a texture and optionally a pointer to a shader.<br>
 Every sprite can be drawn with a different shader if desired. If no shader is specified the default is used.<br>
-All entities with the sprite component will be drawn by the RenderSystem.
+All entities with the sprite component will be drawn by the RenderSystem as long as they also have the transform component.
 ```cpp
 //Create a new entity
 Entity sprite = ecs.newEntity();
+//Add the sprite component with a texture and custom shader
+ecs.addComponent(sprite, Sprite{&texture, &shader});
 //Add the sprite component with a texture and custom shader
 ecs.addComponent(sprite, Sprite{&texture, &shader});
 ```
@@ -92,7 +94,7 @@ You can manually create it from textures, or automatically create it from a spri
 std::vector<Texture*> slicedTextures = SliceSpritesheet("spritesheet.png", 4, 6);
 //Copy the first row of the spritesheet to a new vector
 std::vector<Texture*> textures(4);
-std::copy(slicedTextures.begin(), slicedTetures.begin() + 4, textures.begin());
+std::copy(slicedTextures.begin(), slicedTextures.begin() + 4, textures.begin());
 //Create a vector of delays with each delay being 250ms
 std::vector<int> delays(4, 250);
 

@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -981);
+	engine.physicsSystem->gravity = Vector2(0, -4000);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -31,9 +31,10 @@ int main()
 	ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
+	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 1, .friction = 0, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
-	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
+	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
+	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
@@ -79,6 +80,8 @@ int main()
 
 	engine.physicsSystem->SetTilemap(&map);
 
+	bool upHeld = false;
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -96,26 +99,52 @@ int main()
 		{
 			engine.physicsSystem->Move(player, Vector2(-500, 0) * engine.deltaTime);
 		}
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		{
-			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
-		}
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		{
 			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
 		}
 
+		//When jump is pressed
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		{
+			upHeld = true;
+			//If touching ground
+			if (playerCollider.collisions.end() != find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
+				[](const Collision& c)
+				{
+					return c.side == Direction::down;
+				}))
+			{
+				PhysicsSystem::Impulse(player, Vector2(0, 3000));
+			}
+		}
+		else
+		{
+			if (upHeld)
+			{
+				//If not touching ground
+				if (playerCollider.collisions.end() == find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
+					[](const Collision& c)
+					{
+						return c.side == Direction::down;
+					}))
+				{
+					playerRigidbody.velocity = Vector2(0, min(playerRigidbody.velocity.y, 1000.0f));
+					upHeld = false;
+				}
+			}
+		}
+
+
 		Transform playerTransform = ecs.getComponent<Transform>(player);
 		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
-		if (collider.collisions.size() > 0)
+		if (playerCollider.collisions.size() > 0)
 		{
-			for (const Collision& c : collider.collisions)
+			for (const Collision& c : playerCollider.collisions)
 			{
-				if (c.type == Collision::entity)
-					cout << "Entity-Entity: " << c.a << " " << c.b << endl;
-				else
-					cout << "Entity-Tilemap: " << c.a << " " << c.tileID << endl;
+				if (c.side == Direction::down)
+					cout << "Player touching ground\n";
 			}
 		}
 
