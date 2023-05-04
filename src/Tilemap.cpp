@@ -56,7 +56,7 @@ void Tilemap::draw()
 {
 	m_shader->use();
 
-	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), TilemapPos);
 	model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "u_modelMatrix");
@@ -83,7 +83,7 @@ void Tilemap::loadMap(const std::string ownMap)
 
 	//create shared resources, shader and tileset textures
 	initGLStuff(map);
-	
+
 
 	bounds = map.getBounds();
 	tileSize = map.getTileSize();
@@ -140,11 +140,11 @@ unsigned int Tilemap::checkCollision(float x, float y)
 	if (collisionLayer.empty())
 		return 0;
 
-	int xIndex = floor(x / tileSize.x);
-	int yIndex = floor(-y / tileSize.y);
+	int xIndex = floor((x - TilemapPos.x) / tileSize.x);
+	int yIndex = floor((-y + TilemapPos.y) / tileSize.y);
 
 	//Check out of bounds
-	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= 0 || x <= 0)
+	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= TilemapPos.y || x <= TilemapPos.x)
 		return 0;
 
 	return collisionLayer[xIndex][yIndex];
@@ -174,5 +174,5 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 
 std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
 {
-	return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);
+	return std::make_shared<engine::Texture>(path.c_str(), GL_NEAREST, false);
 }

@@ -1,6 +1,6 @@
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
-
+#include <vector>
 #include <chrono>
 #include <thread>
 using namespace std;
@@ -69,6 +69,7 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo.tmx");
+	map.TilemapPos = glm::vec3(64.0f, 64.0f, 0.0f);
 
 
 	engine.physicsSystem->SetTilemap(&map);
@@ -126,3 +127,4 @@ int main()
 
 	return 0;
 }
+
