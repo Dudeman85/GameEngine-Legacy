@@ -174,5 +174,5 @@ void Tilemap::initGLStuff(const tmx::Map& map)
 
 std::shared_ptr<engine::Texture> Tilemap::loadTexture(const std::string& path)
 {
-	return std::make_shared<engine::Texture>("assets/images/tilemap/tileset.png", GL_NEAREST, false);
+	return std::make_shared<engine::Texture>(path, GL_NEAREST, false);
 }
