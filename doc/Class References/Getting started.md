@@ -13,6 +13,7 @@ First add filepath to source, and then define path to build folder, for example 
 It is recommended to create build folder into your source folder, for example C:/....filepath.../tiimi4/build
 After defining filepaths, you can first configure the project. CMake asks you to specify the generator for the project. select visual studio compiler you are using. Leave other fields empty or default.
 Once configuration is completed, generate build files and you can open project.
+
 ***This engine uses OpenAL. You might need to download OpenAL 1.1 Windows Installer from their website***
 
 
