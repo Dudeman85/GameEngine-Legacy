@@ -64,7 +64,7 @@ int main()
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .gravityScale = 0, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
 	ecs.addComponent(sprite4, BoxCollider{});
 	//Bottom-Right
 	Entity sprite5 = ecs.newEntity();
@@ -143,6 +143,11 @@ int main()
 		{
 			for (const Collision& c : playerCollider.collisions)
 			{
+				if (c.type == Collision::Type::entity)
+				{
+						cout << "HERE\n";
+				}
+
 				if (c.side == Direction::down)
 					cout << "Player touching ground\n";
 			}

@@ -65,6 +65,23 @@ namespace engine
 			return pixmap[i];
 		}
 
+		//Returns the data of this imge in stbimage friendly format
+		unsigned char* data()
+		{
+			unsigned char* data = new unsigned char[width * height * 4];
+			for (int y = 0; y < height; y++)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					data[y * width + x] = pixmap[x][y].r;
+					data[y * width + x + 1] = pixmap[x][y].g;
+					data[y * width + x + 2] = pixmap[x][y].b;
+					data[y * width + x + 3] = pixmap[x][y].a;
+				}
+			}
+			return data;
+		}
+
 		//Get a subsection of pixels from x1 y1 top-left, to x2, y2 bottom-right (inclusive).
 		Image Slice(int x1, int y1, int x2, int y2)
 		{
