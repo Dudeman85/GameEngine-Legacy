@@ -69,7 +69,7 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo.tmx");
-	map.TilemapPos = glm::vec3(64.0f, 64.0f, 0.0f);
+	map.position = glm::vec3(64.0f, 64.0f, 0.0f);
 
 
 	engine.physicsSystem->SetTilemap(&map);
