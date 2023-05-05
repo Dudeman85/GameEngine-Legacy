@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -6000);
+	engine.physicsSystem->gravity = Vector2(0, -1000);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -31,7 +31,7 @@ int main()
 	ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 1, .friction = 0.2, .elasticity = 0 });
+	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0.2, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
@@ -56,7 +56,7 @@ int main()
 	ecs.addComponent(sprite3, Rigidbody{ .isStatic = true });
 	ecs.addComponent(sprite3, BoxCollider{});
 	Entity sprite6 = ecs.newEntity();
-	ecs.addComponent(sprite6, Transform{ .x = -320, .y = -200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite6, Transform{ .x = -270, .y = -200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite6, Sprite{ &texture });
 	ecs.addComponent(sprite6, Rigidbody{ .isStatic = true });
 	ecs.addComponent(sprite6, BoxCollider{});
@@ -64,7 +64,7 @@ int main()
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .gravityScale = 0, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .gravityScale = 1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
 	ecs.addComponent(sprite4, BoxCollider{});
 	//Bottom-Right
 	Entity sprite5 = ecs.newEntity();
@@ -103,52 +103,10 @@ int main()
 		{
 			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
 		}
-
-		//When jump is pressed
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
-			//If touching ground
-			if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) != playerCollider.sidesCollided.end())
-			{
-				PhysicsSystem::Impulse(player, Vector2(0, 3200));
-			}
-			//If not touching ground
-			else
-			{
-				//Walljump
-				if (!jumpHeld)
-				{
-					//Right side
-					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::right) != playerCollider.sidesCollided.end())
-					{
-						PhysicsSystem::Impulse(player, Vector2(-3000, 4000));
-						cout << "going left\n";
-					}
-
-					//Left side
-					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::left) != playerCollider.sidesCollided.end())
-					{
-						PhysicsSystem::Impulse(player, Vector2(3000, 4000));
-						cout << "going right\n";
-					}
-				}
-			}
-			jumpHeld = true;
+			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
 		}
-		else
-		{
-			if (jumpHeld)
-			{
-				//If not touching ground
-				if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) == playerCollider.sidesCollided.end())
-				{
-					playerRigidbody.velocity = Vector2(playerRigidbody.velocity.x, min(playerRigidbody.velocity.y, 700.0f));
-				}
-				jumpHeld = false;
-			}
-		}
-
-
 
 
 
@@ -156,11 +114,6 @@ int main()
 		{
 			for (const Collision& c : playerCollider.collisions)
 			{
-				if (c.type == Collision::Type::entity)
-				{
-					cout << "HERE\n";
-				}
-
 				if (c.side == Direction::down)
 					cout << "Player touching ground\n";
 			}

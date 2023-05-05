@@ -48,7 +48,9 @@ namespace engine
 		Vector2 offset = Vector2(0, 0);
 		bool isTrigger = false;
 		vector<Collision> collisions;
-		vector<int> sidesCollided;
+
+		//Which sides of this collided have collided with something
+		array<bool, 4> sidesCollided;
 	};
 
 	//Physics System
@@ -79,7 +81,7 @@ namespace engine
 
 					if (i == 0)
 					{
-						collider.sidesCollided.clear();
+						collider.sidesCollided.fill(false);
 						collider.collisions.clear();
 					}
 
@@ -210,14 +212,14 @@ namespace engine
 				{
 					collisions.push_back(collision);
 					aCollider.collisions.push_back(collision);
-					aCollider.sidesCollided.push_back(collision.side);
+					aCollider.sidesCollided[collision.side] = true;
 
 					//Calculate the collision from the perspective of b, but still keep a as the main collider
 					Collision reverseCollision = AABBIntersect(b, a);
 					reverseCollision.a = a;
 					reverseCollision.b = b;
    					bCollider.collisions.push_back(reverseCollision);
-					bCollider.sidesCollided.push_back(reverseCollision.side);
+					bCollider.sidesCollided[reverseCollision.side] = true;
 				}
 			}
 
@@ -277,7 +279,7 @@ namespace engine
 							}
 
 							aCollider.collisions.push_back(collision);
-							aCollider.sidesCollided.push_back(collision.side);
+							aCollider.sidesCollided[collision.side] = true;
 							collisions.push_back(collision);
 						}
 					}

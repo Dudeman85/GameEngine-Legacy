@@ -108,7 +108,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
 			//If touching ground
-			if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) != playerCollider.sidesCollided.end())
+			if (playerCollider.sidesCollided[Direction::down])
 			{
 				PhysicsSystem::Impulse(player, Vector2(0, 3200));
 			}
@@ -119,14 +119,14 @@ int main()
 				if (!jumpHeld)
 				{
 					//Right side
-					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::right) != playerCollider.sidesCollided.end())
+					if (playerCollider.sidesCollided[Direction::right])
 					{
 						PhysicsSystem::Impulse(player, Vector2(-3000, 4000));
 						cout << "going left\n";
 					}
 
 					//Left side
-					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::left) != playerCollider.sidesCollided.end())
+					if (playerCollider.sidesCollided[Direction::left])
 					{
 						PhysicsSystem::Impulse(player, Vector2(3000, 4000));
 						cout << "going right\n";
@@ -140,7 +140,7 @@ int main()
 			if (jumpHeld)
 			{
 				//If not touching ground
-				if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) == playerCollider.sidesCollided.end())
+				if (!playerCollider.sidesCollided[Direction::down])
 				{
 					playerRigidbody.velocity = Vector2(playerRigidbody.velocity.x, min(playerRigidbody.velocity.y, 700.0f));
 				}
