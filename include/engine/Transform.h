@@ -53,5 +53,13 @@ namespace engine
 			transform.y = y;
 			transform.z = z;
 		}
+		//Set the absolute position of entity
+		static void SetPosition(Entity entity, Vector3 position)
+		{
+			Transform& transform = ecs.getComponent<Transform>(entity);
+			transform.x = position.x;
+			transform.y = position.y;
+			transform.z = position.z;
+		}
 	};
 }

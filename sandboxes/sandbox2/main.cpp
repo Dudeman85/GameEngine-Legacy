@@ -30,7 +30,7 @@ int main()
 	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 0, .friction = 0, .elasticity = 0 });
+	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
 	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 
@@ -45,25 +45,25 @@ int main()
 	Entity sprite2 = ecs.newEntity();
 	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite2, Sprite{ &texture });
-	ecs.addComponent(sprite2, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite2, Rigidbody{ .kinematic = true });
 	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
 	//Bottom-Left
 	Entity sprite3 = ecs.newEntity();
 	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite3, Sprite{ &texture });
-	ecs.addComponent(sprite3, Rigidbody{ .isStatic = true });
+	ecs.addComponent(sprite3, Rigidbody{ .kinematic = true });
 	ecs.addComponent(sprite3, BoxCollider{});
 	//Top-Left
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite4, BoxCollider{});
 	//Bottom-Right
 	Entity sprite5 = ecs.newEntity();
 	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite5, Sprite{ &texture });
-	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);

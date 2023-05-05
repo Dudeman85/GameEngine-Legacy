@@ -47,6 +47,7 @@ int main()
 	ecs.addComponent(sprite, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
 	//
 	
+	Sprite& spriteComponent = ecs.getComponent<Sprite>(sprite);
 
 	//Add the sprite component with a texture and custom shader
 	ecs.addComponent(sprite, Sprite{ &texture});

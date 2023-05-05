@@ -334,13 +334,14 @@ public:
 		componentManager->registerComponent<T>();
 	}
 
-	//Add a component to an entity
+	//Add a component to an entity and return a reference to it
 	template<typename T>
-	void addComponent(Entity entity, T component)
+	T& addComponent(Entity entity, T component)
 	{
 		componentManager->addComponent(entity, component);
 		entityManager->entitySignatures[entity].set(componentManager->getComponentId<T>(), true);
 		systemManager->onEntitySignatureChanged(entity, entityManager->entitySignatures[entity]);
+		return componentManager->getComponent<T>(entity);
 	}
 
 	//Remove a component from an entity
