@@ -1,4 +1,4 @@
-//#if 0
+#if 0
 
 
 // Getting started ok!
@@ -41,4 +41,4 @@ int main() {
 	}
 	glfwTerminate();
 }
-//#endif
+#endif
