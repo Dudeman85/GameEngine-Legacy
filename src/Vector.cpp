@@ -1,3 +1,4 @@
+
 #include "engine/Vector.h"
 
 namespace engine
@@ -65,6 +66,10 @@ namespace engine
 		return Vector2(x / div, y / div);
 	}
 
+	Vector2 Vector2::Normalize() {
+		float length = sqrt(x * x + y * y);
+		return Vector2(x / length, y / length);
+	}
 
 	Vector3::Vector3()
 	{
@@ -84,4 +89,33 @@ namespace engine
 		y = vec2.y;
 		z = _z;
 	}
+	Vector3 Vector3::operator+(float add)
+	{
+		return Vector3(x + add, y + add, z + add);
+	}
+	Vector3 Vector3::operator+(Vector3 add)
+	{
+		return Vector3(x + add.x, y + add.y, z + add.z);
+	}
+	Vector3& Vector3::operator+=(const Vector3& add)
+	{
+		x += add.x;
+		y += add.y;
+		z += add.z;
+		return *this;
+	}
+	Vector3 Vector3::operator*(float mult) {
+		return Vector3(x * mult, y * mult, z * mult);
+	}
+	Vector3 Vector3::operator*(Vector3 mult) {
+		return Vector3(x * mult.x, y * mult.y, z * mult.z);
+	}
+	Vector3& Vector3::operator*=(float mult) {
+		x *= mult;
+		y *= mult;
+		z *= mult;
+		return *this;
+	}
+
+
 }

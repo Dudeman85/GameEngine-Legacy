@@ -1,4 +1,6 @@
+
 #pragma once
+#include <cmath>
 
 namespace engine
 {
@@ -25,7 +27,7 @@ namespace engine
 		Vector2& operator*=(float mult);
 
 		Vector2 operator/(float div);
-
+		Vector2 Normalize();
 		float x, y;
 	};
 
@@ -36,7 +38,13 @@ namespace engine
 		Vector3();
 		Vector3(float _x, float _y, float _z);
 		Vector3(Vector2 vec2, float _z = 0);
-
+		Vector3 operator+(float add);
+		Vector3 operator+(Vector3 add);
+		Vector3& operator+=(const Vector3& add);
+		Vector3 operator*(float mult);
+		Vector3 operator*(Vector3 mult);
+		Vector3& operator*=(float mult);
 		float x, y, z;
 	};
 }
+

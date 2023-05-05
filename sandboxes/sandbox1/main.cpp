@@ -5,7 +5,6 @@
 #include <thread> // std::this_thread::sleep_for
 
 #include <fstream>
-#include <cmath>
 
 #include <engine/Application.h>
 #include <../src/detail/pugixml.hpp>
@@ -13,8 +12,6 @@
 using namespace std;
 using namespace engine;
 ECS ecs;
-
-
 
 //void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 //	{
@@ -26,6 +23,7 @@ int main()
 	//Create the window and OpenGL context before creating EngineLib
 	GLFWwindow* window = CreateWindow(800, 600, "Window");
 
+	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
 
 
 	//glfwSetCursorPosCallback(window, mouse_callback);
@@ -58,6 +56,8 @@ int main()
 	mySpeaker4.setLinearDistanceClamped(4, 1.f, 20.f, 300.f, 1.f);
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
+	Texture texture2 = Texture("assets/crosshairEdit.png");
+
 
 
 	GLFWimage cursor_image;
@@ -108,11 +108,15 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
+
+	// Luo uusi entity crosshair
+	Entity crosshair = ecs.newEntity();
+
+
+
 	/*
 	GLFWcursor* cursor = glfwCreateCursor((GLFWimage*)&cursorTextureID, 20, 20);
 	glfwSetCursor(window, cursor);*/
-
-
 
 
 
@@ -177,8 +181,9 @@ int main()
 			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
 		}
 
+
 		Transform playerTransform = ecs.getComponent<Transform>(player);
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
@@ -219,6 +224,89 @@ int main()
 			mySpeaker2.Play(sound2);
 			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 		}
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
+
+		GLFWgamepadstate state;
+
+		// set player speed
+		float player_speed = 500.0f;
+		//define deadzone
+		float deadzone_size = 0.2f;
+		//calculate deadzone barrier
+		float deadzone_treshold = deadzone_size / 2.0f;
+		//Camera max distance
+		float max_distance = 30.0f;
+
+		// Hae peliohjaimen vasemman analogisen tikun tila
+		int axis_count;
+		int button_count;
+		int count;
+		float radian = 5.0f;
+
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axis_count);
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &button_count);
+
+
+		if (abs(axes[0]) > deadzone_treshold || abs(axes[1]) > deadzone_treshold) {
+			// Aseta liikkumisvektori pelaajan nopeuden perusteella
+			Vector2 movement(axes[0] * player_speed, -axes[1] * player_speed);
+
+			// Liikuta pelaajaa käyttämällä liikkumisvektoria
+			engine.physicsSystem->Move(player, movement * engine.deltaTime);
+
+		}
+
+
+		Vector2 crosshairPosition(300, -200);
+		if (axes[2] > deadzone_treshold || axes[3] > deadzone_treshold ||
+			axes[2] < -deadzone_treshold || axes[3] < -deadzone_treshold) {
+
+			// Muuta tatin koordinaatiston origo keskipisteeksi ja skaalaa se välille [-1, 1]
+			Vector2 right_thumbstick(axes[2], axes[3]);
+			right_thumbstick = (right_thumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
+			right_thumbstick -= Vector2(0.5f, 0.5f);
+			right_thumbstick *= 2.0f;
+
+			// Laske uusi sijainti
+			crosshairPosition.x += right_thumbstick.x * 100.0f;
+			crosshairPosition.y -= right_thumbstick.y * 100.0f;
+
+			// Luo vektori, joka osoittaa tatin suuntaan
+			float angle = atan2f(right_thumbstick.y, right_thumbstick.x);
+			Vector2 direction = Vector2(cosf(angle), sinf(angle));
+
+			// Normalisoi vektori ja kerro se etäisyydellä 100
+			direction.Normalize();
+			direction *= 150.0f;
+
+			// Lisää pelaajan sijainti crosshairin sijaintiin
+			Vector3 player_position(playerTransform.x, playerTransform.y, playerTransform.z);
+			Vector3 crosshair_position = player_position + Vector3(direction.x, -direction.y, 0);
+
+			// Lisää transform- ja sprite-komponentit crosshairiin
+			ecs.addComponent(crosshair, Transform{ .x = crosshair_position.x, .y = crosshair_position.y, .xScale = 20, .yScale = 20 });
+			ecs.addComponent(crosshair, Sprite{ &texture2 });
+			cam.SetPosition(playerTransform.x + (crosshair_position.x / 4), playerTransform.y + (crosshair_position.y / 4), playerTransform.z);
+		}
+
+		if (buttons[0] == GLFW_PRESS) {
+			Vector2 movement(0.0f, player_speed);
+			engine.physicsSystem->Move(player, movement * engine.deltaTime);
+		}
+		if (buttons[1] == GLFW_PRESS) {
+			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
+			mySpeaker2.Play(sound2);
+			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+		}
+
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
