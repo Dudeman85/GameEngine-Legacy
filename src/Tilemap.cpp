@@ -116,7 +116,6 @@ void Tilemap::loadMap(const std::string ownMap)
 						collisionLayer[x][y] = tiles[(y * collisionLayer.size()) + x].ID;
 					}
 				}
-
 				//Print for debug
 				for (int y = 0; y < collisionLayer[0].size(); y++)
 				{
@@ -126,6 +125,7 @@ void Tilemap::loadMap(const std::string ownMap)
 					}
 					printf("\n");
 				}
+
 			}
 			else
 			{
