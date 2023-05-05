@@ -1,3 +1,4 @@
+#if 0
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include <vector>
@@ -68,8 +69,8 @@ int main()
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
-	map.loadMap("assets/demo.tmx");
-	map.position = glm::vec3(64.0f, 64.0f, 0.0f);
+	map.loadMap("assets/Demo1_Rough.tmx");
+	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
 	engine.physicsSystem->SetTilemap(&map);
@@ -127,4 +128,6 @@ int main()
 
 	return 0;
 }
+#endif
+
 
