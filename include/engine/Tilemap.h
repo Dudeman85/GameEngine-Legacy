@@ -45,7 +45,7 @@ public:
 	unsigned int checkCollision(float x, float y);
 
 	tmx::Vector2u tileSize;
-	glm::vec3 TilemapPos;
+	glm::vec3 position;
 private:
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);

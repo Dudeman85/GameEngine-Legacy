@@ -63,6 +63,8 @@ namespace engine
 
 		void Update(float deltaTime)
 		{
+			deltaTime = min(deltaTime, 0.5f);
+
 			//For each physics step per frame
 			for (int i = 0; i < step; i++)
 			{
@@ -209,7 +211,7 @@ namespace engine
 					Collision reverseCollision = AABBIntersect(b, a);
 					reverseCollision.a = a;
 					reverseCollision.b = b;
-					bCollider.collisions.push_back(collision);
+   					bCollider.collisions.push_back(reverseCollision);
 				}
 			}
 

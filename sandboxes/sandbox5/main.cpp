@@ -64,7 +64,7 @@ int main()
 	Entity sprite4 = ecs.newEntity();
 	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
+	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .gravityScale = 0, .friction = 0.2, .elasticity = 0.125, .isStatic = false });
 	ecs.addComponent(sprite4, BoxCollider{});
 	//Bottom-Right
 	Entity sprite5 = ecs.newEntity();
@@ -80,7 +80,7 @@ int main()
 
 	engine.physicsSystem->SetTilemap(&map);
 
-	bool upHeld = false;
+	bool jumpHeld = false;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -107,7 +107,7 @@ int main()
 		//When jump is pressed
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		{
-			upHeld = true;
+			jumpHeld = true;
 			//If touching ground
 			if (playerCollider.collisions.end() != find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
 				[](const Collision& c)
@@ -120,7 +120,7 @@ int main()
 		}
 		else
 		{
-			if (upHeld)
+			if (jumpHeld)
 			{
 				//If not touching ground
 				if (playerCollider.collisions.end() == find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
@@ -129,8 +129,8 @@ int main()
 						return c.side == Direction::down;
 					}))
 				{
-					playerRigidbody.velocity = Vector2(0, min(playerRigidbody.velocity.y, 1000.0f));
-					upHeld = false;
+					playerRigidbody.velocity = Vector2(0, min(playerRigidbody.velocity.y, 700.0f));
+					jumpHeld = false;
 				}
 			}
 		}
@@ -143,6 +143,11 @@ int main()
 		{
 			for (const Collision& c : playerCollider.collisions)
 			{
+				if (c.type == Collision::Type::entity)
+				{
+						cout << "HERE\n";
+				}
+
 				if (c.side == Direction::down)
 					cout << "Player touching ground\n";
 			}

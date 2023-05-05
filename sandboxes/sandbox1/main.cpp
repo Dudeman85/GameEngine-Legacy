@@ -13,6 +13,9 @@
 using namespace std;
 using namespace engine;
 ECS ecs;
+
+
+
 //void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 //	{
 //	cout << xpos << "x : " << ypos <<"y"<< endl;
@@ -55,7 +58,16 @@ int main()
 	mySpeaker4.setLinearDistanceClamped(4, 1.f, 20.f, 300.f, 1.f);
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
-	Texture texture2 = Texture("assets/crosshair.png");
+	
+
+	GLFWimage cursor_image;
+	cursor_image.pixels = stbi_load("assets/crosshairEdit.png", &cursor_image.width, &cursor_image.height, 0, 4); // 4 tarkoittaa, että kuvassa on 4 kanavaa (RGBA)
+	GLFWcursor* cursor = glfwCreateCursor(&cursor_image, 0, 0);
+	stbi_image_free(cursor_image.pixels);
+	glfwSetCursor(window, cursor);
+
+
+
 	//Create a new entity
 	Entity player = ecs.newEntity();
 	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
@@ -96,20 +108,16 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .isStatic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
-	Entity sprite6 = ecs.newEntity();
-	ecs.addComponent(sprite6, Transform{ .x = 50, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite6, Sprite{ &texture2 });
-
+	/*
+	GLFWcursor* cursor = glfwCreateCursor((GLFWimage*)&cursorTextureID, 20, 20);
+	glfwSetCursor(window, cursor);*/
 
 	
 
 
 	
 	RenderSystem::SetBackgroundColor(0, .5, .1);
-	Tilemap map(&cam);
-	engine.physicsSystem->SetTilemap(&map);
-	map.loadMap("assets/demo.tmx");
-
+	
 	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 	myMusic.Play();
 	
@@ -123,9 +131,7 @@ int main()
 	{
 		
 		myMusic.updateBufferStream();
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		GLFWcursor* cursor = glfwCreateCursor((GLFWimage*)&texture2, 20, 20);
-		glfwSetCursor(window, cursor);
+		
 
 		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
 			myMusic.Pause();

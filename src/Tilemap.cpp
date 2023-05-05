@@ -46,6 +46,7 @@ Tilemap::Tilemap(engine::Camera* cam)
 	m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
 	camera = cam;
 	collisionLayer = std::vector<std::vector<unsigned int>>();
+	position = glm::vec3(0);
 }
 
 Tilemap::~Tilemap()
@@ -56,7 +57,7 @@ void Tilemap::draw()
 {
 	m_shader->use();
 
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), TilemapPos);
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 	model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "u_modelMatrix");
@@ -140,11 +141,11 @@ unsigned int Tilemap::checkCollision(float x, float y)
 	if (collisionLayer.empty())
 		return 0;
 
-	int xIndex = floor((x - TilemapPos.x) / tileSize.x);
-	int yIndex = floor((-y + TilemapPos.y) / tileSize.y);
+	int xIndex = floor((x - position.x) / tileSize.x);
+	int yIndex = floor((-y + position.y) / tileSize.y);
 
 	//Check out of bounds
-	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= TilemapPos.y || x <= TilemapPos.x)
+	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= position.y || x <= position.x)
 		return 0;
 
 	return collisionLayer[xIndex][yIndex];
