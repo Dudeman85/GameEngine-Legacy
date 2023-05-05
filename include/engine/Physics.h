@@ -36,7 +36,7 @@ namespace engine
 		Vector2 velocity;
 		float drag = 0;
 		float gravityScale = 1;
-		float friction = 1;
+		float friction = 0.1;
 		float elasticity = 0;
 		bool isStatic = false;
 	};
@@ -48,6 +48,7 @@ namespace engine
 		Vector2 offset = Vector2(0, 0);
 		bool isTrigger = false;
 		vector<Collision> collisions;
+		vector<int> sidesCollided;
 	};
 
 	//Physics System
@@ -77,7 +78,10 @@ namespace engine
 					BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
 					if (i == 0)
+					{
+						collider.sidesCollided.clear();
 						collider.collisions.clear();
+					}
 
 					//Dont process static rigidbodies
 					if (rigidbody.isStatic)
@@ -206,12 +210,14 @@ namespace engine
 				{
 					collisions.push_back(collision);
 					aCollider.collisions.push_back(collision);
+					aCollider.sidesCollided.push_back(collision.side);
 
 					//Calculate the collision from the perspective of b, but still keep a as the main collider
 					Collision reverseCollision = AABBIntersect(b, a);
 					reverseCollision.a = a;
 					reverseCollision.b = b;
    					bCollider.collisions.push_back(reverseCollision);
+					bCollider.sidesCollided.push_back(reverseCollision.side);
 				}
 			}
 
@@ -271,6 +277,7 @@ namespace engine
 							}
 
 							aCollider.collisions.push_back(collision);
+							aCollider.sidesCollided.push_back(collision.side);
 							collisions.push_back(collision);
 						}
 					}

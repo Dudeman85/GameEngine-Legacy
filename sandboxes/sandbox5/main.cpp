@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -4000);
+	engine.physicsSystem->gravity = Vector2(0, -6000);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -31,7 +31,7 @@ int main()
 	ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 1, .friction = 0, .elasticity = 0 });
+	ecs.addComponent(player, Rigidbody{ .drag = 0, .gravityScale = 1, .friction = 0.2, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
@@ -105,39 +105,52 @@ int main()
 		}
 
 		//When jump is pressed
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
-			jumpHeld = true;
 			//If touching ground
-			if (playerCollider.collisions.end() != find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
-				[](const Collision& c)
-				{
-					return c.side == Direction::down;
-				}))
+			if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) != playerCollider.sidesCollided.end())
 			{
-				PhysicsSystem::Impulse(player, Vector2(0, 3000));
+				PhysicsSystem::Impulse(player, Vector2(0, 3200));
 			}
+			//If not touching ground
+			else
+			{
+				//Walljump
+				if (!jumpHeld)
+				{
+					//Right side
+					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::right) != playerCollider.sidesCollided.end())
+					{
+						PhysicsSystem::Impulse(player, Vector2(-3000, 4000));
+						cout << "going left\n";
+					}
+
+					//Left side
+					if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::left) != playerCollider.sidesCollided.end())
+					{
+						PhysicsSystem::Impulse(player, Vector2(3000, 4000));
+						cout << "going right\n";
+					}
+				}
+			}
+			jumpHeld = true;
 		}
 		else
 		{
 			if (jumpHeld)
 			{
 				//If not touching ground
-				if (playerCollider.collisions.end() == find_if(playerCollider.collisions.begin(), playerCollider.collisions.end(),
-					[](const Collision& c)
-					{
-						return c.side == Direction::down;
-					}))
+				if (find(playerCollider.sidesCollided.begin(), playerCollider.sidesCollided.end(), Direction::down) == playerCollider.sidesCollided.end())
 				{
-					playerRigidbody.velocity = Vector2(0, min(playerRigidbody.velocity.y, 700.0f));
-					jumpHeld = false;
+					playerRigidbody.velocity = Vector2(playerRigidbody.velocity.x, min(playerRigidbody.velocity.y, 700.0f));
 				}
+				jumpHeld = false;
 			}
 		}
 
 
-		Transform playerTransform = ecs.getComponent<Transform>(player);
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+
+
 
 		if (playerCollider.collisions.size() > 0)
 		{
@@ -145,13 +158,16 @@ int main()
 			{
 				if (c.type == Collision::Type::entity)
 				{
-						cout << "HERE\n";
+					cout << "HERE\n";
 				}
 
 				if (c.side == Direction::down)
 					cout << "Player touching ground\n";
 			}
 		}
+
+		Transform playerTransform = ecs.getComponent<Transform>(player);
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

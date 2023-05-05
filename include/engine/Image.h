@@ -69,14 +69,15 @@ namespace engine
 		unsigned char* data()
 		{
 			unsigned char* data = new unsigned char[width * height * 4];
+			int i = 0;
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					data[y * width + x] = pixmap[x][y].r;
-					data[y * width + x + 1] = pixmap[x][y].g;
-					data[y * width + x + 2] = pixmap[x][y].b;
-					data[y * width + x + 3] = pixmap[x][y].a;
+					data[i++] = pixmap[x][y].r;
+					data[i++] = pixmap[x][y].g;
+					data[i++] = pixmap[x][y].b;
+					data[i++] = pixmap[x][y].a;
 				}
 			}
 			return data;
@@ -131,11 +132,10 @@ namespace engine
 		{
 			for (int x = 0; x < image.width; x++)
 			{
-				imageData[i] = image[x][y].r;
-				imageData[i + 1] = image[x][y].g;
-				imageData[i + 2] = image[x][y].b;
-				imageData[i + 3] = image[x][y].a;
-				i += 4;
+				imageData[i++] = image[x][y].r;
+				imageData[i++] = image[x][y].g;
+				imageData[i++] = image[x][y].b;
+				imageData[i++] = image[x][y].a;
 			}
 		}
 
