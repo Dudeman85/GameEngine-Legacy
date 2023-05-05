@@ -1,9 +1,12 @@
-#if 0
+//#if 0
 
 
 // Getting started ok!
+// ECS Reference
+// - Ecs komponenteista olisi hyvä jos 
 // Audio Reference 
 #include <engine/Application.h>
+#include <engine/ECSCore.h>
 
 using namespace std;
 using namespace engine;
@@ -15,6 +18,24 @@ int main() {
 
 	// Initialize the default engine library
 	EngineLib engine;
+
+	// Player entity
+	Entity player = ecs.newEntity();
+
+	// Sound sources
+	static SoundSource mySpeaker1;
+	static SoundSource mySpeaker2;
+	static SoundSource mySpeaker3;
+	static SoundSource mySpeaker4;
+
+	// Load sound from files
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
+	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
+
+	// Play sound files
+	mySpeaker1.Play(sound1);
+	// Sets sound to loop, value 1 = true
+	mySpeaker1.SetLooping(1);
 
 	// Create the camera
 	Camera cam = Camera(800, 600);
@@ -41,4 +62,4 @@ int main() {
 	}
 	glfwTerminate();
 }
-#endif
+//#endif
