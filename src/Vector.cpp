@@ -117,5 +117,9 @@ namespace engine
 		return *this;
 	}
 
+	Vector3 Vector3::Normalize() {
+		float length = sqrt(x * x + y * y + z * z);
+		return Vector3(x / length, y / length, z / length);
+	}
 
 }

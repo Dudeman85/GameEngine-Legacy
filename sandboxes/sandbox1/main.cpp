@@ -59,9 +59,9 @@ int main()
 	Texture texture2 = Texture("assets/crosshairEdit.png");
 
 
-
+	// mouse settings
 	GLFWimage cursor_image;
-	cursor_image.pixels = stbi_load("assets/crosshairEdit.png", &cursor_image.width, &cursor_image.height, 0, 4); // 4 tarkoittaa, ett‰ kuvassa on 4 kanavaa (RGBA)
+	cursor_image.pixels = stbi_load("assets/crosshairEdit.png", &cursor_image.width, &cursor_image.height, 0, 4);
 	GLFWcursor* cursor = glfwCreateCursor(&cursor_image, 0, 0);
 	stbi_image_free(cursor_image.pixels);
 	glfwSetCursor(window, cursor);
@@ -109,14 +109,8 @@ int main()
 	ecs.addComponent(sprite5, BoxCollider{});
 
 
-	// Luo uusi entity crosshair
+	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
-
-
-
-	/*
-	GLFWcursor* cursor = glfwCreateCursor((GLFWimage*)&cursorTextureID, 20, 20);
-	glfwSetCursor(window, cursor);*/
 
 
 
@@ -240,10 +234,9 @@ int main()
 		//Camera max distance
 		float max_distance = 30.0f;
 
-		// Hae peliohjaimen vasemman analogisen tikun tila
+		
 		int axis_count;
 		int button_count;
-		int count;
 		float radian = 5.0f;
 
 		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axis_count);
@@ -251,45 +244,48 @@ int main()
 
 
 		if (abs(axes[0]) > deadzone_treshold || abs(axes[1]) > deadzone_treshold) {
-			// Aseta liikkumisvektori pelaajan nopeuden perusteella
+			// Sets movement vector based on movement speed
 			Vector2 movement(axes[0] * player_speed, -axes[1] * player_speed);
 
-			// Liikuta pelaajaa k‰ytt‰m‰ll‰ liikkumisvektoria
+			// move player based on movement vector
 			engine.physicsSystem->Move(player, movement * engine.deltaTime);
 
 		}
 
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
-		Vector2 crosshairPosition(300, -200);
-		if (axes[2] > deadzone_treshold || axes[3] > deadzone_treshold ||
-			axes[2] < -deadzone_treshold || axes[3] < -deadzone_treshold) {
+		// sets crosshair position to zero
+		Vector2 crosshairPosition(0, 0);
+		if (abs(axes[2]) > deadzone_treshold || abs(axes[3]) > deadzone_treshold) {
 
-			// Muuta tatin koordinaatiston origo keskipisteeksi ja skaalaa se v‰lille [-1, 1]
+			// Changes joystick cordinates into origo and scales it between -1, 1
 			Vector2 right_thumbstick(axes[2], axes[3]);
 			right_thumbstick = (right_thumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
 			right_thumbstick -= Vector2(0.5f, 0.5f);
 			right_thumbstick *= 2.0f;
 
-			// Laske uusi sijainti
+			// Calculates new crosshair position
 			crosshairPosition.x += right_thumbstick.x * 100.0f;
 			crosshairPosition.y -= right_thumbstick.y * 100.0f;
 
-			// Luo vektori, joka osoittaa tatin suuntaan
+			// creates vector toward joystick direction
 			float angle = atan2f(right_thumbstick.y, right_thumbstick.x);
-			Vector2 direction = Vector2(cosf(angle), sinf(angle));
+			Vector2 aimdirection = Vector2(cosf(angle), sinf(angle));
 
-			// Normalisoi vektori ja kerro se et‰isyydell‰ 100
-			direction.Normalize();
-			direction *= 150.0f;
+			// normalizes vector and sets crosshair distance
+			aimdirection.Normalize();
+			aimdirection *= 150.0f;
 
-			// Lis‰‰ pelaajan sijainti crosshairin sijaintiin
+			// crosshair position based on player position
 			Vector3 player_position(playerTransform.x, playerTransform.y, playerTransform.z);
-			Vector3 crosshair_position = player_position + Vector3(direction.x, -direction.y, 0);
+			Vector3 crosshair_position = player_position + Vector3(aimdirection.x, -aimdirection.y, 0);
 
-			// Lis‰‰ transform- ja sprite-komponentit crosshairiin
+
+			// adds crosshair texture
 			ecs.addComponent(crosshair, Transform{ .x = crosshair_position.x, .y = crosshair_position.y, .xScale = 20, .yScale = 20 });
 			ecs.addComponent(crosshair, Sprite{ &texture2 });
-			cam.SetPosition(playerTransform.x + (crosshair_position.x / 4), playerTransform.y + (crosshair_position.y / 4), playerTransform.z);
+			// set camera location between player and crosshair
+			cam.SetPosition(playerTransform.x + (aimdirection.x/4), playerTransform.y - (aimdirection.y/4), playerTransform.z);
 		}
 
 		if (buttons[0] == GLFW_PRESS) {

@@ -44,6 +44,7 @@ namespace engine
 		Vector3 operator*(float mult);
 		Vector3 operator*(Vector3 mult);
 		Vector3& operator*=(float mult);
+		Vector3 Normalize();
 		float x, y, z;
 	};
 }
