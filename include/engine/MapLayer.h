@@ -41,11 +41,9 @@ public:
 	MapLayer(const MapLayer&) = delete;
 	MapLayer& operator = (const MapLayer&) = delete;
 
-	void draw();
+	void draw(glm::mat4 model, unsigned int modelLoc);
 
-	// Custom int property for layer drawing order
-	int zOrder = 0;
-
+	float zOffset = 0;
 private:
 	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 

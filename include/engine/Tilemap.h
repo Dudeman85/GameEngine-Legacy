@@ -47,6 +47,7 @@ public:
 	tmx::Vector2u tileSize;
 	glm::vec3 position;
 private:
+
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 

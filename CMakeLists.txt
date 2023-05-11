@@ -43,6 +43,7 @@ configure_file("bin/vertexShader.glsl" "sandboxes/sandbox3/vertexShader.glsl" CO
 configure_file("bin/vertexShader.glsl" "sandboxes/sandbox4/vertexShader.glsl" COPYONLY)
 configure_file("bin/vertexShader.glsl" "sandboxes/sandbox5/vertexShader.glsl" COPYONLY)
 configure_file("bin/vertexShader.glsl" "sandboxes/Demot/demo1/vertexShader.glsl" COPYONLY)
+configure_file("bin/vertexShader.glsl" "sandboxes/Demot/demo2/vertexShader.glsl" COPYONLY)
 
 # fragmentShader copy
 configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox1/fragmentShader.glsl" COPYONLY)
@@ -51,6 +52,7 @@ configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox3/fragmentShader.glsl
 configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox4/fragmentShader.glsl" COPYONLY)
 configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox5/fragmentShader.glsl" COPYONLY)
 configure_file("bin/fragmentShader.glsl" "sandboxes/Demot/demo1/fragmentShader.glsl" COPYONLY)
+configure_file("bin/fragmentShader.glsl" "sandboxes/Demot/demo2/fragmentShader.glsl" COPYONLY)
 
 # OpenAL32 copy
 IF (WIN32)
@@ -60,6 +62,7 @@ IF (WIN32)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo1/OpenAL32.dll" COPYONLY)
+configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo2/OpenAL32.dll" COPYONLY)
 ENDIF()
 
 

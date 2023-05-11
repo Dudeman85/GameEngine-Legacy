@@ -36,7 +36,7 @@ source distribution.
 #include <glm/gtc/type_ptr.hpp>
 #include <cmath>
 #include <tmxlite/TileLayer.hpp>
-#include <tmxlite/Property.hpp>
+#include <algorithm>
 
 Tilemap::Tilemap(engine::Camera* cam)
 {
@@ -55,10 +55,8 @@ void Tilemap::draw()
 	m_shader->use();
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-	model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	unsigned int modelLoc = glGetUniformLocation(m_shader->ID, "u_modelMatrix");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	unsigned int viewLoc = glGetUniformLocation(m_shader->ID, "u_viewMatrix");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->GetViewMatrix()));
@@ -69,7 +67,7 @@ void Tilemap::draw()
 
 	for (const auto& layer : mapLayers)
 	{
-		layer->draw();
+		layer->draw(model, modelLoc);
 	}
 }
 
@@ -85,6 +83,8 @@ void Tilemap::loadMap(const std::string ownMap)
 
 	bounds = map.getBounds();
 	tileSize = map.getTileSize();
+
+	//std::vector<std::pair<int, tmx::Layer>> sortedLayers;
 
 	//create a drawable object for each tile layer
 	const auto& layers = map.getLayers();
@@ -127,13 +127,37 @@ void Tilemap::loadMap(const std::string ownMap)
 			else
 			{
 				// Get the custom property from Tiled Layer and place
-				// int zOrder variable
-				// TODO: Figure how to get custom property in tmxlite
-				//auto zOrderProperty = layers[i]
+				// Custom int property for layer drawing order
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+				
+				const auto& properties = layers[i]->getProperties();
+				for (const auto& property : properties)
+				{
+					if (property.getName() == "Z")
+					{
+						mapLayers.back()->zOffset = property.getFloatValue();
+						break;
+					}
+				}
+
+
+				//sortedLayers.emplace_back(zOrder, *layers[i]);
+				
 			}
 		}
 	}
+	 // Sort the layers based on the "Z" property
+	//std::sort(sortedLayers.begin(), sortedLayers.end(), [](const auto& a, const auto& b)
+		//{
+			//return a.first < b.first;
+		//});
+
+	 // Create maplayer objects objects from the sorted layers
+	//for (const auto& [_, layer] : sortedLayers)
+	//{
+		//mapLayers.emplace_back(std::make_unique<MapLayer>(map, layer, allTextures));
+// 
+	//}
 }
 
 //Returns the collision layers tile ID at x and y

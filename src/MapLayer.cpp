@@ -24,11 +24,12 @@ and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any
 source distribution.
 *********************************************************************/
-
+#define _USE_MATH_DEFINES
 #include <engine/MapLayer.h>
 #include <tmxlite/Map.hpp>
 #include <tmxlite/TileLayer.hpp>
 #include <engine/GL/Texture.h>
+#include <glm/gtc/type_ptr.hpp>
 
 MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures) : m_allTextures(textures)
 {
@@ -52,8 +53,12 @@ MapLayer::~MapLayer()
 }
 
 //public
-void MapLayer::draw()
+void MapLayer::draw(glm::mat4 model, unsigned int modelLoc)
 {
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, zOffset));
+    model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
     glBindVertexArray(VAO);
 
     glEnableVertexAttribArray(0);

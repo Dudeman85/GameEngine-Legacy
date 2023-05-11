@@ -69,11 +69,11 @@ int main()
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
-	map.loadMap("assets/demo.tmx");
-	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
+	map.loadMap("assets/demo2_RoughTilemap.tmx");
+	//map.position = glm::vec3(50.0f, 50.0f, 0.0f);
 
 
-	//engine.physicsSystem->SetTilemap(&map);
+	engine.physicsSystem->SetTilemap(&map);
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
