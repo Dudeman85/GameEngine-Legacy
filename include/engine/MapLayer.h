@@ -43,6 +43,9 @@ public:
 
 	void draw();
 
+	// Custom int property for layer drawing order
+	int zOrder = 0;
+
 private:
 	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 

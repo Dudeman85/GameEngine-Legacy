@@ -28,18 +28,15 @@ source distribution.
 #include <engine/Tilemap.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <tmxlite/Map.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <engine/Tilemap.h>
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/MapLayer.h>
 #include <cassert>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
-
 #include <tmxlite/TileLayer.hpp>
+#include <tmxlite/Property.hpp>
 
 Tilemap::Tilemap(engine::Camera* cam)
 {
@@ -129,6 +126,10 @@ void Tilemap::loadMap(const std::string ownMap)
 			}
 			else
 			{
+				// Get the custom property from Tiled Layer and place
+				// int zOrder variable
+				// TODO: Figure how to get custom property in tmxlite
+				//auto zOrderProperty = layers[i]
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
 			}
 		}

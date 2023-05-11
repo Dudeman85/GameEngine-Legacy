@@ -1,4 +1,4 @@
-#if 0
+//#if 0
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include <vector>
@@ -128,6 +128,6 @@ int main()
 
 	return 0;
 }
-#endif
+//#endif
 
 
