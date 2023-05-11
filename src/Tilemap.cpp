@@ -120,6 +120,7 @@ void Tilemap::loadMap(const std::string ownMap)
 				// Custom int property for layer drawing order
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
 				
+				/*
 				const auto& properties = layers[i]->getProperties();
 				for (const auto& property : properties)
 				{
@@ -129,6 +130,8 @@ void Tilemap::loadMap(const std::string ownMap)
 						break;
 					}
 				}
+				*/
+				
 
 
 				//sortedLayers.emplace_back(zOrder, *layers[i]);
