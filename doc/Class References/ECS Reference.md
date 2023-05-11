@@ -28,7 +28,7 @@ Systems:
 - [AnimationSystem](Sprite%20Reference.md): Requires Sprite and Animator
 - [PhysicsSystem](Physics%20Reference.md): Requires Rigidbody, Transform, and BoxCollider
 
-To use these create a window and an instance of EngineLib. The window must be created first, otherwise OpenGL will fail to load.
+To use these create a window, camera, and an instance of EngineLib. The window must be created first, otherwise OpenGL will fail to load.
 ```cpp
 //Includes engine library and all default ECS functionality
 #include <engine/Application.h>
@@ -43,6 +43,9 @@ int main()
 	//Initialize the default engine library
 	engine::EngineLib engine;
 
+	//Create the camera
+	Camera cam = Camera(800, 600);
+
 	//You can access each default engine system
 	engine.physicsSystem->gravity = engine::Vector2(0, -400);
 
@@ -51,8 +54,10 @@ int main()
 	{
 		//This will update all default engine systems and calculate deltaTime
 		double deltaTime = engine.Update(&cam);
-
-		...
+		
+		//OpenGL stuff, goes very last
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 }
 ```
@@ -78,6 +83,9 @@ Entities are IDs. They have no data or methods themselves and can be though of a
 //Example entity
 //This is just an id with no actual data
 Entity player = ecs.newEntity();
+
+//Destroys an entity along with all of its components
+ecs.destroyEntity(player);
 ```
 
 ---
@@ -140,7 +148,7 @@ public:
 }
 ```
 
-Once you create a system, you need to register it with the ECS manager and set its signature of required components.
+Once you create a system, you need to register it with the ECS manager and set its signature of required components. This should only be done once.
 ```cpp
 //Register the custom GravitySystem
 shared_ptr<GravitySystem> gravitySystem = ecs.registerSystem<GravitySystem>();
@@ -151,7 +159,10 @@ gravitySystemSignature.set(ecs.getComponentId<Position>());
 
 //Assign the signature to the GravitySystem
 ecs.setSystemSignature<GravitySystem>(gravitySystemSignature);
+```
 
+In your game loop:
+```cpp
 //Now you can use the gravity system
 //It will automatically operate upon every entity with the Position component
 gravitySystem->Update();

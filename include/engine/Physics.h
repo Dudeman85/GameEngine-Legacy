@@ -184,7 +184,7 @@ namespace engine
 			return 0;
 		}
 
-		//Add an impulse to entity
+		//Add velocity to entity
 		static void Impulse(Entity entity, Vector2 velocity)
 		{
 			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);

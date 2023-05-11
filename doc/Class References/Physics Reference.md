@@ -13,7 +13,7 @@ These static methods are implemented:
 //Add the Transform component
 Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
 
-//Current Transform system static methods
+//Current Transform system static methods using either Vector3 or 3 floats
 TransformSystem::Translate(player, 0, 10, 0);
 TransformSystem::Translate(player, Vector3(0, 10, 0));
 TransformSystem::SetPosition(player, 20, 500, 0);
