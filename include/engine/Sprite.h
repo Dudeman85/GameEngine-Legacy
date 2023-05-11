@@ -28,6 +28,7 @@ namespace engine
 	{
 		Texture* texture;
 		Shader* shader = nullptr;
+		bool enabled = true;
 	};
 
 	//Animation struct. Not a component
@@ -134,6 +135,9 @@ namespace engine
 				//Get relevant components
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
 				Transform& transform = ecs.getComponent<Transform>(entity);
+
+				if (!sprite.enabled)
+					continue;
 
 				//If a shader has been specified for this sprite use it, else use the default
 				Shader shader = defaultShader;

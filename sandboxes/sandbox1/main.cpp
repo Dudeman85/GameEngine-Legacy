@@ -31,7 +31,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -400);
+	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -57,6 +57,7 @@ int main()
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
+	Texture texture3 = Texture("assets/bullet.png");
 
 
 	// mouse settings
@@ -111,7 +112,16 @@ int main()
 
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
+	// adds crosshair texture
+	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(crosshair, Sprite{ &texture2 });
 
+	vector <Entity>bullets;
+
+
+	float fireCooldown = 0.4f;
+	bool canFire = true;
+	
 
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
@@ -226,26 +236,26 @@ int main()
 		GLFWgamepadstate state;
 
 		// set player speed
-		float player_speed = 500.0f;
+		float playerSpeed = 500.0f;
 		//define deadzone
-		float deadzone_size = 0.2f;
+		float deadzoneSize = 0.5f;
 		//calculate deadzone barrier
-		float deadzone_treshold = deadzone_size / 2.0f;
+		float deadzoneTreshold = deadzoneSize / 2.0f;
 		//Camera max distance
 		float max_distance = 30.0f;
 
 		
-		int axis_count;
-		int button_count;
+		int axisCount;
+		int buttonCount;
 		float radian = 5.0f;
 
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axis_count);
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &button_count);
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 
 
-		if (abs(axes[0]) > deadzone_treshold || abs(axes[1]) > deadzone_treshold) {
+		if (abs(axes[0]) > deadzoneTreshold || abs(axes[1]) > deadzoneTreshold) {
 			// Sets movement vector based on movement speed
-			Vector2 movement(axes[0] * player_speed, -axes[1] * player_speed);
+			Vector2 movement(axes[0] * playerSpeed, -axes[1] * playerSpeed);
 
 			// move player based on movement vector
 			engine.physicsSystem->Move(player, movement * engine.deltaTime);
@@ -256,40 +266,72 @@ int main()
 
 		// sets crosshair position to zero
 		Vector2 crosshairPosition(0, 0);
-		if (abs(axes[2]) > deadzone_treshold || abs(axes[3]) > deadzone_treshold) {
+		if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold) {
 
 			// Changes joystick cordinates into origo and scales it between -1, 1
-			Vector2 right_thumbstick(axes[2], axes[3]);
-			right_thumbstick = (right_thumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
-			right_thumbstick -= Vector2(0.5f, 0.5f);
-			right_thumbstick *= 2.0f;
+			Vector2 rightThumbstick(axes[2], axes[3]);
+			rightThumbstick = (rightThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
+			rightThumbstick -= Vector2(0.5f, 0.5f);
+			rightThumbstick *= 2.0f;
 
-			// Calculates new crosshair position
-			crosshairPosition.x += right_thumbstick.x * 100.0f;
-			crosshairPosition.y -= right_thumbstick.y * 100.0f;
-
+			
 			// creates vector toward joystick direction
-			float angle = atan2f(right_thumbstick.y, right_thumbstick.x);
+			float angle = atan2f(rightThumbstick.y, rightThumbstick.x);
 			Vector2 aimdirection = Vector2(cosf(angle), sinf(angle));
 
 			// normalizes vector and sets crosshair distance
 			aimdirection.Normalize();
 			aimdirection *= 150.0f;
-
+			ecs.getComponent<Sprite>(crosshair).enabled = true;
 			// crosshair position based on player position
-			Vector3 player_position(playerTransform.x, playerTransform.y, playerTransform.z);
-			Vector3 crosshair_position = player_position + Vector3(aimdirection.x, -aimdirection.y, 0);
+			Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+			Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
+			TransformSystem::SetPosition(crosshair, crosshairPosition);
 
 
-			// adds crosshair texture
-			ecs.addComponent(crosshair, Transform{ .x = crosshair_position.x, .y = crosshair_position.y, .xScale = 20, .yScale = 20 });
-			ecs.addComponent(crosshair, Sprite{ &texture2 });
+
+			if (fireCooldown <=0)  {
+				if (axes[5] > 0.5f) {
+
+
+					Entity bullet = ecs.newEntity();
+					ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
+					ecs.addComponent(bullet, Sprite{ &texture3 });
+					ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
+					ecs.addComponent(bullet, BoxCollider{.isTrigger = true});
+					bullets.push_back(bullet);
+					fireCooldown = 0.4f;
+				}
+			}
+			else {
+				fireCooldown -= engine.deltaTime;
+			}
+			
+			
+			
 			// set camera location between player and crosshair
-			cam.SetPosition(playerTransform.x + (aimdirection.x/4), playerTransform.y - (aimdirection.y/4), playerTransform.z);
+			//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
+		}
+		else {
+			ecs.getComponent<Sprite>(crosshair).enabled = false;
+		}
+
+		for (const Entity& bullet : bullets) 
+		{
+			auto hit = ecs.getComponent<BoxCollider>(bullet);
+			for (const Collision& collision : hit.collisions) {
+				// TODO killing enemies
+				
+			}
+
+			if (hit.collisions.size()>0){
+				bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+				ecs.destroyEntity(bullet);
+			}
 		}
 
 		if (buttons[0] == GLFW_PRESS) {
-			Vector2 movement(0.0f, player_speed);
+			Vector2 movement(0.0f, playerSpeed);
 			engine.physicsSystem->Move(player, movement * engine.deltaTime);
 		}
 		if (buttons[1] == GLFW_PRESS) {
@@ -297,6 +339,7 @@ int main()
 			mySpeaker2.Play(sound2);
 			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 		}
+		
 
 
 

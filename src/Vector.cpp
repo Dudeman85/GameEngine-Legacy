@@ -61,6 +61,7 @@ namespace engine
 		return *this;
 	}
 
+
 	Vector2 Vector2::operator/(float div)
 	{
 		return Vector2(x / div, y / div);
@@ -69,6 +70,10 @@ namespace engine
 	Vector2 Vector2::Normalize() {
 		float length = sqrt(x * x + y * y);
 		return Vector2(x / length, y / length);
+	}
+
+	float Vector2::Squared() const {
+		return x * x + y * y;
 	}
 
 	Vector3::Vector3()
