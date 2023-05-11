@@ -61,6 +61,12 @@ public:
 		entityCount--;
 		availableEntities.push(entity);
 	}
+
+	//Check if this entity exists
+	bool entityExists(Entity entity)
+	{
+		return usedEntities.count(entity);
+	}
 };
 
 //Generic component array interface for component manager
@@ -197,7 +203,7 @@ public:
 	{
 		for (size_t i = 0; i < signature.size(); i++)
 		{
-			if (signature[i] == 0)
+			if (signature[i] != 0)
 			{
 				componentArrays[idToType[i]]->removeComponent(entity);
 			}
@@ -322,9 +328,15 @@ public:
 	//Destroys an entity and all of its components
 	void destroyEntity(Entity entity)
 	{
-		entityManager->deleteEntity(entity);
 		componentManager->destroyEntity(entity, entityManager->entitySignatures[entity]);
+		entityManager->deleteEntity(entity);
 		systemManager->destroyEntity(entity);
+	}
+
+	//Check if an entity exists
+	bool entityExists(Entity entity)
+	{
+		return entityManager->entityExists(entity);
 	}
 
 	//Register a component

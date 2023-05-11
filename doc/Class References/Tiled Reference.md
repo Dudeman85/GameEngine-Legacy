@@ -18,3 +18,14 @@ map.loadMap("address where tilemap is located");
 map.position = glm::vec3(0.0f, 0.0f, 0.0f);
 ```
 
+## Tilemap collider
+
+You can specify a tilemap layer to be used as a collision layer by naming it "collider".
+The tilemap collision works on a per tile basis meaning the collider is always the full size of a tile. Any tile in the collision layer will act as a collider.
+
+To add a tilemap collision layer:
+```cpp
+engine.physicsSystem->SetTilemap(&map);
+```
+
+Every collision with the tilemap will be logged in the Entity's BoxCollider. The type will be Collision::Type::tilemap, and tileID will be the id of the collided tile as defined by Tiled, b will be undefined.

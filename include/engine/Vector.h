@@ -28,6 +28,8 @@ namespace engine
 
 		Vector2 operator/(float div);
 		Vector2 Normalize();
+
+		float Squared() const;
 		float x, y;
 	};
 
