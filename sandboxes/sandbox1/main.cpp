@@ -68,10 +68,28 @@ int main()
 	glfwSetCursor(window, cursor);
 
 
+	////Create a new entity
+	//Entity player = ecs.newEntity();
+	//Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 30, .yScale = 30 });
+	//ecs.addComponent(player, Sprite{});
+	//ecs.addComponent(player, Animator{});
+	//ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
+	//ecs.addComponent(player, BoxCollider{ .isTrigger = true });
+	//BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
+	//Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+	//TransformSystem::SetPosition(player, 0, 10, 0);
 
+	////Define the test animation
+	//Animator& animator = ecs.getComponent<Animator>(player);
+	//auto testAnims = AnimationsFromSpritesheet("warriorsheet.png", 8, 4, vector<int>(32, 100));
+	//AnimationSystem::AddAnimation(player, testAnims[0], "1");
+	//AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	//AnimationSystem::PlayAnimation(player, "2", true);
+
+	//
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0,  .friction = 0, .elasticity = 0 });
@@ -79,10 +97,14 @@ int main()
 
 	//Define the test animation
 	Animator animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("assets/gradient.png", 2, 2, vector<int>(4, 200));
+	auto testAnims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(40, 100));
 	AnimationSystem::AddAnimation(player, testAnims[0], "1");
 	AnimationSystem::AddAnimation(player, testAnims[1], "2");
-	AnimationSystem::PlayAnimation(player, "2", true);
+	AnimationSystem::AddAnimation(player, testAnims[2], "3");
+	AnimationSystem::AddAnimation(player, testAnims[3], "4");
+	AnimationSystem::AddAnimation(player, testAnims[4], "5");
+	AnimationSystem::PlayAnimation(player, "5", true);
+
 
 	//Top-Right
 	Entity sprite2 = ecs.newEntity();
@@ -109,7 +131,7 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
-
+	/*
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
@@ -121,7 +143,7 @@ int main()
 
 	float fireCooldown = 0.4f;
 	bool canFire = true;
-
+	*/
 
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
@@ -232,7 +254,7 @@ int main()
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
-
+		/*
 		GLFWgamepadstate state;
 
 		// set player speed
@@ -349,7 +371,7 @@ int main()
 
 
 
-
+		*/
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
