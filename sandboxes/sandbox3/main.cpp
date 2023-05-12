@@ -17,7 +17,7 @@ int main()
 
 	//Create a new shader by loading the fragment and vertex shaders from file
 	//Leaving either of these empty will use the default shader for that type
-	Shader shader = Shader("assets/vertexShader.glsl", "assets/fragmentShader.glsl");
+	Shader shader = Shader();
 
 
 	//Create a new entity
@@ -36,11 +36,11 @@ int main()
 
 	//Create animations from a spritesheet where one animation contains all the textures from one row of the spritesheet
 	//The parameters are: the path to the image, how many sprites wide, how many sprites tall, and a vector of delays for each frame
-	std::vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 4, vector<int>(32, 250));
+	//std::vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 4, vector<int>(32, 250));
 	
 	//Add the first animation, aka the first row, created from the spritesheet
 	//This has essentially the same results as the above example
-	AnimationSystem::AddAnimation(sprite, anims[0], "Animation 1");
+	//AnimationSystem::AddAnimation(sprite, anims[0], "Animation 1");
 /*
 	//Start playing an animation named "Animation 1", without looping
 	AnimationSystem::PlayAnimation(sprite, "Animation 1", false);

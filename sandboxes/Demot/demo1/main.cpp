@@ -82,12 +82,19 @@ int main()
 
 	bool jumpHeld = false;
 	bool jumping = false;
+	bool wallJumping = false;
 
 	float maxSpeed = 2000;
 	float accelSpeed = 400;
 	float reactivityMult = 2;
 	float maxJumpSpeed = 3800;
 	float jumpAccelSpeed = 1000;
+
+	// > 0 = yes
+	float canWallJump = 0;
+	int wallJumpDir = 0;
+	float maxWallJumpSpeed = 4000;
+	float wallJumpAccelSpeed = 2000;
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -97,7 +104,8 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		//test movement
+		//Movement
+		//Right
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		{
 			if (playerRigidbody.velocity.x < maxSpeed)
@@ -113,6 +121,7 @@ int main()
 				PhysicsSystem::Impulse(player, impulse);
 			}
 		}
+		//Left
 		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 		{
 			if (playerRigidbody.velocity.x > -maxSpeed)
@@ -128,16 +137,56 @@ int main()
 				PhysicsSystem::Impulse(player, impulse);
 			}
 		}
+		//No direction
 		else
 		{
 			//Slow the player down aka friction
 			if (abs(playerRigidbody.velocity.x) > 0)
+			{
+				//If touching ground decelerate faster
 				playerRigidbody.velocity.x -= (playerRigidbody.velocity.x / abs(playerRigidbody.velocity.x) * min(accelSpeed, abs(playerRigidbody.velocity.x)));
+			}
+		}
+
+		//Set can wall jump for 100ms after touching wall
+		if (playerCollider.sidesCollided[Direction::left] || playerCollider.sidesCollided[Direction::right])
+		{
+			//Enable Walljump
+			if (!jumpHeld)
+			{
+				//Right wall
+				if (playerCollider.sidesCollided[Direction::right])
+				{
+					canWallJump = 0.1;
+					wallJumpDir = -1;
+				}
+
+				//Left wall
+				if (playerCollider.sidesCollided[Direction::left])
+				{
+					canWallJump = 0.1;
+					wallJumpDir = 1;
+				}
+			}
+
+			//Wall Slide
+			playerRigidbody.velocity.y = max(playerRigidbody.velocity.y, -1000.f);
 		}
 
 		//When jump is pressed
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		{
+			//If touching ground
+			if (playerCollider.sidesCollided[Direction::down])
+			{
+				jumping = true;
+			}
+			else
+			{
+				if (canWallJump > 0)
+					wallJumping = true;
+			}
+
 			//Accelerate to max jump speed while holding jump
 			if (jumping)
 			{
@@ -149,47 +198,43 @@ int main()
 				{
 					PhysicsSystem::Impulse(player, Vector2(0, jumpAccelSpeed));
 				}
-				else
+				else //Once max speed has been reached
 				{
 					playerRigidbody.velocity.y = maxJumpSpeed;
 					jumping = false;
 				}
 			}
 
-			//If touching ground
-			if (playerCollider.sidesCollided[Direction::down])
+			//Accelerate to max wall jump speed while holding jump
+			if (wallJumping)
 			{
-				jumping = true;
-			}
-			//If not touching ground
-			else
-			{
-				//Walljump
-				if (!jumpHeld)
-				{
-					//Right side
-					if (playerCollider.sidesCollided[Direction::right])
-					{
-						PhysicsSystem::Impulse(player, Vector2(-3000, 4000));
-						cout << "going left\n";
-					}
+				canWallJump = 0;
 
-					//Left side
-					if (playerCollider.sidesCollided[Direction::left])
-					{
-						PhysicsSystem::Impulse(player, Vector2(3000, 4000));
-						cout << "going right\n";
-					}
+				//If ceiling is hit cancel the jump
+				if (playerCollider.sidesCollided[Direction::up])
+					wallJumping = false;
+
+				if (playerRigidbody.velocity.y + wallJumpAccelSpeed < maxWallJumpSpeed)
+				{
+					PhysicsSystem::Impulse(player, Vector2(wallJumpDir * wallJumpAccelSpeed / 2, wallJumpAccelSpeed));
+				}
+				else //Once max speed has been reached
+				{
+					playerRigidbody.velocity = Vector2(wallJumpDir * maxWallJumpSpeed / 2, maxWallJumpSpeed);
+					wallJumping = false;
 				}
 			}
+
 			jumpHeld = true;
 		}
 		else
 		{
+			wallJumping = false;
+			wallJumpDir = 0;
 			jumping = false;
 			if (jumpHeld)
 			{
-				//If not touching ground
+				//If not touching ground smooth the analog jump apex
 				if (!playerCollider.sidesCollided[Direction::down])
 				{
 					playerRigidbody.velocity = Vector2(playerRigidbody.velocity.x, min(playerRigidbody.velocity.y, 1500.0f));
@@ -198,6 +243,8 @@ int main()
 			}
 		}
 
+		if (canWallJump > 0)
+			canWallJump -= engine.deltaTime;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

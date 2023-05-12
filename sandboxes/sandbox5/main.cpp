@@ -39,7 +39,7 @@ int main()
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
+	auto testAnims = AnimationsFromSpritesheet("warriorsheet.png", 8, 4, vector<int>(32, 200));
 	AnimationSystem::AddAnimation(player, testAnims[0], "1");
 	AnimationSystem::AddAnimation(player, testAnims[1], "2");
 	AnimationSystem::PlayAnimation(player, "2", true);
