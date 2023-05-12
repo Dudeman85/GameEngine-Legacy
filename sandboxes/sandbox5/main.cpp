@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -1000);
+	engine.physicsSystem->gravity = Vector2(0, 000);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -32,7 +32,7 @@ int main()
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{});
+	ecs.addComponent(player, BoxCollider{ .isTrigger = true });
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
 	TransformSystem::SetPosition(player, 0, 10, 0);
