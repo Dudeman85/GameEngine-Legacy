@@ -53,7 +53,7 @@ MapLayer::~MapLayer()
 }
 
 //public
-void MapLayer::draw(glm::mat4 model, unsigned int modelLoc)
+void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc)
 {
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, zOffset));
     model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -68,6 +68,8 @@ void MapLayer::draw(glm::mat4 model, unsigned int modelLoc)
     
     for(const auto& ss : m_subsets)
     {
+        glUniform2f(tilesetCountLoc, ss.sx, ss.sy);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ss.texture->ID());
         
@@ -110,6 +112,8 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
     {        
         //check each tile ID to see if it falls in the current tile set
         const auto& ts = tilesets[i];
+        int numRows = ts.getTileCount() / ts.getColumnCount();
+        int numCols = ts.getColumnCount();
         const auto& tileIDs = layer->getTiles();
         std::vector<std::uint16_t> pixelData;
         bool tsUsed = false;
@@ -118,13 +122,16 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         {
             for(auto x = 0u; x < mapSize.x; ++x)
             {
-                auto idx = y * mapSize.x + x;
-                if(idx < tileIDs.size() && tileIDs[idx].ID >= ts.getFirstGID()
+               auto idx = y * mapSize.x + x;
+               if (idx < tileIDs.size() && tileIDs[idx].ID >= ts.getFirstGID()
                     && tileIDs[idx].ID < (ts.getFirstGID() + ts.getTileCount()))
-                {
-                    pixelData.push_back(static_cast<std::uint16_t>((tileIDs[idx].ID - ts.getFirstGID()) + 1)); //red channel - making sure to index relative to the tileset
-                    pixelData.push_back(static_cast<std::uint16_t>(tileIDs[idx].flipFlags)); //green channel - tile flips are performed on the shader
+                {      
+                   auto id = tileIDs[idx].ID - ts.getFirstGID() + 1;
+                   printf("id=%d\n", id);
+                   pixelData.push_back(static_cast<std::uint16_t>(id)); //red channel - making sure to index relative to the tileset
+                   pixelData.push_back(static_cast<std::uint16_t>(tileIDs[idx].flipFlags)); //green channel - tile flips are performed on the shader
                     tsUsed = true;
+
                 }
                 else
                 {
@@ -139,7 +146,8 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
         if(tsUsed)
         {
             m_subsets.emplace_back();
-
+            m_subsets.back().sx = numCols;
+            m_subsets.back().sy = numRows;
             m_subsets.back().texture = m_allTextures[i];
             m_subsets.back().lookup = std::make_shared<engine::Texture>(mapSize.x, mapSize.y, pixelData);
      

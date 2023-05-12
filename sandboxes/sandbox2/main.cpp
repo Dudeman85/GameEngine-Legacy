@@ -116,6 +116,8 @@ int main()
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
+
+
 		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
 		map.draw();
 

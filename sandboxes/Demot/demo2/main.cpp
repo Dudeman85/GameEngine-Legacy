@@ -22,7 +22,7 @@ int main()
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
-
+#if 0
 	//Load a new texture
 	Texture texture = Texture("strawberry.png");
 
@@ -66,11 +66,11 @@ int main()
 	ecs.addComponent(sprite5, Sprite{ &texture });
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
-
-	RenderSystem::SetBackgroundColor(0, .5, .1);
+#endif
+	RenderSystem::SetBackgroundColor(1.0f, 0.0f, .1);
 	Tilemap map(&cam);
-	map.loadMap("assets/demo2_RoughTilemap.tmx");
-	//map.position = glm::vec3(50.0f, 50.0f, 0.0f);
+	map.loadMap("assets/Test.tmx");
+	//map.position = glm::vec3(500.0f, 0.0f, 0.0f);
 
 
 	engine.physicsSystem->SetTilemap(&map);
@@ -81,7 +81,7 @@ int main()
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
-
+#if 0
 		//test movement
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		{
@@ -110,11 +110,14 @@ int main()
 				cout << c.a << " " << c.b << endl;
 			}
 		}
-
-
+#endif
+	//	engine.physicsSystem->Move(player, Vector2(100, 100) * engine.deltaTime);
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
+
+		//glClearColor(1, 0, 0, 1);
+		//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
 		map.draw();

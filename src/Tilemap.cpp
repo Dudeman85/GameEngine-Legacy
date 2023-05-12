@@ -65,9 +65,12 @@ void Tilemap::draw()
 	unsigned int projLoc = glGetUniformLocation(m_shader->ID, "u_projectionMatrix");
 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera->GetProjectionMatrix()));
 
+	unsigned int u_tilesetCount = glGetUniformLocation(m_shader->ID, "u_tilesetCount");
+
+
 	for (const auto& layer : mapLayers)
 	{
-		layer->draw(model, modelLoc);
+		layer->draw(model, modelLoc, u_tilesetCount);
 	}
 }
 
@@ -119,7 +122,7 @@ void Tilemap::loadMap(const std::string ownMap)
 				// Get the custom property from Tiled Layer and place
 				// Custom int property for layer drawing order
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
-				
+				/*
 				const auto& properties = layers[i]->getProperties();
 				for (const auto& property : properties)
 				{
@@ -128,7 +131,7 @@ void Tilemap::loadMap(const std::string ownMap)
 						mapLayers.back()->zOffset = property.getFloatValue();
 						break;
 					}
-				}
+				}*/
 			}
 		}
 	}

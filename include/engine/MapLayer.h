@@ -41,7 +41,7 @@ public:
 	MapLayer(const MapLayer&) = delete;
 	MapLayer& operator = (const MapLayer&) = delete;
 
-	void draw(glm::mat4 model, unsigned int modelLoc);
+	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int);
 
 	float zOffset = 0;
 private:
@@ -51,6 +51,8 @@ private:
 
 	struct Subset final
 	{
+		float sx;
+		float sy;
 		unsigned vbo = 0;
 		std::shared_ptr<engine::Texture> texture = 0;
 		std::shared_ptr<engine::Texture> lookup = 0;
