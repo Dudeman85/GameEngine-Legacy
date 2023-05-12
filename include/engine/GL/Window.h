@@ -36,7 +36,6 @@ namespace engine
 				glViewport(0, 0, width, height);
 			}
 		);
-
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 

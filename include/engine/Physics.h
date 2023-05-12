@@ -3,6 +3,7 @@
 #include <engine/Transform.h>
 #include <engine/Tilemap.h>
 #include <vector>
+#include <array>
 
 namespace engine
 {
@@ -36,7 +37,7 @@ namespace engine
 		Vector2 velocity;
 		float gravityScale = 1;
 		float drag = 0;
-		float friction = 0.1;
+		float friction = 0;
 		float elasticity = 0;
 		bool kinematic = false;
 	};
@@ -142,7 +143,7 @@ namespace engine
 						Rigidbody collisionRigidbody;
 						//Fake the Rigidbody of a tilemap to get friction and elasticity values
 						if (collision.type == Collision::Type::tilemap)
-							collisionRigidbody = Rigidbody{ .friction = 0, .elasticity = 0 };
+							collisionRigidbody = tileProperties[collision.tileID];
 						else
 							collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
 
@@ -421,11 +422,24 @@ namespace engine
 			tilemap = map;
 		}
 
+		//Sets the rigidbody properties of a tile type
+		void SetTileProperty(unsigned int tileID, Rigidbody properties)
+		{
+			if (!tilemap)
+			{
+				cout << "Warning: Tilemap not set, no properties changed!" << endl;
+				return;
+			}
+
+			tileProperties[tileID] = properties;
+		}
+
 		int step = 4;
 		//Pixels/second^2
 		Vector2 gravity;
 
 	private:
 		Tilemap* tilemap = nullptr;
+		map<unsigned int, Rigidbody> tileProperties;
 	};
 }
