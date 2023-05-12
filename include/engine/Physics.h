@@ -126,14 +126,18 @@ namespace engine
 				//If the entity collided with something, move it back so it is no longer colliding
 				for (const Collision& collision : collisions)
 				{
+					//Completely ignore misses
+					if (collision.type == Collision::Type::miss)
+						continue;
+
 					//Don't process collision on the same side twice
 					if (find(sidesCollided.begin(), sidesCollided.end(), collision.side) != sidesCollided.end())
 						continue;
 
 					sidesCollided.push_back(collision.side);
 
-					//Don't process triggers or misses
-					if (collision.type != Collision::Type::entityTrigger && collision.type != Collision::Type::tilemapTrigger && collision.type != Collision::Type::miss)
+					//Don't process triggers
+					if (collision.type != Collision::Type::entityTrigger && collision.type != Collision::Type::tilemapTrigger)
 					{
 						Rigidbody collisionRigidbody;
 						//Fake the Rigidbody of a tilemap to get friction and elasticity values
@@ -253,7 +257,7 @@ namespace engine
 		}
 
 		//Check intersect between tilemap collision layer and entity a
-		vector<Collision> TilemapIntersect(Entity a)
+		vector<Collision> TilemapIntersect(Entity entity)
 		{
 			vector<Collision> collisions;
 
@@ -264,7 +268,7 @@ namespace engine
 				return collisions;
 			}
 
-			std::array<float, 4> bounds = GetBounds(a);
+			std::array<float, 4> bounds = GetBounds(entity);
 
 			//TODO automate making more checks if collider is bigger than tile
 			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
@@ -289,7 +293,9 @@ namespace engine
 					{
 						loggedTiles.push_back(tileIndex);
 
-						Collision collision{ .type = Collision::Type::tilemap, .a = a, .tileID = result };
+						Collision collision{ .type = Collision::Type::tilemap, .a = entity, .tileID = result };
+
+						collision.type = ecs.getComponent<BoxCollider>(entity).isTrigger ? Collision::Type::tilemapTrigger : Collision::Type::tilemap;
 
 						//TODO figure out the actual fix for this instead of the +0.0001 hack
 						//Calculate the bounds for the collided tile
