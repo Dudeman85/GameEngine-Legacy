@@ -91,8 +91,27 @@ unsigned char* imageData = testImage.data();
 ---
 ## Animations
 
+The AnimationSystem requires the Sprite and Animator components:
+
+```cpp
+//Add the Animator and Sprite components to the sprite entity
+ecs.addComponent(sprite, Sprite{});
+ecs.addComponent(sprite, Animator{});
+```
+
 An animation is simply a list of textures to be used as frames and a list of ints to be used as delays in milliseconds.<br>
 You can manually create it from textures, or automatically create it from a spritesheet. <br>
+
+The automatic way:
+```cpp
+//Create animations from a spritesheet where one animation contains all the textures from one row of the spritesheet
+//The parameters are: the path to the image, how many sprites wide, how many sprites tall, and a vector of delays for each frame
+std::vector<Animation> anims = AnimationsFromSpritesheet("spritesheet.png", 4, 6, vector<int>(24, 250));
+
+//Add the first animation, aka the first row, created from the spritesheet
+//This has essentially the same results as the above example
+AnimationSystem::AddAnimation(sprite, anims[0], "Animation 2");
+```
 
 The manual way:
 ```cpp
@@ -107,22 +126,8 @@ std::vector<int> delays(4, 250);
 //Create the animation
 Animation anim = Animation(textures, delays);
 
-//Add the Animator component to the sprite entity
-ecs.addComponent(sprite, Animator{});
-
 //Add the anim animation with the name "Animation 1" to the sprite entity
 AnimationSystem::AddAnimation(sprite, anim, "Animation 1");
-```
-
-The automatic way:
-```cpp
-//Create animations from a spritesheet where one animation contains all the textures from one row of the spritesheet
-//The parameters are: the path to the image, how many sprites wide, how many sprites tall, and a vector of delays for each frame
-std::vector<Animation> anims = AnimationsFromSpritesheet("spritesheet.png", 4, 6, vector<int>(24, 250));
-
-//Add the first animation, aka the first row, created from the spritesheet
-//This has essentially the same results as the above example
-AnimationSystem::AddAnimation(sprite, anims[0], "Animation 2");
 ```
 
 Animation control:
