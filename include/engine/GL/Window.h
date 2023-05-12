@@ -37,8 +37,8 @@ namespace engine
 			}
 		);
 
-		//glEnable(GL_DEPTH_TEST);
-		//glDepthFunc(GL_LESS);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 
 		OPENGL_INITIALIZED = true;
 

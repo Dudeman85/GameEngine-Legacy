@@ -120,7 +120,6 @@ void Tilemap::loadMap(const std::string ownMap)
 				// Custom int property for layer drawing order
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
 				
-				/*
 				const auto& properties = layers[i]->getProperties();
 				for (const auto& property : properties)
 				{
@@ -130,27 +129,9 @@ void Tilemap::loadMap(const std::string ownMap)
 						break;
 					}
 				}
-				*/
-				
-
-
-				//sortedLayers.emplace_back(zOrder, *layers[i]);
-				
 			}
 		}
 	}
-	 // Sort the layers based on the "Z" property
-	//std::sort(sortedLayers.begin(), sortedLayers.end(), [](const auto& a, const auto& b)
-		//{
-			//return a.first < b.first;
-		//});
-
-	 // Create maplayer objects objects from the sorted layers
-	//for (const auto& [_, layer] : sortedLayers)
-	//{
-		//mapLayers.emplace_back(std::make_unique<MapLayer>(map, layer, allTextures));
-// 
-	//}
 }
 
 //Returns the collision layers tile ID at x and y

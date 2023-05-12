@@ -204,7 +204,7 @@ int main()
 
 
 		map.draw();
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
