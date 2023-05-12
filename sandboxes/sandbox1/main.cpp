@@ -293,11 +293,10 @@ int main()
 			if (fireCooldown <=0)  {
 				if (axes[5] > 0.5f) {
 
-
 					Entity bullet = ecs.newEntity();
 					ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
 					ecs.addComponent(bullet, Sprite{ &texture3 });
-					ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
+					ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 20, -aimdirection.y * 20), .drag = 0, .elasticity = 0, .kinematic = true });
 					ecs.addComponent(bullet, BoxCollider{.isTrigger = true});
 					bullets.push_back(bullet);
 					fireCooldown = 0.4f;
@@ -321,7 +320,9 @@ int main()
 			auto hit = ecs.getComponent<BoxCollider>(bullet);
 			for (const Collision& collision : hit.collisions) {
 				// TODO killing enemies
-				
+				if(collision.type==Collision::Type::trigger){
+					ecs.destroyEntity(collision.b);
+					}
 			}
 
 			if (hit.collisions.size()>0){
