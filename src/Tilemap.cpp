@@ -83,11 +83,8 @@ void Tilemap::loadMap(const std::string ownMap)
 	//create shared resources, shader and tileset textures
 	initGLStuff(map);
 
-
 	bounds = map.getBounds();
 	tileSize = map.getTileSize();
-
-	//std::vector<std::pair<int, tmx::Layer>> sortedLayers;
 
 	//create a drawable object for each tile layer
 	const auto& layers = map.getLayers();
@@ -122,7 +119,7 @@ void Tilemap::loadMap(const std::string ownMap)
 				// Get the custom property from Tiled Layer and place
 				// Custom int property for layer drawing order
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
-				/*
+				
 				const auto& properties = layers[i]->getProperties();
 				for (const auto& property : properties)
 				{
@@ -131,7 +128,7 @@ void Tilemap::loadMap(const std::string ownMap)
 						mapLayers.back()->zOffset = property.getFloatValue();
 						break;
 					}
-				}*/
+				}
 			}
 		}
 	}

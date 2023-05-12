@@ -41,21 +41,20 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 25, .z = -10, .xScale = 60, .yScale = 60 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{});
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.5, 0.65), .offset = Vector2(0, -18.5) });
 	ecs.addComponent(player, Player{});
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("assets/gradient.png", 2, 2, vector<int>(4, 200));
-	AnimationSystem::AddAnimation(player, testAnims[0], "1");
-	AnimationSystem::AddAnimation(player, testAnims[1], "2");
-	AnimationSystem::PlayAnimation(player, "2", true);
+	auto testAnims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
+	AnimationSystem::AddAnimations(player, testAnims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
+	AnimationSystem::PlayAnimation(player, "Idle", true);
 
 	//Top-Right
 	Entity sprite2 = ecs.newEntity();
@@ -101,6 +100,11 @@ int main()
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+
+		if (playerCollider.sidesCollided[Direction::up])
+		{
+			cout << "a";
+		}
 
 
 		playerController->Update(window, engine.deltaTime);

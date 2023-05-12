@@ -16,7 +16,6 @@ namespace engine
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
 		//Create window object
 		GLFWwindow* window = glfwCreateWindow(width, height, name, NULL, NULL);
 		if (window == NULL)
@@ -36,6 +35,8 @@ namespace engine
 				glViewport(0, 0, width, height);
 			}
 		);
+
+		//Enable Depth buffering
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 

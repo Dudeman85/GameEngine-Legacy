@@ -160,13 +160,16 @@ public:
 						player.wallJumping = false;
 					}
 				}
+				else
+				{
+					player.wallJumpDir = 0;
+				}
 
 				player.jumpHeld = true;
 			}
 			else
 			{
 				player.wallJumping = false;
-				player.wallJumpDir = 0;
 				player.jumping = false;
 				if (player.jumpHeld)
 				{

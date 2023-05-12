@@ -127,7 +127,6 @@ void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
                     && tileIDs[idx].ID < (ts.getFirstGID() + ts.getTileCount()))
                 {      
                    auto id = tileIDs[idx].ID - ts.getFirstGID() + 1;
-                   printf("id=%d\n", id);
                    pixelData.push_back(static_cast<std::uint16_t>(id)); //red channel - making sure to index relative to the tileset
                    pixelData.push_back(static_cast<std::uint16_t>(tileIDs[idx].flipFlags)); //green channel - tile flips are performed on the shader
                     tsUsed = true;

@@ -31,10 +31,8 @@ int main()
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .z = -1, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{ .isTrigger = true });
-	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
-	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
+	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{ .isTrigger = true });
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
@@ -73,7 +71,7 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 2000), .drag = 0.25, .elasticity = 0.625, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
-	RenderSystem::SetBackgroundColor(1, .5, .1);
+	RenderSystem::SetBackgroundColor(0, .5, .1);
 
 	Tilemap map(&cam);
 	map.loadMap("assets/demo.tmx");

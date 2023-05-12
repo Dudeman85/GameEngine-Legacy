@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="30" height="9" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="30" height="13" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="1">
  <tileset firstgid="1" name="tileset" tilewidth="64" tileheight="64" tilecount="42" columns="6">
   <image source="images/tilemap/tileset.png" width="384" height="448"/>
  </tileset>
- <layer id="1" name="Tile Layer 1" width="30" height="9">
+ <layer id="1" name="Tile Layer 1" width="30" height="13">
+  <properties>
+   <property name="Z" type="float" value="-2"/>
+  </properties>
   <data encoding="base64" compression="zlib">
-   eJwTYyANiKHRxKilxAxCZtEa4PODGB55fHpBgBeIeZAwHwl6yQWcQKyCBXNRYCY2d1LD7cSE70CbL4aDTa4Z6OK0DgNKAADGrQNv
+   eJxjYKANEEPD1DAPH59WgBr2UkMPuf4lVR8p9hIymxS7yfEvLdMVpWmXF4h5kDAfkfZSAjiBWAUL5qLATGzuola4U6tsoIf51M5/xJaP6OrohQG9xwcL
   </data>
  </layer>
- <layer id="4" name="collider" width="30" height="9">
+ <layer id="4" name="collider" width="30" height="13">
   <data encoding="base64" compression="zlib">
-   eJwTYyANiKHRxKilxAxCZtEa4PODGB55fHopsZcSIIYHU2ImMWLkmEup22htvhgONrlmoIsTm8YGAgMAVhEFlw==
+   eJxjYKANEEPD1DAPH59WgBr2UkMPuf4lVR8p9hIymxS7yfEvLdMVNdMuKfZSaiYuTImZxIiRYy6tw5ea5lM7/xEbP/jilJYYAK1EBp8=
   </data>
  </layer>
- <layer id="2" name="Tile Layer 2" width="30" height="9">
+ <layer id="2" name="Tile Layer 2" width="30" height="13">
+  <properties>
+   <property name="Z" type="float" value="-1"/>
+  </properties>
   <data encoding="base64" compression="zlib">
-   eJxjYBgFIMAyQPYyI7H5B8gNo2AUkAoAQTQAFw==
+   eJxjYBgFo2D4A5YBspcZic0/QG4YBaOAVAAAQxQAFw==
   </data>
  </layer>
- <layer id="3" name="Tile Layer 3" width="30" height="9">
+ <layer id="3" name="Tile Layer 3" width="30" height="13">
+  <properties>
+   <property name="Z" type="float" value="1"/>
+  </properties>
   <data encoding="base64" compression="zlib">
-   eJxjYBgF9AaCQCwAxdxI7FEwCoYKAAD/JABd
+   eJxjYBgFo2AUUBMIArEAFHMjsUfBKBgqAAABEwBd
   </data>
  </layer>
 </map>

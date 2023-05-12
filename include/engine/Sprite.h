@@ -159,9 +159,9 @@ namespace engine
 				//Scale
 				model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
 				//X, Y, Z euler rotations
-				model = glm::rotate(model, transform.xRotation, glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, transform.yRotation, glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, transform.zRotation, glm::vec3(0.0f, 0.0f, 1.0f));
+				model = glm::rotate(model, glm::degrees(transform.xRotation), glm::vec3(1.0f, 0.0f, 0.0f));
+				model = glm::rotate(model, glm::degrees(transform.yRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::rotate(model, glm::degrees(transform.zRotation), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				//Give the shader the model matrix
 				unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
@@ -293,7 +293,7 @@ namespace engine
 
 			if (animator.animations.find(animation) == animator.animations.end())
 			{
-				cout << "No animation named \"" << animation << "\" was found in this entity.";
+				cout << "Warning: No animation named \"" << animation << "\" was found in this entity." << endl;
 				return;
 			}
 
