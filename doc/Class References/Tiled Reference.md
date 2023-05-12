@@ -28,4 +28,10 @@ To add a tilemap collision layer:
 engine.physicsSystem->SetTilemap(&map);
 ```
 
-Every collision with the tilemap will be logged in the Entity's BoxCollider. The type will be Collision::Type::tilemap, and tileID will be the id of the collided tile as defined by Tiled, b will be undefined.
+Every collision with the tilemap will be logged in the Entity's BoxCollider. The type will be Collision::Type::tilemap or Collision::Type::tilemapTrigger, and tileID will be the id of the collided tile as defined by Tiled, b will be undefined.
+
+You can add a custom rigidbody for each tile ID, for example to make ice physics
+```cpp
+//Add higher friction to tile 12
+engine.physicsSystem->SetTileProperty(12, Rigidbody{ .friction = 0.25 })
+```

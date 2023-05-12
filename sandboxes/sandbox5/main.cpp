@@ -17,7 +17,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, -1000);
+	engine.physicsSystem->gravity = Vector2(0, 000);
 	engine.physicsSystem->step = 4;
 
 	//Create the camera
@@ -28,14 +28,13 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 20, .yScale = 20 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .z = -1, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{});
+	ecs.addComponent(player, BoxCollider{ .isTrigger = true });
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
-	TransformSystem::SetPosition(player, 0, 10, 0);
 
 	//Define the test animation
 	Animator& animator = ecs.getComponent<Animator>(player);
@@ -74,7 +73,7 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 2000), .drag = 0.25, .elasticity = 0.625, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
-	RenderSystem::SetBackgroundColor(0, .5, .1);
+	RenderSystem::SetBackgroundColor(1, .5, .1);
 
 	Tilemap map(&cam);
 	map.loadMap("assets/demo.tmx");
@@ -120,7 +119,7 @@ int main()
 			}
 		}
 
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+		cam.SetPosition(playerTransform.x, playerTransform.y, 10);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

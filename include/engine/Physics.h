@@ -3,6 +3,7 @@
 #include <engine/Transform.h>
 #include <engine/Tilemap.h>
 #include <vector>
+#include <array>
 
 namespace engine
 {
@@ -11,7 +12,7 @@ namespace engine
 	//Collision struct, not a component
 	struct Collision
 	{
-		enum class Type { entity, tilemap, trigger, miss };
+		enum class Type { entity, tilemap, entityTrigger, tilemapTrigger, miss };
 
 		Type type;
 
@@ -36,7 +37,7 @@ namespace engine
 		Vector2 velocity;
 		float gravityScale = 1;
 		float drag = 0;
-		float friction = 0.1;
+		float friction = 0;
 		float elasticity = 0;
 		bool kinematic = false;
 	};
@@ -121,20 +122,14 @@ namespace engine
 
 				//Keep track of which sides have already been processes, so we don't move the entity too much
 				vector<int> sidesCollided;
+				bool collided = false;
 
 				//If the entity collided with something, move it back so it is no longer colliding
 				for (const Collision& collision : collisions)
 				{
-					//Don't process triggers or misses
-					if (collision.type == Collision::Type::trigger || collision.type == Collision::Type::miss)
+					//Completely ignore misses
+					if (collision.type == Collision::Type::miss)
 						continue;
-
-					Rigidbody collisionRigidbody;
-					//Fake the Rigidbody of a tilemap to get friction and elasticity values
-					if (collision.type == Collision::Type::tilemap)
-						collisionRigidbody = Rigidbody{ .friction = 0, .elasticity = 0 };
-					else
-						collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
 
 					//Don't process collision on the same side twice
 					if (find(sidesCollided.begin(), sidesCollided.end(), collision.side) != sidesCollided.end())
@@ -142,42 +137,54 @@ namespace engine
 
 					sidesCollided.push_back(collision.side);
 
-					//Top, right, bottom, left
-					switch (collision.side)
+					//Don't process triggers
+					if (collision.type != Collision::Type::entityTrigger && collision.type != Collision::Type::tilemapTrigger)
 					{
-					case 0:
-						//Collision on top, move down
-						TransformSystem::Translate(entity, 0, -collision.intersects[0]);
-						//Apply friction and elasticity to appropriate axis
-						rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
-						rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
-						break;
-					case 1:
-						//Collision on right, move left
-						TransformSystem::Translate(entity, -collision.intersects[1], 0);
-						//Apply friction and elasticity to appropriate axis
-						rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
-						rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
-						break;
-					case 2:
-						//Collision on bottom, move up
-						TransformSystem::Translate(entity, 0, collision.intersects[2]);
-						//Apply friction and elasticity to appropriate axis
-						rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
-						rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
-						break;
-					case 3:
-						//Collision on left, move right
-						TransformSystem::Translate(entity, collision.intersects[3], 0);
-						//Apply friction and elasticity to appropriate axis
-						rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
-						rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
-						break;
+						Rigidbody collisionRigidbody;
+						//Fake the Rigidbody of a tilemap to get friction and elasticity values
+						if (collision.type == Collision::Type::tilemap)
+							collisionRigidbody = tileProperties[collision.tileID];
+						else
+							collisionRigidbody = ecs.getComponent<Rigidbody>(collision.b);
+
+						//Top, right, bottom, left
+						switch (collision.side)
+						{
+						case 0:
+							//Collision on top, move down
+							TransformSystem::Translate(entity, 0, -collision.intersects[0]);
+							//Apply friction and elasticity to appropriate axis
+							rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+							rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+							break;
+						case 1:
+							//Collision on right, move left
+							TransformSystem::Translate(entity, -collision.intersects[1], 0);
+							//Apply friction and elasticity to appropriate axis
+							rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+							rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+							break;
+						case 2:
+							//Collision on bottom, move up
+							TransformSystem::Translate(entity, 0, collision.intersects[2]);
+							//Apply friction and elasticity to appropriate axis
+							rigidbody.velocity.x -= rigidbody.velocity.x * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+							rigidbody.velocity.y = -rigidbody.velocity.y * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+							break;
+						case 3:
+							//Collision on left, move right
+							TransformSystem::Translate(entity, collision.intersects[3], 0);
+							//Apply friction and elasticity to appropriate axis
+							rigidbody.velocity.x = -rigidbody.velocity.x * ((rigidbody.elasticity + collisionRigidbody.elasticity) / 2);
+							rigidbody.velocity.y -= rigidbody.velocity.y * ((rigidbody.friction + collisionRigidbody.friction) / 2);
+							break;
+						}
+						collided = true;
 					}
 				}
 
 				//If there was a collision don't process any more steps and return the current step
-				if (collisions.size() != 0)
+				if (collided)
 					return i + 1;
 			}
 			//No collision, return 0
@@ -210,6 +217,18 @@ namespace engine
 				Collision collision = AABBIntersect(a, b);
 				if (collision.type != Collision::Type::miss)
 				{
+					if (collision.type == Collision::Type::entityTrigger)
+					{
+						//In the case of a trigger make sure the same entity collision is not logged multiple times
+						if (aCollider.collisions.end() != find_if(aCollider.collisions.begin(), aCollider.collisions.end(), [collision](const Collision& rhs)
+							{
+								return rhs.a == collision.a;
+							}))
+						{
+							continue;
+						}
+					}
+
 					collisions.push_back(collision);
 					aCollider.collisions.push_back(collision);
 					aCollider.sidesCollided[collision.side] = true;
@@ -227,7 +246,7 @@ namespace engine
 			if (tilemap)
 			{
 				vector<Collision> tilmapCollisions = TilemapIntersect(a);
-				for (Collision collision : tilmapCollisions)
+				for (const Collision& collision : tilmapCollisions)
 				{
 					collisions.push_back(collision);
 					aCollider.collisions.push_back(collision);
@@ -239,7 +258,7 @@ namespace engine
 		}
 
 		//Check intersect between tilemap collision layer and entity a
-		vector<Collision> TilemapIntersect(Entity a)
+		vector<Collision> TilemapIntersect(Entity entity)
 		{
 			vector<Collision> collisions;
 
@@ -250,7 +269,7 @@ namespace engine
 				return collisions;
 			}
 
-			std::array<float, 4> bounds = GetBounds(a);
+			std::array<float, 4> bounds = GetBounds(entity);
 
 			//TODO automate making more checks if collider is bigger than tile
 			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
@@ -275,7 +294,9 @@ namespace engine
 					{
 						loggedTiles.push_back(tileIndex);
 
-						Collision collision{ .type = Collision::Type::tilemap, .a = a, .tileID = result };
+						Collision collision{ .type = Collision::Type::tilemap, .a = entity, .tileID = result };
+
+						collision.type = ecs.getComponent<BoxCollider>(entity).isTrigger ? Collision::Type::tilemapTrigger : Collision::Type::tilemap;
 
 						//TODO figure out the actual fix for this instead of the +0.0001 hack
 						//Calculate the bounds for the collided tile
@@ -328,7 +349,7 @@ namespace engine
 			if (aBounds[3] < bBounds[1] && aBounds[1] > bBounds[3] && aBounds[2] < bBounds[0] && aBounds[0] > bBounds[2])
 			{
 				//Set the collision data
-				collision.type = aCollider.isTrigger || bCollider.isTrigger ? Collision::Type::trigger : Collision::Type::entity;
+				collision.type = aCollider.isTrigger || bCollider.isTrigger ? Collision::Type::entityTrigger : Collision::Type::entity;
 				collision.intersects = GetIntersects(aBounds, bBounds);
 
 				//Get the smallest intersection amount, this will determine which side actually collided
@@ -401,11 +422,24 @@ namespace engine
 			tilemap = map;
 		}
 
+		//Sets the rigidbody properties of a tile type
+		void SetTileProperty(unsigned int tileID, Rigidbody properties)
+		{
+			if (!tilemap)
+			{
+				cout << "Warning: Tilemap not set, no properties changed!" << endl;
+				return;
+			}
+
+			tileProperties[tileID] = properties;
+		}
+
 		int step = 4;
 		//Pixels/second^2
 		Vector2 gravity;
 
 	private:
 		Tilemap* tilemap = nullptr;
+		map<unsigned int, Rigidbody> tileProperties;
 	};
 }

@@ -22,15 +22,12 @@ add_subdirectory("ext/glm-0.9.9.7")
 include_directories("${GLFW_SOURCE_DIR}/deps")
 set(GLAD_GL "${GLFW_SOURCE_DIR}/deps/glad/gl.h" "${GLFW_SOURCE_DIR}/deps/glad_gl.c")
 
-add_subdirectory("ext/box2d-main")
-include_directories("ext/box2d-main/include")
-
 file(GLOB_RECURSE ENGINE_SOURCE_FILES "./src/*.cpp")
 file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/GL/*.h" "./include/engine/AL/*.h")
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
-target_link_libraries(engine glfw OpenAL tmxlite glm sndfile box2d)
+target_link_libraries(engine glfw OpenAL tmxlite glm sndfile)
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>

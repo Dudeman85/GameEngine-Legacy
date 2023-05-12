@@ -173,18 +173,18 @@ namespace engine
 			cout << "Spritesheet is not divisible by sprite count. Clipping may occur!";
 
 		//For each sprite to slice out
-		int paddingX = 0;
+		int paddingY = 0;
 		for (size_t row = 0; row < spritesHigh; row++)
 		{
-			int paddingY = 0;
+			int paddingX = 0;
 			for (size_t col = 0; col < spritesWide; col++)
 			{
 				//Get the slice from the spritesheet
 				Image slice = spritesheet.Slice(col * width + paddingX, row * height + paddingY, col * width + width + paddingX, row * height + height + paddingY);
 				slicedTextures.push_back(new Texture(slice));
-				paddingY++;
+				paddingX++;
 			}
-			paddingX++;
+			paddingY++;
 		}
 
 		return slicedTextures;

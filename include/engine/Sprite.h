@@ -130,7 +130,14 @@ namespace engine
 			//Only need to bind the VAO once
 			glBindVertexArray(VAO);
 
-			for (auto const& entity : entities)
+			//Sort the entities by Z
+			vector<Entity> sortedEntities(entities.begin(), entities.end());
+			sort(sortedEntities.begin(), sortedEntities.end(), [](Entity lhs, Entity rhs)
+				{
+					return ecs.getComponent<Transform>(lhs).z < ecs.getComponent<Transform>(rhs).z;
+				});
+
+			for (auto const& entity : sortedEntities)
 			{
 				//Get relevant components
 				Sprite& sprite = ecs.getComponent<Sprite>(entity);
@@ -170,7 +177,7 @@ namespace engine
 
 				//Bind the texture
 				glActiveTexture(GL_TEXTURE0);
-				if(sprite.texture)
+				if (sprite.texture)
 					sprite.texture->Use();
 
 				//Draw the sprite
@@ -194,7 +201,7 @@ namespace engine
 		unsigned int VAO, VBO, EBO;
 		Shader defaultShader;
 	};
-	
+
 	//Animator system
 	//Requires Animator and Sprite
 	class AnimationSystem : public System
@@ -204,7 +211,7 @@ namespace engine
 		void Update(float deltaTime)
 		{
 			//Delta time in milliseconds
-			deltaTime *= 1000; 
+			deltaTime *= 1000;
 
 			//For each entity that has the required components
 			for (auto const& entity : entities)
