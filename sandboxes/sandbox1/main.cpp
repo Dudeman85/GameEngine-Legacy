@@ -297,7 +297,6 @@ int main()
 				if (axes[5] > 0.5f)
 				{
 
-
 					Entity bullet = ecs.newEntity();
 					ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
 					ecs.addComponent(bullet, Sprite{ &texture3 });
