@@ -89,7 +89,7 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
 	Tilemap map(&cam);
-	map.loadMap("assets/demo.tmx");
+	map.loadMap("assets/level.tmx");
 
 	engine.physicsSystem->SetTilemap(&map);
 
