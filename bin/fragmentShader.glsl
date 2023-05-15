@@ -9,6 +9,7 @@ uniform usampler2D u_lookupMap;
 uniform sampler2D u_tileMap;
 
 uniform vec2 u_tileSize = vec2(64.0);
+//uniform vec2 u_tileSize;
 uniform vec2 u_tilesetCount;
 uniform vec2 u_tilesetScale = vec2(1.0);
 
@@ -26,7 +27,8 @@ void main()
 	{
 		float index = float(tileID) - 1.0;
 		vec2 position = vec2(mod(index + epsilon, u_tilesetCount.x), floor((index / u_tilesetCount.x) + epsilon)) / u_tilesetCount;
-		vec2 offsetCoord = (v_texCoord * (textureSize(u_lookupMap, 0) * u_tilesetScale)) / u_tileSize;
+		 vec2 offsetCoord = (v_texCoord * (textureSize(u_lookupMap, 0) * u_tilesetScale)) / u_tileSize;
+		//vec2 offsetCoord = (v_texCoord * (textureSize(u_lookupMap, 0) * u_tilesetScale)) * (u_tileSize / textureSize(u_tileMap, 0));
 		
 		vec2 texelSize = vec2(1.0) / textureSize(u_lookupMap, 0);
 		vec2 offset = mod(v_texCoord, texelSize);

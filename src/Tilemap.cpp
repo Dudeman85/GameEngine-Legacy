@@ -67,10 +67,13 @@ void Tilemap::draw()
 
 	unsigned int u_tilesetCount = glGetUniformLocation(m_shader->ID, "u_tilesetCount");
 
+	//unsigned int u_tileSize = glGetUniformLocation(m_shader->ID, "u_tileSize");
+
 
 	for (const auto& layer : mapLayers)
 	{
 		layer->draw(model, modelLoc, u_tilesetCount);
+		//layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 	}
 }
 
@@ -118,7 +121,10 @@ void Tilemap::loadMap(const std::string ownMap)
 			{
 				// Get the custom property from Tiled Layer and place
 				// Custom int property for layer drawing order
+				//unsigned int tileSizeUnsigned = static_cast<unsigned int>(tileSize);
+				//mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures, tileSizeUnsigned));
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+
 				
 				const auto& properties = layers[i]->getProperties();
 				for (const auto& property : properties)

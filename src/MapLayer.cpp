@@ -31,12 +31,20 @@ source distribution.
 #include <engine/GL/Texture.h>
 #include <glm/gtc/type_ptr.hpp>
 
+//MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures, unsigned int tileSize) : m_allTextures(textures), tileSize(tileSize)
 MapLayer::MapLayer(const tmx::Map& map, std::size_t layerIdx, const std::vector<std::shared_ptr<engine::Texture>>& textures) : m_allTextures(textures)
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
+
     createSubsets(map, layerIdx);
+    /*
+    const auto mapSize = map.getTileCount();
+    unsigned int mapSizeUInt = static_cast<unsigned int>(mapSize.x * mapSize.y);
+
+    createSubsets(map, layerIdx, mapSizeUInt);
+    */
 }
 
 MapLayer::~MapLayer()
@@ -53,6 +61,7 @@ MapLayer::~MapLayer()
 }
 
 //public
+//void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc, unsigned int tileSizeLoc)
 void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc)
 {
     model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, zOffset));
@@ -87,6 +96,7 @@ void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tileset
 }
 
 //private
+//void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx, unsigned int mapSizeUInt)
 void MapLayer::createSubsets(const tmx::Map& map, std::size_t layerIdx)
 {
     const auto& layers = map.getLayers();
