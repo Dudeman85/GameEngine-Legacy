@@ -89,7 +89,7 @@ int main()
 	//
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40, .yRotation = 3.1 });
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40, .yRotation = 0 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0,  .friction = 0, .elasticity = 0 });
@@ -131,11 +131,11 @@ int main()
 	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
 	ecs.addComponent(sprite5, BoxCollider{});
 
-	/*
+	
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
-	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 0, .y = 0, .xScale = 20, .yScale = 20 });
+	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 500, .y = 500, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(crosshair, Sprite{ &texture2 });
 
 	vector <Entity>bullets;
@@ -143,7 +143,7 @@ int main()
 
 	float fireCooldown = 0.4f;
 	bool canFire = true;
-	*/
+	
 
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
@@ -250,128 +250,122 @@ int main()
 			mySpeaker2.Play(sound2);
 			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 		}
-
+		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
-		/*
-		GLFWgamepadstate state;
+		int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+		if (present == GLFW_TRUE) {
 
-		// set player speed
-		float playerSpeed = 500.0f;
-		//define deadzone
-		float deadzoneSize = 0.5f;
-		//calculate deadzone barrier
-		float deadzoneTreshold = deadzoneSize / 2.0f;
-		//Camera max distance
-		float max_distance = 30.0f;
+			GLFWgamepadstate state;
 
-
-		int axisCount;
-		int buttonCount;
-		float radian = 5.0f;
-
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+			// set player speed
+			float playerSpeed = 500.0f;
+			//define deadzone
+			float deadzoneSize = 0.5f;
+			//calculate deadzone barrier
+			float deadzoneTreshold = deadzoneSize / 2.0f;
+			//Camera max distance
+			float max_distance = 30.0f;
 
 
-		if (abs(axes[0]) > deadzoneTreshold || abs(axes[1]) > deadzoneTreshold)
-		{
-			// Sets movement vector based on movement speed
-			Vector2 movement(axes[0] * playerSpeed, -axes[1] * playerSpeed);
+			int axisCount;
+			int buttonCount;
+			float radian = 5.0f;
 
-			// move player based on movement vector
-			engine.physicsSystem->Move(player, movement * engine.deltaTime);
-
-		}
-
-		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-
-		// sets crosshair position to zero
-		Vector2 crosshairPosition(0, 0);
-		if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
-		{
-
-			// Changes joystick cordinates into origo and scales it between -1, 1
-			Vector2 rightThumbstick(axes[2], axes[3]);
-			rightThumbstick = (rightThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
-			rightThumbstick -= Vector2(0.5f, 0.5f);
-			rightThumbstick *= 2.0f;
+			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axisCount);
+			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 
 
-			// creates vector toward joystick direction
-			float angle = atan2f(rightThumbstick.y, rightThumbstick.x);
-			Vector2 aimdirection = Vector2(cosf(angle), sinf(angle));
-
-			// normalizes vector and sets crosshair distance
-			aimdirection.Normalize();
-			aimdirection *= 150.0f;
-			ecs.getComponent<Sprite>(crosshair).enabled = true;
-			// crosshair position based on player position
-			Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-			Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
-			TransformSystem::SetPosition(crosshair, crosshairPosition);
-
-
-
-			if (fireCooldown <= 0)
+			if (abs(axes[0]) > deadzoneTreshold || abs(axes[1]) > deadzoneTreshold)
 			{
-				if (axes[5] > 0.5f)
-				{
+				// Sets movement vector based on movement speed
+				Vector2 movement(axes[0] * playerSpeed, -axes[1] * playerSpeed);
 
-					Entity bullet = ecs.newEntity();
-					ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
-					ecs.addComponent(bullet, Sprite{ &texture3 });
-					ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
-					ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
-					bullets.push_back(bullet);
-					fireCooldown = 0.4f;
+				// move player based on movement vector
+				engine.physicsSystem->Move(player, movement * engine.deltaTime);
+
+			}
+
+			// sets crosshair position to zero
+			Vector2 crosshairPosition(0, 0);
+			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
+			{
+				// Changes joystick cordinates into origo and scales it between -1, 1
+				Vector2 rightThumbstick(axes[2], axes[3]);
+				rightThumbstick = (rightThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
+				rightThumbstick -= Vector2(0.5f, 0.5f);
+				rightThumbstick *= 2.0f;
+
+				// creates vector toward joystick direction
+				float angle = atan2f(rightThumbstick.y, rightThumbstick.x);
+				Vector2 aimdirection = Vector2(cosf(angle), sinf(angle));
+
+				// normalizes vector and sets crosshair distance
+				aimdirection.Normalize();
+				aimdirection *= 150.0f;
+				ecs.getComponent<Sprite>(crosshair).enabled = true;
+				// crosshair position based on player position
+				Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
+				TransformSystem::SetPosition(crosshair, crosshairPosition);
+
+				if (fireCooldown <= 0)
+				{
+					if (axes[5] > 0.5f)
+					{
+
+						Entity bullet = ecs.newEntity();
+						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Sprite{ &texture3 });
+						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
+						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
+						bullets.push_back(bullet);
+						fireCooldown = 0.4f;
+					}
 				}
+				else
+				{
+					fireCooldown -= engine.deltaTime;
+				}
+
+				// set camera location between player and crosshair
+				//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
 			}
 			else
 			{
-				fireCooldown -= engine.deltaTime;
+				ecs.getComponent<Sprite>(crosshair).enabled = false;
 			}
 
-
-
-			// set camera location between player and crosshair
-			//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
-		}
-		else
-		{
-			ecs.getComponent<Sprite>(crosshair).enabled = false;
-		}
-
-		for (const Entity& bullet : bullets)
-		{
-			auto hit = ecs.getComponent<BoxCollider>(bullet);
-			for (const Collision& collision : hit.collisions)
+			for (const Entity& bullet : bullets)
 			{
-				if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
+				auto hit = ecs.getComponent<BoxCollider>(bullet);
+				for (const Collision& collision : hit.collisions)
 				{
-					ecs.destroyEntity(collision.b);
-					bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
-					ecs.destroyEntity(bullet);
+					if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
+					{
+						ecs.destroyEntity(collision.b);
+						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+						ecs.destroyEntity(bullet);
+					}
 				}
 			}
+
+			if (buttons[0] == GLFW_PRESS)
+			{
+				Vector2 movement(0.0f, playerSpeed);
+				engine.physicsSystem->Move(player, movement * engine.deltaTime);
+			}
+			if (buttons[1] == GLFW_PRESS)
+			{
+				Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
+				mySpeaker2.Play(sound2);
+				engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+			}
+
 		}
 
-		if (buttons[0] == GLFW_PRESS)
-		{
-			Vector2 movement(0.0f, playerSpeed);
-			engine.physicsSystem->Move(player, movement * engine.deltaTime);
-		}
-		if (buttons[1] == GLFW_PRESS)
-		{
-			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
-			mySpeaker2.Play(sound2);
-			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
-		}
-
-
-
-		*/
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
