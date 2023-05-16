@@ -6,7 +6,8 @@
 #include <thread>
 using namespace std;
 using namespace engine;
-
+// OpenGameArt
+// itchio
 ECS ecs;
 
 int main()

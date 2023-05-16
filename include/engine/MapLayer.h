@@ -46,6 +46,7 @@ public:
 	//void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, tmx::Vector2u);
 
 	float zOffset = 0;
+	glm::vec2 tileSize;
 private:
 	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
 

@@ -127,6 +127,8 @@ void Tilemap::loadMap(const std::string ownMap)
 
 				
 				const auto& properties = layers[i]->getProperties();
+				tmx::Tileset tileset = map.getTilesets()[0];
+				mapLayers.back()->tileSize = glm::vec2(tileset.getTileSize().x, tileset.getTileSize().y);
 				for (const auto& property : properties)
 				{
 					if (property.getName() == "Z")
