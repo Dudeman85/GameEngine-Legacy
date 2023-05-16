@@ -68,6 +68,8 @@ void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tileset
     model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+    glUniform2f(tileSizeLoc, tileSize.x, tileSize.y);
+
     glBindVertexArray(VAO);
 
     glEnableVertexAttribArray(0);
