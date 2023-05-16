@@ -42,7 +42,7 @@ public:
 	MapLayer(const MapLayer&) = delete;
 	MapLayer& operator = (const MapLayer&) = delete;
 
-	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int);
+	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int);
 	//void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, tmx::Vector2u);
 
 	float zOffset = 0;

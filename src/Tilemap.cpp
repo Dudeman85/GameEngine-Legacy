@@ -67,12 +67,12 @@ void Tilemap::draw()
 
 	unsigned int u_tilesetCount = glGetUniformLocation(m_shader->ID, "u_tilesetCount");
 
-	//unsigned int u_tileSize = glGetUniformLocation(m_shader->ID, "u_tileSize");
+	unsigned int u_tileSize = glGetUniformLocation(m_shader->ID, "u_tileSize");
 
 
 	for (const auto& layer : mapLayers)
 	{
-		layer->draw(model, modelLoc, u_tilesetCount);
+		layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 		//layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 	}
 }

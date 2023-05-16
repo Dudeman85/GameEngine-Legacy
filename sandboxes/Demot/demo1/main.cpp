@@ -41,7 +41,7 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 25, .z = -10, .xScale = 60, .yScale = 60 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 25, .z = 0, .xScale = 60, .yScale = 60 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
@@ -114,7 +114,7 @@ int main()
 		engine.Update(&cam);
 
 		map.draw();
-		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
+		cam.SetPosition(playerTransform.x, playerTransform.y, + 100);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
