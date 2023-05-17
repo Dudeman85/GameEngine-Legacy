@@ -206,10 +206,10 @@ int main()
 		{
 			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
 		}
-
+		
 
 		Transform playerTransform = ecs.getComponent<Transform>(player);
-
+		engine.physicsSystem->Move(sprite3, Vector2(playerTransform.x, playerTransform.y) * engine.deltaTime);
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
