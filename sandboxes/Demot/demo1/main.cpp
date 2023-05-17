@@ -28,6 +28,7 @@ int main()
 	playerControllerSignature.set(ecs.getComponentId<Sprite>());
 	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	playerControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
 
 	engine.physicsSystem->gravity = Vector2(0, -10000);
@@ -54,7 +55,6 @@ int main()
 	Animator& animator = ecs.getComponent<Animator>(player);
 	auto testAnims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
 	AnimationSystem::AddAnimations(player, testAnims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
-	AnimationSystem::PlayAnimation(player, "Idle", true);
 
 	//Top-Right
 	Entity sprite2 = ecs.newEntity();

@@ -26,7 +26,7 @@ struct Player
 	float wallJumpAccelSpeed = 2000;
 };
 
-//Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody
+//Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody, Animator
 class PlayerController : public System
 {
 public:
@@ -37,6 +37,7 @@ public:
 		for (auto const& entity : entities)
 		{
 			Player& player = ecs.getComponent<Player>(entity);
+			Transform& transform = ecs.getComponent<Transform>(entity);
 			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
@@ -44,6 +45,11 @@ public:
 			//Right
 			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 			{
+				//If touching ground play run
+				if (collider.sidesCollided[Direction::down])
+					AnimationSystem::PlayAnimation(entity, "Run");
+				transform.yRotation = 0;
+
 				if (rigidbody.velocity.x < player.maxSpeed)
 				{
 					Vector2 impulse;
@@ -60,6 +66,11 @@ public:
 			//Left
 			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 			{
+				//If touching ground play run but mirror it
+				if (collider.sidesCollided[Direction::down])
+					AnimationSystem::PlayAnimation(entity, "Run");
+				transform.yRotation = 180;
+
 				if (rigidbody.velocity.x > -player.maxSpeed)
 				{
 					Vector2 impulse;
@@ -76,6 +87,10 @@ public:
 			//No direction
 			else
 			{
+				//If touching ground play idle
+				if(collider.sidesCollided[Direction::down])
+					AnimationSystem::PlayAnimation(entity, "Idle");
+
 				//Slow the player down aka friction
 				if (abs(rigidbody.velocity.x) > 0)
 				{
@@ -84,9 +99,15 @@ public:
 				}
 			}
 
+			//If in the air ground play Jump
+			if (!collider.sidesCollided[Direction::down])
+				AnimationSystem::PlayAnimation(entity, "Jump");
+
 			//Set can wall jump for 100ms after touching wall
 			if (collider.sidesCollided[Direction::left] || collider.sidesCollided[Direction::right])
 			{
+				AnimationSystem::PlayAnimation(entity, "Wallslide");
+
 				//Enable Walljump
 				if (!player.jumpHeld && !collider.sidesCollided[Direction::down])
 				{

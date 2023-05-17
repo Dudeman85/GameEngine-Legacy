@@ -273,7 +273,11 @@ namespace engine
 
 			//TODO automate making more checks if collider is bigger than tile
 			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
-			vector<Vector2> checkPoints{ Vector2(bounds[1], bounds[0]), Vector2(bounds[1], bounds[2]), Vector2(bounds[3], bounds[2]), Vector2(bounds[3], bounds[0]) };
+			vector<Vector2> checkPoints{ 
+				Vector2(bounds[1], bounds[0]),
+				Vector2(bounds[1], bounds[2]), 
+				Vector2(bounds[3], bounds[2]), 
+				Vector2(bounds[3], bounds[0]) };
 
 			//Log each tile collision index, so it will only be counted once
 			vector<Vector2> loggedTiles;
