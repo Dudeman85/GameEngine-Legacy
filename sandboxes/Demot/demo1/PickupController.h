@@ -16,7 +16,10 @@ struct Pickup
 class PickupController : public System
 {
 public:
-	PickupController(){}
+	PickupController()
+	{
+		defaultTexture = new Texture("assets/strawberry.png");
+	}
 
 	void Update(Entity player, double programTime)
 	{
@@ -27,10 +30,10 @@ public:
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
 			//If floating animate it
-			if(pickup.floating)
+			if (pickup.floating)
 				transform.y += sin(programTime);
 
-			if (collider.collisions.end() != find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) {return collision.a == player;}))
+			if (collider.collisions.end() != find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) { return collision.a == player; }))
 			{
 				collected++;
 				ecs.destroyEntity(entity);
@@ -38,10 +41,15 @@ public:
 		}
 	}
 
-	static Entity CreatePickup()
+	Entity CreatePickup(float x, float y)
 	{
-
+		Entity pickup = ecs.newEntity();
+		ecs.addComponent(pickup, Transform{ .x = x, .y = y, .xScale = 20, .yScale = 20 });
+		ecs.addComponent(pickup, Sprite{ .texture = defaultTexture });
+		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
+		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
 	}
 
+	Texture* defaultTexture;
 	int collected = 0;
 };

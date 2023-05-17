@@ -25,7 +25,7 @@ struct Player
 	float canWallJump = 0;
 	int wallJumpDir = 0;
 	float maxWallJumpSpeed = 4000;
-	float wallJumpAccelSpeed = 2000;
+	float wallJumpAccelSpeed = 1500;
 
 	//Fix because of bad tilemap collision checking
 	int shouldWallslide = 0;
@@ -37,9 +37,10 @@ class PlayerController : public System
 public:
 	PlayerController()
 	{
+		jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
 	}
 
-	void Update(GLFWwindow* window, double deltaTime)
+	void Update(GLFWwindow* window, double deltaTime, static SoundSource& speaker)
 	{
 		for (auto const& entity : entities)
 		{
@@ -62,12 +63,7 @@ public:
 			{
 				//If not touching ground play wallslide
 				if (!collider.sidesCollided[Direction::down])
-					player.shouldWallslide = 2;
-				else
-					player.shouldWallslide--;
-
-				if (player.shouldWallslide > 0)
-					AnimationSystem::PlayAnimation(entity, "Wallslide");
+					player.shouldWallslide = 4;
 
 				//Enable Walljump
 				if (!player.jumpHeld && !collider.sidesCollided[Direction::down])
@@ -155,11 +151,12 @@ public:
 				if (collider.sidesCollided[Direction::down])
 				{
 					player.jumping = true;
+					speaker.Play(jumpSound);
 				}
-				else
+				else if (player.canWallJump > 0)
 				{
-					if (player.canWallJump > 0)
-						player.wallJumping = true;
+					player.wallJumping = true;
+					speaker.Play(jumpSound);
 				}
 
 				//Accelerate to max jump speed while holding jump
@@ -191,11 +188,11 @@ public:
 
 					if (rigidbody.velocity.y + player.wallJumpAccelSpeed < player.maxWallJumpSpeed)
 					{
-						PhysicsSystem::Impulse(entity, Vector2(player.wallJumpDir * player.wallJumpAccelSpeed / 2, player.wallJumpAccelSpeed));
+						PhysicsSystem::Impulse(entity, Vector2(player.wallJumpDir * player.wallJumpAccelSpeed / 1.5, player.wallJumpAccelSpeed));
 					}
 					else //Once max speed has been reached
 					{
-						rigidbody.velocity = Vector2(player.wallJumpDir * player.maxWallJumpSpeed / 2, player.maxWallJumpSpeed);
+						rigidbody.velocity = Vector2(player.wallJumpDir * player.maxWallJumpSpeed / 1.5, player.maxWallJumpSpeed);
 						player.wallJumping = false;
 					}
 				}
@@ -204,7 +201,9 @@ public:
 					player.wallJumpDir = 0;
 				}
 
-				player.jumpHeld = true;
+				if (!player.jumpHeld)
+
+					player.jumpHeld = true;
 			}
 			else
 			{
@@ -222,8 +221,13 @@ public:
 			}
 
 			//If in the air play Jump
-			if (!collider.sidesCollided[Direction::down])
+			if (!collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
 				AnimationSystem::PlayAnimation(entity, "Jump");
+
+			//This is not a good fix
+			player.shouldWallslide--;
+			if (player.shouldWallslide > 0)
+				AnimationSystem::PlayAnimation(entity, "Wallslide");
 
 			//Attack
 			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
@@ -244,4 +248,6 @@ public:
 			rigidbody.velocity.y = max(rigidbody.velocity.y, -8000.f);
 		}
 	}
+
+	uint32_t jumpSound;
 };

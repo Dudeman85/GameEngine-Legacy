@@ -1,4 +1,4 @@
-
+#include <engine/Application.h>
 #include <engine/Tilemap.h>
 
 #include "PlayerController.h"
@@ -14,13 +14,15 @@ ECS ecs;
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
+	GLFWwindow* window = CreateWindow(1000, 800, "Window");
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
 	//Initialize the default engine library
 	EngineLib engine;
+
+	static SoundSource speaker;
 
 	//Register Player Controller
 	ecs.registerComponent<Player>();
@@ -39,11 +41,11 @@ int main()
 
 	//Create the player entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 250, .z = 0, .xScale = 60, .yScale = 60 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 250, .z = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.1, 0.65), .offset = Vector2(0, -18.5) });
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.65), .offset = Vector2(0, -16) });
 	ecs.addComponent(player, Player{});
 
 	//Add animation to player
@@ -83,11 +85,15 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
 	Tilemap map(&cam);
-	map.loadMap("assets/level.tmx");
+	map.loadMap("assets/level01.tmx");
 
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
+
+	auto jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
+
+	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -98,7 +104,7 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 
-		playerController->Update(window, engine.deltaTime);
+		playerController->Update(window, engine.deltaTime, speaker);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
@@ -106,6 +112,10 @@ int main()
 
 		map.draw();
 		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
+
+		//speaker.Play(jumpSound);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
