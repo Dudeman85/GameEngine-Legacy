@@ -4,13 +4,26 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include "PlayerController.h"
 using namespace std;
 using namespace engine;
-
+// OpenGameArt
+// itchio
 ECS ecs;
 
 int main()
 {
+	/*
+	ecs.registerComponent<Player>();
+	shared_ptr<PlayerController> playerController = ecs.registerSystem<PlayerController>();
+	Signature playerControllerSignature;
+	playerControllerSignature.set(ecs.getComponentId<Transform>());
+	playerControllerSignature.set(ecs.getComponentId<Player>());
+	playerControllerSignature.set(ecs.getComponentId<Sprite>());
+	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
+	*/
 	//Create the window and OpenGL context before creating EngineLib
 	GLFWwindow* window = CreateWindow(800, 600, "Window");
 
@@ -78,9 +91,11 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		//std::this_thread::sleep_for(std::chrono::milliseconds{100});
-
+		
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+		
+
 #if 0
 		//test movement
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
