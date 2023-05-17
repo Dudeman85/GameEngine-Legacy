@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="demo2_tileset.tsx"/>
+ <layer id="2" name="collider" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYEAAfmb64YEA2Oylh9uIMXfUXtrYO1jilxZg1N5Re0ftHbV31N5Re0ftHbV31N7hZe9AYACupQi5
+  </data>
+ </layer>
+ <layer id="1" name="Tile Layer 1" width="30" height="30">
+  <properties>
+   <property name="Z" type="float" value="0"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztzaENADAIAEGW6KjsT6pwSDD3yeuL6HLx31v+0k0ul8vlcrlcLpfLHdyLC6VScww=
+  </data>
+ </layer>
+ <layer id="3" name="Tile Layer 2" width="30" height="30">
+  <properties>
+   <property name="Z" type="float" value="1"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJxjYBjZQIyZgWEnE4QGYXHmgXHHDaaBsdd0mPv3K9CeIGYIDcLBA+TfUTAKRsEoGAWjYBSMglEwCgYjAACtsgad
+  </data>
+ </layer>
+</map>
