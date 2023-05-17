@@ -32,7 +32,7 @@ int main()
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
 	
 	engine.physicsSystem->gravity = Vector2(0, 0);
-	engine.physicsSystem->step = 4;
+	engine.physicsSystem->step = 8;
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
@@ -66,7 +66,8 @@ int main()
 
 	RenderSystem::SetBackgroundColor(0.3f, 0.3f, 0.1f);
 	Tilemap map(&cam);
-	map.loadMap("assets/Test.tmx");
+	map.loadMap("assets/demo2.tmx");
+// TODO! Fixing tilemap position movement. Collider does not move with Tilemap.
 	//map.position = glm::vec3(500.0f, 0.0f, 0.0f);
 
 
