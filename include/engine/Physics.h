@@ -260,6 +260,9 @@ namespace engine
 		//Check intersect between tilemap collision layer and entity a
 		vector<Collision> TilemapIntersect(Entity entity)
 		{
+			Transform& transform = ecs.getComponent<Transform>(entity);
+			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
+
 			vector<Collision> collisions;
 
 			//Check for tilemap collision layer
@@ -273,11 +276,16 @@ namespace engine
 
 			//TODO automate making more checks if collider is bigger than tile
 			//Points to check at top-right, bottom-right, bottom-left, and top-left of the entity
-			vector<Vector2> checkPoints{ 
+			//Add the inbetween points too because im lazy
+			vector<Vector2> checkPoints{
 				Vector2(bounds[1], bounds[0]),
-				Vector2(bounds[1], bounds[2]), 
-				Vector2(bounds[3], bounds[2]), 
-				Vector2(bounds[3], bounds[0]) };
+				Vector2(bounds[1], bounds[2]),
+				Vector2(bounds[3], bounds[2]),
+				Vector2(bounds[3], bounds[0]),
+				Vector2(transform.x + collider.offset.x, bounds[0]),
+				Vector2(transform.x + collider.offset.x, bounds[2]),
+				Vector2(bounds[1], transform.y + collider.offset.y),
+				Vector2(bounds[3], transform.y + collider.offset.y) };
 
 			//Log each tile collision index, so it will only be counted once
 			vector<Vector2> loggedTiles;
