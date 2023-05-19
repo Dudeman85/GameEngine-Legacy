@@ -44,7 +44,7 @@ int main()
 	//Create a new entity
 	Entity player = ecs.newEntity();
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 10, .z = 0, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(player, Sprite{});
+	ecs.addComponent(player, Sprite{&texture});
 	//ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
