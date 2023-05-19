@@ -203,12 +203,12 @@ int main()
 		fireCooldown -= engine.deltaTime;
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
-		
+		engine.Update(&cam);
 		map.draw();
 		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
 		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
-		map.draw();
+		
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
