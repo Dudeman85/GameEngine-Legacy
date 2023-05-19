@@ -26,6 +26,8 @@ namespace engine
 	public:
 		SoundDevice* soundDevice;
 		double deltaTime = 0;
+		double programTime = 0;
+
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
@@ -92,6 +94,7 @@ namespace engine
 			chrono::duration<double> duration = thisFrame - lastFrame;
 			deltaTime = duration.count();
 			lastFrame = thisFrame;
+			programTime += deltaTime;
 
 			return deltaTime;
 		}

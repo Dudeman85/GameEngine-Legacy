@@ -97,13 +97,10 @@ int main()
 
 	//Define the test animation
 	Animator animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(40, 100));
+	auto testAnims = AnimationsFromSpritesheet("assets/vikingattack.png", 4, 1, vector<int>(4, 200));
 	AnimationSystem::AddAnimation(player, testAnims[0], "1");
-	AnimationSystem::AddAnimation(player, testAnims[1], "2");
-	AnimationSystem::AddAnimation(player, testAnims[2], "3");
-	AnimationSystem::AddAnimation(player, testAnims[3], "4");
-	AnimationSystem::AddAnimation(player, testAnims[4], "5");
-	AnimationSystem::PlayAnimation(player, "2", true);
+	//AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	AnimationSystem::PlayAnimation(player, "1", true);
 
 
 	//Top-Right
