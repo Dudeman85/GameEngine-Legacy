@@ -3,6 +3,7 @@
 
 #include "PlayerController.h"
 #include "PickupController.h"
+#include "EnemyController.h"
 
 #include <chrono>
 #include <thread>
@@ -18,7 +19,7 @@ int main()
 	GLFWwindow* window = CreateWindow(1000, 800, "Window");
 
 	//Create the camera
-	Camera cam = Camera(800, 600);
+	Camera cam = Camera(1000, 800);
 
 	//Initialize the default engine library
 	EngineLib engine;
@@ -35,7 +36,6 @@ int main()
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	playerControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
-
 	//Register Pickup Controller
 	ecs.registerComponent<Pickup>();
 	shared_ptr<PickupController> pickupController = ecs.registerSystem<PickupController>();
@@ -46,7 +46,17 @@ int main()
 	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
-
+	//Register Enemy Controller
+	ecs.registerComponent<Enemy>();
+	shared_ptr<EnemyController> enemyController = ecs.registerSystem<EnemyController>();
+	Signature enemyControllerSignature;
+	enemyControllerSignature.set(ecs.getComponentId<Transform>());
+	enemyControllerSignature.set(ecs.getComponentId<Enemy>());
+	enemyControllerSignature.set(ecs.getComponentId<Sprite>());
+	enemyControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	enemyControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	enemyControllerSignature.set(ecs.getComponentId<Animator>());
+	ecs.setSystemSignature<EnemyController>(enemyControllerSignature);
 
 	static SoundSource speaker;
 
@@ -55,46 +65,16 @@ int main()
 
 	//Create the player entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 250, .z = 0, .xScale = 50, .yScale = 50 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.65), .offset = Vector2(0, -16) });
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.5), .offset = Vector2(0, -18) });
 	ecs.addComponent(player, Player{});
 
 	//Add animation to player
 	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
 	AnimationSystem::AddAnimations(player, anims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
-
-	//Top-Right
-	Entity sprite2 = ecs.newEntity();
-	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite2, Sprite{ &texture });
-	ecs.addComponent(sprite2, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
-	//Bottom-Left
-	Entity sprite3 = ecs.newEntity();
-	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite3, Sprite{ &texture });
-	ecs.addComponent(sprite3, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite3, BoxCollider{});
-	Entity sprite6 = ecs.newEntity();
-	ecs.addComponent(sprite6, Transform{ .x = -320, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite6, Sprite{ &texture });
-	ecs.addComponent(sprite6, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite6, BoxCollider{});
-	//Top-Left
-	Entity sprite4 = ecs.newEntity();
-	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .gravityScale = 0, .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .kinematic = false });
-	ecs.addComponent(sprite4, BoxCollider{});
-	//Bottom-Right
-	Entity sprite5 = ecs.newEntity();
-	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite5, Sprite{ &texture });
-	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 2000), .drag = 0.25, .elasticity = 0.625, .kinematic = false });
-	ecs.addComponent(sprite5, BoxCollider{});
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
@@ -109,7 +89,10 @@ int main()
 
 	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
 
-	pickupController->CreatePickup(200, -100);
+	pickupController->CreatePickup(1780, -840);
+	pickupController->CreatePickup(915, -420);
+	pickupController->CreatePickup(624, -1250);
+	pickupController->CreatePickup(1750, -1505);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -130,7 +113,12 @@ int main()
 		engine.Update(&cam);
 
 		map.draw();
-		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
+
+		//Keep the camera in bounds of the tilemap
+		float camPosX = clamp(playerTransform.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		float camPosY = clamp(playerTransform.y, map.position.y - map.bounds.height + cam.width / 2, map.position.y - cam.width / 2);
+		cam.SetPosition(camPosX, camPosY, 100);
+
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
 

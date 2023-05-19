@@ -73,14 +73,12 @@ void Tilemap::draw()
 	for (const auto& layer : mapLayers)
 	{
 		layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
-		//layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 	}
 }
 
 void Tilemap::loadMap(const std::string ownMap)
 {
 	tmx::Map map;
-	//map.load("assets/demo.tmx");
 	map.load(ownMap);
 
 	//create shared resources, shader and tileset textures
@@ -121,8 +119,6 @@ void Tilemap::loadMap(const std::string ownMap)
 			{
 				// Get the custom property from Tiled Layer and place
 				// Custom int property for layer drawing order
-				//unsigned int tileSizeUnsigned = static_cast<unsigned int>(tileSize);
-				//mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures, tileSizeUnsigned));
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
 
 				

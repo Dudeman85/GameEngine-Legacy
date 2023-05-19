@@ -67,7 +67,7 @@ namespace engine
 
 		void Update(float deltaTime)
 		{
-			deltaTime = min(deltaTime, 0.5f);
+			deltaTime = min(deltaTime, 0.1f);
 
 			//For each physics step per frame
 			for (int i = 0; i < step; i++)
