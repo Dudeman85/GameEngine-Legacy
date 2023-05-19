@@ -29,6 +29,8 @@ struct Player
 
 	//Fix because of bad tilemap collision checking
 	int shouldWallslide = 0;
+
+	static SoundSource speaker;
 };
 
 //Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody, Animator
@@ -37,10 +39,12 @@ class PlayerController : public System
 public:
 	PlayerController()
 	{
-		jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
+		jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
+		swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+		stepSound = SoundBuffer::getFile()->addSoundEffect("assets/step.wav");
 	}
 
-	void Update(GLFWwindow* window, double deltaTime, SoundSource& speaker)
+	void Update(GLFWwindow* window, double deltaTime, SoundSource& speaker, SoundSource& walkSpeaker, SoundSource& swordSpeaker)
 	{
 		for (auto const& entity : entities)
 		{
@@ -54,7 +58,14 @@ public:
 			{
 				if (!animator.playingAnimation)
 				{
-					player.attacking = 0;
+					if (player.attacking < 2)
+					{
+						swordSpeaker.Play(swingSound);
+						player.attacking++;
+						AnimationSystem::PlayAnimation(entity, "Attack " + to_string(player.attacking));
+					}
+					else
+						player.attacking = 0;
 				}
 			}
 
@@ -90,9 +101,13 @@ public:
 			//Right
 			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && player.attacking == 0)
 			{
-				//If touching ground play run
+				//If touching ground play run and walk sound
 				if (collider.sidesCollided[Direction::down])
+				{
 					AnimationSystem::PlayAnimation(entity, "Run");
+					if (!walkSpeaker.isPlaying())
+						walkSpeaker.Play(stepSound);
+				}
 				transform.yRotation = 0;
 
 				if (rigidbody.velocity.x < player.maxSpeed)
@@ -113,7 +128,11 @@ public:
 			{
 				//If touching ground play run but mirror it
 				if (collider.sidesCollided[Direction::down])
+				{
 					AnimationSystem::PlayAnimation(entity, "Run");
+					if (!walkSpeaker.isPlaying())
+						walkSpeaker.Play(stepSound);
+				}
 				transform.yRotation = 180;
 
 				if (rigidbody.velocity.x > -player.maxSpeed)
@@ -232,13 +251,21 @@ public:
 			//Attack
 			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 			{
-				AnimationSystem::PlayAnimation(entity, "Attack 1");
-				player.attacking++;
-				player.attackHeld = true;
+				if (collider.sidesCollided[Direction::down])
+				{
+					if (!player.attackHeld)
+					{
+						if (!swordSpeaker.isPlaying())
+							swordSpeaker.Play(swingSound);
+						AnimationSystem::PlayAnimation(entity, "Attack 1");
+						player.attacking = 1;
+						player.attackHeld = true;
+					}
+				}
 			}
 			else
 			{
-				player.attackHeld = true;
+				player.attackHeld = false;
 			}
 
 			if (player.canWallJump > 0)
@@ -250,4 +277,6 @@ public:
 	}
 
 	uint32_t jumpSound;
+	uint32_t swingSound;
+	uint32_t stepSound;
 };

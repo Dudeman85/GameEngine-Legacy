@@ -31,7 +31,7 @@
 Demo 1 TODO list
 [ ] sound effects(walk sounds, attack sound, torch sound, waterfall sound) : Aleksi
 [ ] attack animations and hitboxes : Aleksi
-[ ] turret enemy(animation, projectile) : Aleksi
+[x] turret enemy(animation, projectile) : Aleksi
 [ ] torch and waterfall effects : Viksteri
 [ ] music : Viksteri
 [ ] collectible counter : Aaro
