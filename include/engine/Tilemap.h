@@ -46,6 +46,7 @@ public:
 
 	tmx::Vector2u tileSize;
 	glm::vec3 position;
+	tmx::FloatRect bounds;
 private:
 
 	void initGLStuff(const tmx::Map&);
@@ -54,7 +55,6 @@ private:
 	//A 2D vector of tile IDs used for simple tile collision checking
 	std::vector<std::vector<unsigned int>> collisionLayer;
 
-	tmx::FloatRect bounds;
 
 	std::vector<std::unique_ptr<MapLayer>> mapLayers;
 	std::vector<std::shared_ptr<engine::Texture>> allTextures;
