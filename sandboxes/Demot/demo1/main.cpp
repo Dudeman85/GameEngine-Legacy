@@ -69,12 +69,20 @@ int main()
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.5), .offset = Vector2(0, -18) });
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.6), .offset = Vector2(0, -18) });
 	ecs.addComponent(player, Player{});
 
 	//Add animation to player
 	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
 	AnimationSystem::AddAnimations(player, anims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
+
+	Entity waterfall = ecs.newEntity(); 
+	ecs.addComponent(waterfall, Transform{ .x = 300, .y = -200, .z = 10, .xScale = 80, .yScale = 40 });
+	ecs.addComponent(waterfall, Sprite{});
+	ecs.addComponent(waterfall, Animator{});
+	vector<Animation> waterfallAnims = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100));
+	AnimationSystem::AddAnimation(waterfall, waterfallAnims[0], "1");
+	AnimationSystem::PlayAnimation(waterfall, "1", true);
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
