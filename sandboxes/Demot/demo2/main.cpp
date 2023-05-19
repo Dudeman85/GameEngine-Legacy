@@ -7,16 +7,16 @@
 #include "PlayerController.h"
 using namespace std;
 using namespace engine;
-// OpenGameArt
-// itchio
+
 ECS ecs;
 
 int main()
 {
 
 	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
-
+	GLFWwindow* window = CreateWindow(1000, 800, "Window");
+	//Create the camera
+	Camera cam = Camera(1000, 800);
 
 	//Initialize the default engine library
 	EngineLib engine;
@@ -34,8 +34,7 @@ int main()
 	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 8;
 
-	//Create the camera
-	Camera cam = Camera(800, 600);
+	
 
 	Texture texture = Texture("assets/Gun_01.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
@@ -46,20 +45,22 @@ int main()
 	Entity player = ecs.newEntity();
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1, .xScale = 30, .yScale = 15 });
 	ecs.addComponent(player, Sprite{&texture});
-	//ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Player{});
-
-
+	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
+	ecs.addComponent(player, BoxCollider{});
+	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
+	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+	/*
 	Entity hull = ecs.newEntity();
-	Transform& hullTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
-	ecs.addComponent(player, Sprite{ &texture4 });
-	//ecs.addComponent(player, Animator{});
+	Transform& hullTransform = ecs.addComponent(hull, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
+	ecs.addComponent(hull, Sprite{ &texture4 });
+	
 	ecs.addComponent(hull, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	ecs.addComponent(hull, BoxCollider{});
 	ecs.addComponent(hull, Player{});
 	BoxCollider& hullCollider = ecs.getComponent<BoxCollider>(hull);
 	Rigidbody& hullRigidbody = ecs.getComponent<Rigidbody>(hull);
-
+	*/
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
@@ -75,11 +76,10 @@ int main()
 	RenderSystem::SetBackgroundColor(0.3f, 0.3f, 0.1f);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo2.tmx");
-// TODO! Fixing tilemap position movement. Collider does not move with Tilemap.
-	//map.position = glm::vec3(500.0f, 0.0f, 0.0f);
-
-
 	engine.physicsSystem->SetTilemap(&map);
+
+
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -122,7 +122,7 @@ int main()
 
 				// move player based on movement vector
 				engine.physicsSystem->Move(player, movement * engine.deltaTime);
-				engine.physicsSystem->Move(hull, movement * engine.deltaTime);
+				//engine.physicsSystem->Move(hull, movement * engine.deltaTime);
 
 			}
 
