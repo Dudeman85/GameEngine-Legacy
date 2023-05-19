@@ -40,7 +40,7 @@ public:
 		jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
 	}
 
-	void Update(GLFWwindow* window, double deltaTime, static SoundSource& speaker)
+	void Update(GLFWwindow* window, double deltaTime, SoundSource& speaker)
 	{
 		for (auto const& entity : entities)
 		{

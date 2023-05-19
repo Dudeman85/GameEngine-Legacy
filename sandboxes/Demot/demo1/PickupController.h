@@ -48,6 +48,9 @@ public:
 		ecs.addComponent(pickup, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
 		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
+		ecs.addComponent(pickup, Pickup{});
+
+		return pickup;
 	}
 
 	Texture* defaultTexture;
