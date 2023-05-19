@@ -4,6 +4,7 @@
 #include "PlayerController.h"
 #include "PickupController.h"
 #include "EnemyController.h"
+#include "TurretController.h"
 
 #include <chrono>
 #include <thread>
@@ -57,24 +58,34 @@ int main()
 	enemyControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	enemyControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<EnemyController>(enemyControllerSignature);
+	//Register Turret Controller
+	ecs.registerComponent<Turret>();
+	shared_ptr<TurretController> turretController = ecs.registerSystem<TurretController>();
+	Signature turretControllerSignature;
+	turretControllerSignature.set(ecs.getComponentId<Transform>());
+	turretControllerSignature.set(ecs.getComponentId<Turret>());
+	turretControllerSignature.set(ecs.getComponentId<Sprite>());
+	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	turretControllerSignature.set(ecs.getComponentId<Animator>());
+	ecs.setSystemSignature<TurretController>(turretControllerSignature);
 
 	static SoundSource speaker;
 
-	//Load a new texture
-	Texture texture = Texture("assets/strawberry.png");
-
 	//Create the player entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 0, .xScale = 50, .yScale = 50 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 1, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.6), .offset = Vector2(0, -18) });
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.625), .offset = Vector2(0, -18) });
 	ecs.addComponent(player, Player{});
 
 	//Add animation to player
-	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
-	AnimationSystem::AddAnimations(player, anims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
+	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 4, vector<int>(8 * 4, 100));
+	AnimationSystem::AddAnimations(player, anims, vector<string>{"Idle", "Run", "Wallslide", "Jump"});
+	vector<Animation> attackAnims = AnimationsFromSpritesheet("assets/warriorattack.png", 4, 4, vector<int>(4 * 4, 100));
+	AnimationSystem::AddAnimations(player, attackAnims, vector<string>{"Jump Attack", "Attack 1", "Attack 2", "Attack 3"});
 
 	Entity waterfall = ecs.newEntity(); 
 	ecs.addComponent(waterfall, Transform{ .x = 300, .y = -200, .z = 10, .xScale = 80, .yScale = 40 });
@@ -92,8 +103,6 @@ int main()
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
-
-	auto jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
 
 	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
 
