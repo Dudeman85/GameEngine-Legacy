@@ -47,6 +47,8 @@ int main()
 
 	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
+	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/bang_09.wav");
+	uint32_t sound4 = SoundBuffer::getFile()->addSoundEffect("assets/hit.wav");
 
 	MusicBuffer myMusic("assets/forest.wav");
 	myMusic.SetVolume(0.2f);
@@ -223,16 +225,15 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		{
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
-			mySpeaker1.Play(sound2);
+			mySpeaker1.Play(sound3);
 			engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
-			mySpeaker1.SetLooping(1);
+			mySpeaker1.SetLooping(0);
 			Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
 			engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
-			mySpeaker3.Play(sound2);
+			mySpeaker3.Play(sound4);
 		}
 
-		Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
-		engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
+		
 
 
 		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
@@ -240,13 +241,16 @@ int main()
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 			mySpeaker2.Play(sound2);
 			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
+		engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
+		mySpeaker4.Play(sound2);
 		}
 
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
-			mySpeaker2.Play(sound2);
+			mySpeaker2.Play(sound1);
 			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 		}
 		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);

@@ -40,17 +40,25 @@ int main()
 	Texture texture = Texture("assets/Gun_01.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
 	Texture texture3 = Texture("assets/bullet.png");
+	Texture texture4 = Texture("assets/Hull.png");
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 25, .y = 5, .z = 0, .xScale = 30, .yScale = 15 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1, .xScale = 30, .yScale = 15 });
 	ecs.addComponent(player, Sprite{&texture});
 	//ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{});
 	ecs.addComponent(player, Player{});
-	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
-	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+
+
+	Entity hull = ecs.newEntity();
+	Transform& hullTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
+	ecs.addComponent(player, Sprite{ &texture4 });
+	//ecs.addComponent(player, Animator{});
+	ecs.addComponent(hull, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
+	ecs.addComponent(hull, BoxCollider{});
+	ecs.addComponent(hull, Player{});
+	BoxCollider& hullCollider = ecs.getComponent<BoxCollider>(hull);
+	Rigidbody& hullRigidbody = ecs.getComponent<Rigidbody>(hull);
 
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
@@ -114,6 +122,7 @@ int main()
 
 				// move player based on movement vector
 				engine.physicsSystem->Move(player, movement * engine.deltaTime);
+				engine.physicsSystem->Move(hull, movement * engine.deltaTime);
 
 			}
 
