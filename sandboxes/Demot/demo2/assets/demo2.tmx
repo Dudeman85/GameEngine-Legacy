@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
  <tileset firstgid="1" source="demo2_tileset.tsx"/>
- <layer id="2" name="collider" width="30" height="30">
+ <layer id="2" name="collider" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJxjYEAAfmb64YEAA2kvrezGF7a0tpeQm0btHdr2DkS6IsZNo/aO2otNH7luHmr2UgpG7R0c9tKqbUSMvcSIjdpLmr3ExCU14hubveSYMVTtpRcYaHsHAgMAaVELCw==
+   eJzt2UEKgCAYBWGhA3j/27Zqaw9LGXUGXAXhB/4Lq16l1IMWudZ+V3a0npNL9qnjn5JZTWdgNQfx/PQ6aKYTHeR2cSTpYKWDlQ5WOljpYKWD1WjHrDuADlY6WOlgpYOVDlY6WCUO8rffJx1z9pe2s+Ptn8gI19d36WCdMx18x4rpYNU7C8R1A+eBGqc=
   </data>
  </layer>
- <layer id="1" name="Tile Layer 1" width="30" height="30">
+ <layer id="1" name="Tile Layer 1" width="50" height="50">
   <properties>
    <property name="Z" type="float" value="0"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJzt1ssNgCAMgOEu4ePAGMogygAu0f2Fk8S0+CCtUdvkP38hJBSAbVCxNI1yUm4b64j6zEUBd4iNRN5cc1/opmaioOCWMtdcc7/pcrs7398SLvfGpry5t939fTqAhXNd5X3nbul8R109/5/dCeg/wplChasZPtgK8fOH/Q==
+   eJztmtENgjAQhm8J1AfGsA6iPvDIFC6CA7iCTuAIjCQm1JyXtlgh5W9zX/IHYvrA57UJuaMnoj7j3Ilae58zF6Lbg+gpPcyYnJAexnOPzrC3PvvKsKsRv6WmGrMZsnVkJ9ZfWT0QPfbseXgOYn1H3+dc7qu1zkqsR+icy6Qk1oOfDxfqMY8l9hUCS9djLSqWkyNnsR69HqFwUOsRSwnviW/UAwv1wEI9sFAPLNQDC/XAQj2wUA8s1AML9cCiVA/ZI/LNH+wMItRTSsmUh68vaXuT6rEspXrI81ATtT6PmsIzu5RIj9D/PxXZy0+JemB7HOl/DzlbSUnJ9XDNsX4JUj1yxXo0az/IDBr2/VUJeQGqL9iM
   </data>
  </layer>
- <layer id="3" name="Tile Layer 2" width="30" height="30">
+ <layer id="3" name="Tile Layer 2" width="50" height="50">
   <properties>
    <property name="Z" type="float" value="1"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJxjYBgFQxnsYGJg2AnEYswQDGLTAxgz08eekW7vNTrFJzoIBPo3CAl/HSB3jALyQMsAxdeiAbB3P9DOA0B8kM523wXadw+I74/mjVFABhBFqrNh9C46pCVsdQo96reBshebHbSoV3egtcO+YbEjEEmeWvFNjl9MqRDu5MTdjdGyclADAIzPGTs=
+   eJztmckJwkAYhcekABfQLlxArMIF1JbsweVoD64XtQU3vKg1uJ59gwox5CDJDGbi++AjiDp5zzEQ8gtBCCG/ZWwJMYEZ++nU+nUifxTtz9e7iPQo2d6fCztR2Y+tK7ep+1FH7obDpqE9CCGEEEJU0TL0/tRNPwI9ZugwhwvDu+yR/wCPhvcghBBCyP/QjgnRgV3Yi+k5R/o1d3jPIORR9QxigOxDONLUQeJ+TixxPwMPwhLZV3ANN3CrqYvuHpITsp/hBV419fDK7NUtCHGsl4BJmFK09tgxi5PXwt1j3brjfRXXSxbfz8E8LCjq4ee3DjpbKeOcFViFNUU9/Pz3wzgj8rMfYZzZXZHpZj1nWN8eOesiJNw8ABCYM6s=
   </data>
  </layer>
- <layer id="4" name="Tile Layer 4" width="30" height="30">
+ <layer id="4" name="Tile Layer 4" width="50" height="50">
   <properties>
    <property name="Z" type="float" value="2"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztzccRgDAUxNC1r4Q+CH0Q+jDQPKEE1APDP+2b0VmSmdn/ziRddNOT4r5VlmpqqM1x345XTwONgd+J10wLrYHfwmujnY7Ar5mZmX3zAl1aB3c=
+   eJzt17cNAgEQBdG9SzEtYDJMCwdkmBYwGaYFTMuYEpiY8AhOK82TJv8bboQkSZIkSfr1LCJe9KZP0fSa+lplRJs61C2bXlPfiO1jmtA08R1Ltq9oTZvEdxzZfqIzXRLfIUmSpOb0+LP6NKBh4p+rYvuM5rRIfMeW7Tva0yHxHVe23+hOj8R3SJKk/3wBfsAMXw==
   </data>
  </layer>
 </map>
