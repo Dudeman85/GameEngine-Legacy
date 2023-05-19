@@ -154,11 +154,14 @@ int main()
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(1, 0, 0, 0);
+		engine.soundDevice->SetSourceLocation(2, 0, 0, 0);
+		engine.soundDevice->SetSourceLocation(4, 0, 0, 0);
+		/*engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
-		engine.soundDevice->SetSourceLocation(3, 500, 0, 1);
-
+		
+		*/engine.soundDevice->SetSourceLocation(3, 500, 0, 1);
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();
