@@ -89,7 +89,7 @@ int main()
 	//
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 60, .yScale = 40, .yRotation = 0 });
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40, .yRotation = 0 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0,  .friction = 0, .elasticity = 0 });
@@ -102,7 +102,7 @@ int main()
 	AnimationSystem::AddAnimation(player, testAnims[1], "2");
 	AnimationSystem::AddAnimation(player, testAnims[2], "3");
 	AnimationSystem::AddAnimation(player, testAnims[3], "4");
-	AnimationSystem::PlayAnimation(player, "1", true);
+	AnimationSystem::PlayAnimation(player, "2", true);
 
 
 	//Top-Right
