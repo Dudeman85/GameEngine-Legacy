@@ -31,8 +31,8 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	engine.physicsSystem->gravity = Vector2(0, 0);
-	engine.physicsSystem->step = 4;
+	//engine.physicsSystem->gravity = Vector2(0, 0);
+	//engine.physicsSystem->step = 4;
 
 	//Create the camera
 	Camera cam = Camera(800, 600);
@@ -89,7 +89,7 @@ int main()
 	//
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40, .yRotation = 0 });
+	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 60, .yScale = 40, .yRotation = 0 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0,  .friction = 0, .elasticity = 0 });
@@ -97,9 +97,11 @@ int main()
 
 	//Define the test animation
 	Animator animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("assets/vikingattack.png", 4, 1, vector<int>(4, 200));
+	auto testAnims = AnimationsFromSpritesheet("assets/warriorattack.png", 4, 4, vector<int>(16, 200));
 	AnimationSystem::AddAnimation(player, testAnims[0], "1");
-	//AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	AnimationSystem::AddAnimation(player, testAnims[1], "2");
+	AnimationSystem::AddAnimation(player, testAnims[2], "3");
+	AnimationSystem::AddAnimation(player, testAnims[3], "4");
 	AnimationSystem::PlayAnimation(player, "1", true);
 
 
