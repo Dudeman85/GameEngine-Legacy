@@ -16,10 +16,10 @@ namespace engine
 	{
 	private:
 		Texture(const Texture&);
-		Texture operator=(const Texture&);
 
 	public:
-		Texture(int sx, int sy,const std::vector<std::uint16_t>& data) {
+		Texture(int sx, int sy, const std::vector<std::uint16_t>& data)
+		{
 
 			//Generate and bind texture
 			glGenTextures(1, &id);

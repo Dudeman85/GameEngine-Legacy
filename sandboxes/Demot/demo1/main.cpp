@@ -1,4 +1,4 @@
-
+#include <engine/Application.h>
 #include <engine/Tilemap.h>
 
 #include "PlayerController.h"
@@ -14,10 +14,15 @@ ECS ecs;
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
+	GLFWwindow* window = CreateWindow(1000, 800, "Window");
+
+	//Create the camera
+	Camera cam = Camera(800, 600);
 
 	//Initialize the default engine library
 	EngineLib engine;
+
+	static SoundSource speaker;
 
 	//Register Player Controller
 	ecs.registerComponent<Player>();
@@ -28,33 +33,24 @@ int main()
 	playerControllerSignature.set(ecs.getComponentId<Sprite>());
 	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	playerControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
-
-	engine.physicsSystem->gravity = Vector2(0, -10000);
-	engine.physicsSystem->step = 4;
-
-	//Create the camera
-	Camera cam = Camera(800, 600);
 
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
 
-	//Create a new entity
+	//Create the player entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 25, .z = 0, .xScale = 60, .yScale = 60 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 250, .z = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
-	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.5, 0.65), .offset = Vector2(0, -18.5) });
+	ecs.addComponent(player, Rigidbody{});
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.65), .offset = Vector2(0, -16) });
 	ecs.addComponent(player, Player{});
-	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
-	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
 
-	//Define the test animation
-	Animator& animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
-	AnimationSystem::AddAnimations(player, testAnims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
-	AnimationSystem::PlayAnimation(player, "Idle", true);
+	//Add animation to player
+	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 5, vector<int>(8 * 5, 100));
+	AnimationSystem::AddAnimations(player, anims, vector<string>{"Idle", "Run", "Wallslide", "Jump", "Attack 1"});
 
 	//Top-Right
 	Entity sprite2 = ecs.newEntity();
@@ -89,9 +85,15 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
 	Tilemap map(&cam);
-	map.loadMap("assets/level.tmx");
+	map.loadMap("assets/level01.tmx");
 
+	//Set the gravity and tilemap collider
+	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
+
+	auto jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
+
+	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -101,20 +103,19 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		if (playerCollider.sidesCollided[Direction::up])
-		{
-			cout << "a";
-		}
 
-
-		playerController->Update(window, engine.deltaTime);
+		playerController->Update(window, engine.deltaTime, speaker);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
 		map.draw();
-		cam.SetPosition(playerTransform.x, playerTransform.y, + 100);
+		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
+
+		//speaker.Play(jumpSound);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

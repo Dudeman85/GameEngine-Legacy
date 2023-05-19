@@ -9,6 +9,8 @@ using namespace engine;
 //Player Component
 struct Player
 {
+	int attacking;
+	bool attackHeld = false;
 	bool jumpHeld = false;
 	bool jumping = false;
 	bool wallJumping = false;
@@ -23,70 +25,46 @@ struct Player
 	float canWallJump = 0;
 	int wallJumpDir = 0;
 	float maxWallJumpSpeed = 4000;
-	float wallJumpAccelSpeed = 2000;
+	float wallJumpAccelSpeed = 1500;
+
+	//Fix because of bad tilemap collision checking
+	int shouldWallslide = 0;
 };
 
-//Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody
+//Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody, Animator
 class PlayerController : public System
 {
 public:
-	PlayerController() {}
+	PlayerController()
+	{
+		jumpSound = SoundBuffer::getFile()->addSoundEffect("jump.wav");
+	}
 
-	void Update(GLFWwindow* window, double deltaTime)
+	void Update(GLFWwindow* window, double deltaTime, SoundSource& speaker)
 	{
 		for (auto const& entity : entities)
 		{
 			Player& player = ecs.getComponent<Player>(entity);
+			Transform& transform = ecs.getComponent<Transform>(entity);
 			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
+			Animator& animator = ecs.getComponent<Animator>(entity);
 
-			//Movement
-			//Right
-			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			if (player.attacking > 0)
 			{
-				if (rigidbody.velocity.x < player.maxSpeed)
+				if (!animator.playingAnimation)
 				{
-					Vector2 impulse;
-
-					//Decelerate faster
-					if (rigidbody.velocity.x < 0)
-						impulse = Vector2(min(player.accelSpeed * player.reactivityMult, player.maxSpeed - rigidbody.velocity.x), 0);
-					else
-						impulse = Vector2(min(player.accelSpeed, player.maxSpeed - rigidbody.velocity.x), 0);
-
-					PhysicsSystem::Impulse(entity, impulse);
-				}
-			}
-			//Left
-			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			{
-				if (rigidbody.velocity.x > -player.maxSpeed)
-				{
-					Vector2 impulse;
-
-					//Decelerate faster
-					if (rigidbody.velocity.x > 0)
-						impulse = Vector2(max(-player.accelSpeed * player.reactivityMult, -player.maxSpeed - rigidbody.velocity.x), 0);
-					else
-						impulse = Vector2(max(-player.accelSpeed, -player.maxSpeed - rigidbody.velocity.x), 0);
-
-					PhysicsSystem::Impulse(entity, impulse);
-				}
-			}
-			//No direction
-			else
-			{
-				//Slow the player down aka friction
-				if (abs(rigidbody.velocity.x) > 0)
-				{
-					//If touching ground decelerate faster
-					rigidbody.velocity.x -= (rigidbody.velocity.x / abs(rigidbody.velocity.x) * min(player.accelSpeed, abs(rigidbody.velocity.x)));
+					player.attacking = 0;
 				}
 			}
 
 			//Set can wall jump for 100ms after touching wall
 			if (collider.sidesCollided[Direction::left] || collider.sidesCollided[Direction::right])
 			{
+				//If not touching ground play wallslide
+				if (!collider.sidesCollided[Direction::down])
+					player.shouldWallslide = 4;
+
 				//Enable Walljump
 				if (!player.jumpHeld && !collider.sidesCollided[Direction::down])
 				{
@@ -109,18 +87,76 @@ public:
 				rigidbody.velocity.y = max(rigidbody.velocity.y, -1000.f);
 			}
 
+			//Right
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && player.attacking == 0)
+			{
+				//If touching ground play run
+				if (collider.sidesCollided[Direction::down])
+					AnimationSystem::PlayAnimation(entity, "Run");
+				transform.yRotation = 0;
+
+				if (rigidbody.velocity.x < player.maxSpeed)
+				{
+					Vector2 impulse;
+
+					//Decelerate faster
+					if (rigidbody.velocity.x < 0)
+						impulse = Vector2(min(player.accelSpeed * player.reactivityMult, player.maxSpeed - rigidbody.velocity.x), 0);
+					else
+						impulse = Vector2(min(player.accelSpeed, player.maxSpeed - rigidbody.velocity.x), 0);
+
+					PhysicsSystem::Impulse(entity, impulse);
+				}
+			}
+			//Left
+			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && player.attacking == 0)
+			{
+				//If touching ground play run but mirror it
+				if (collider.sidesCollided[Direction::down])
+					AnimationSystem::PlayAnimation(entity, "Run");
+				transform.yRotation = 180;
+
+				if (rigidbody.velocity.x > -player.maxSpeed)
+				{
+					Vector2 impulse;
+
+					//Decelerate faster
+					if (rigidbody.velocity.x > 0)
+						impulse = Vector2(max(-player.accelSpeed * player.reactivityMult, -player.maxSpeed - rigidbody.velocity.x), 0);
+					else
+						impulse = Vector2(max(-player.accelSpeed, -player.maxSpeed - rigidbody.velocity.x), 0);
+
+					PhysicsSystem::Impulse(entity, impulse);
+				}
+			}
+			//No direction
+			else
+			{
+				//If touching ground play idle
+				if (collider.sidesCollided[Direction::down] && player.attacking == 0)
+					AnimationSystem::PlayAnimation(entity, "Idle");
+
+				//Slow the player down aka friction
+				if (abs(rigidbody.velocity.x) > 0)
+				{
+					//If touching ground decelerate faster
+					rigidbody.velocity.x -= (rigidbody.velocity.x / abs(rigidbody.velocity.x) * min(player.accelSpeed, abs(rigidbody.velocity.x)));
+				}
+			}
+
 			//When jump is pressed
-			if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && player.attacking == 0)
 			{
 				//If touching ground
 				if (collider.sidesCollided[Direction::down])
 				{
 					player.jumping = true;
+					speaker.Play(jumpSound);
 				}
-				else
+				else if (player.canWallJump > 0)
 				{
-					if (player.canWallJump > 0)
-						player.wallJumping = true;
+					player.wallJumping = true;
+					speaker.Play(jumpSound);
 				}
 
 				//Accelerate to max jump speed while holding jump
@@ -152,11 +188,11 @@ public:
 
 					if (rigidbody.velocity.y + player.wallJumpAccelSpeed < player.maxWallJumpSpeed)
 					{
-						PhysicsSystem::Impulse(entity, Vector2(player.wallJumpDir * player.wallJumpAccelSpeed / 2, player.wallJumpAccelSpeed));
+						PhysicsSystem::Impulse(entity, Vector2(player.wallJumpDir * player.wallJumpAccelSpeed / 1.5, player.wallJumpAccelSpeed));
 					}
 					else //Once max speed has been reached
 					{
-						rigidbody.velocity = Vector2(player.wallJumpDir * player.maxWallJumpSpeed / 2, player.maxWallJumpSpeed);
+						rigidbody.velocity = Vector2(player.wallJumpDir * player.maxWallJumpSpeed / 1.5, player.maxWallJumpSpeed);
 						player.wallJumping = false;
 					}
 				}
@@ -165,7 +201,9 @@ public:
 					player.wallJumpDir = 0;
 				}
 
-				player.jumpHeld = true;
+				if (!player.jumpHeld)
+
+					player.jumpHeld = true;
 			}
 			else
 			{
@@ -182,8 +220,34 @@ public:
 				}
 			}
 
+			//If in the air play Jump
+			if (!collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
+				AnimationSystem::PlayAnimation(entity, "Jump");
+
+			//This is not a good fix
+			player.shouldWallslide--;
+			if (player.shouldWallslide > 0)
+				AnimationSystem::PlayAnimation(entity, "Wallslide");
+
+			//Attack
+			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			{
+				AnimationSystem::PlayAnimation(entity, "Attack 1");
+				player.attacking++;
+				player.attackHeld = true;
+			}
+			else
+			{
+				player.attackHeld = true;
+			}
+
 			if (player.canWallJump > 0)
 				player.canWallJump -= deltaTime;
+
+			//Lock the max fall speed
+			rigidbody.velocity.y = max(rigidbody.velocity.y, -8000.f);
 		}
 	}
+
+	uint32_t jumpSound;
 };
