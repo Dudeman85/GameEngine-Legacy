@@ -71,14 +71,17 @@ int main()
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
 
 	static SoundSource speaker;
+	static SoundSource walkSpeaker;
+	static SoundSource swordSpeaker;
+	static SoundSource mageSpeaker;
 
 	//Create the player entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 1, .xScale = 50, .yScale = 50 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
-	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.625), .offset = Vector2(0, -18) });
+	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.61), .offset = Vector2(0, -18) });
 	ecs.addComponent(player, Player{});
 
 	//Add animation to player
@@ -87,7 +90,7 @@ int main()
 	vector<Animation> attackAnims = AnimationsFromSpritesheet("assets/warriorattack.png", 4, 4, vector<int>(4 * 4, 100));
 	AnimationSystem::AddAnimations(player, attackAnims, vector<string>{"Jump Attack", "Attack 1", "Attack 2", "Attack 3"});
 
-	Entity waterfall = ecs.newEntity(); 
+	Entity waterfall = ecs.newEntity();
 	ecs.addComponent(waterfall, Transform{ .x = 300, .y = -200, .z = 10, .xScale = 80, .yScale = 40 });
 	ecs.addComponent(waterfall, Sprite{});
 	ecs.addComponent(waterfall, Animator{});
@@ -99,13 +102,14 @@ int main()
 
 	Tilemap map(&cam);
 	map.loadMap("assets/level01.tmx");
-
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
 
-	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
-
+	speaker.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
+	mageSpeaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
+	swordSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
 	pickupController->CreatePickup(1780, -840);
 	pickupController->CreatePickup(915, -420);
 	pickupController->CreatePickup(624, -1250);
@@ -114,6 +118,10 @@ int main()
 	turretController->player = player;
 	turretController->CreateTurret(500, 0);
 
+	auto swingSound = SoundBuffer::getFile()->addSoundEffect("assets/step.wav");
+
+	mageSpeaker.Play(swingSound);
+	mageSpeaker.SetLooping(1);
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -123,9 +131,11 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+		{
 			cout << playerTransform.x << ", " << playerTransform.y << endl;
+		}
 
-		playerController->Update(window, engine.deltaTime, speaker);
+		playerController->Update(window, engine.deltaTime, speaker, walkSpeaker, swordSpeaker);
 		pickupController->Update(player, engine.programTime);
 		turretController->Update(engine.deltaTime);
 
@@ -140,8 +150,14 @@ int main()
 		float camPosY = clamp(playerTransform.y, map.position.y - map.bounds.height + cam.width / 2, map.position.y - cam.width / 2);
 		cam.SetPosition(camPosX, camPosY, 100);
 
+
+		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
+		engine.soundDevice->SetSourceLocation(3, 500, 0, 1);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
