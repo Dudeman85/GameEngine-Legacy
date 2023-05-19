@@ -140,6 +140,8 @@ int main()
 				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
 				TransformSystem::SetPosition(crosshair, crosshairPosition);
 
+				float turretRotation(playerTransform.zRotation = atan2f(-rightThumbstick.y, rightThumbstick.x)*180 /3.14f);
+
 				if (fireCooldown <= 0)
 				{
 					if (axes[5] > 0.5f)
