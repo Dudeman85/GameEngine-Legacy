@@ -2,6 +2,7 @@
 #include <engine/Tilemap.h>
 
 #include "PlayerController.h"
+#include "PickupController.h"
 
 #include <chrono>
 #include <thread>
@@ -22,8 +23,7 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
-	static SoundSource speaker;
-
+	//Register Custom Systems
 	//Register Player Controller
 	ecs.registerComponent<Player>();
 	shared_ptr<PlayerController> playerController = ecs.registerSystem<PlayerController>();
@@ -35,6 +35,20 @@ int main()
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	playerControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
+
+	//Register Pickup Controller
+	ecs.registerComponent<Pickup>();
+	shared_ptr<PickupController> pickupController = ecs.registerSystem<PickupController>();
+	Signature pickupControllerSignature;
+	pickupControllerSignature.set(ecs.getComponentId<Transform>());
+	pickupControllerSignature.set(ecs.getComponentId<Pickup>());
+	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
+	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
+
+
+	static SoundSource speaker;
 
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
@@ -95,6 +109,8 @@ int main()
 
 	speaker.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
 
+	pickupController->CreatePickup(200, -100);
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -103,8 +119,11 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
+		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+			cout << playerTransform.x << ", " << playerTransform.y << endl;
 
 		playerController->Update(window, engine.deltaTime, speaker);
+		pickupController->Update(player, engine.programTime);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
@@ -114,8 +133,6 @@ int main()
 		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
-
-		//speaker.Play(jumpSound);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
