@@ -9,7 +9,7 @@ using namespace engine;
 //Player Component
 struct Player
 {
-	float moveSpeed = 50000.f;
+	float moveSpeed = 500.f;
 	
 	
 };

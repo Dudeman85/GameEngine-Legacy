@@ -37,13 +37,13 @@ int main()
 	//Create the camera
 	Camera cam = Camera(800, 600);
 
-	Texture texture = Texture("assets/strawberry.png");
+	Texture texture = Texture("assets/Gun_01.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
 	Texture texture3 = Texture("assets/bullet.png");
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 10, .y = 10, .z = 0, .xScale = 20, .yScale = 20 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 25, .y = 5, .z = 0, .xScale = 30, .yScale = 15 });
 	ecs.addComponent(player, Sprite{&texture});
 	//ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
@@ -61,7 +61,7 @@ int main()
 	vector <Entity>bullets;
 
 
-	float fireCooldown = 0.4f;
+	float fireCooldown = 0.04f;
 	bool canFire = true;
 
 	RenderSystem::SetBackgroundColor(0.3f, 0.3f, 0.1f);
@@ -90,7 +90,7 @@ int main()
 			GLFWgamepadstate state;
 
 			// set player speed
-			float playerSpeed = 50000.0f;
+			float playerSpeed = 500.0f;
 			//define deadzone
 			float deadzoneSize = 0.5f;
 			//calculate deadzone barrier
@@ -148,18 +148,15 @@ int main()
 					{
 
 						Entity bullet = ecs.newEntity();
-						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 1, .xScale = 5, .yScale = 5 });
 						ecs.addComponent(bullet, Sprite{ &texture3 });
-						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
+						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
 						bullets.push_back(bullet);
 						fireCooldown = 0.4f;
 					}
 				}
-				else
-				{
-					fireCooldown -= engine.deltaTime;
-				}
+				
 
 				// set camera location between player and crosshair
 				//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
@@ -168,7 +165,7 @@ int main()
 			{
 				ecs.getComponent<Sprite>(crosshair).enabled = false;
 			}
-
+			
 			for (const Entity& bullet : bullets)
 			{
 				auto hit = ecs.getComponent<BoxCollider>(bullet);
@@ -194,11 +191,10 @@ int main()
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+		fireCooldown -= engine.deltaTime;
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
-		engine.Update(&cam);
-
+		
 		map.draw();
 		cam.SetPosition(playerTransform.x, playerTransform.y, +100);
 
