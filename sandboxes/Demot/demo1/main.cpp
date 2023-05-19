@@ -111,6 +111,9 @@ int main()
 	pickupController->CreatePickup(624, -1250);
 	pickupController->CreatePickup(1750, -1505);
 
+	turretController->player = player;
+	turretController->CreateTurret(500, 0);
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -124,6 +127,7 @@ int main()
 
 		playerController->Update(window, engine.deltaTime, speaker);
 		pickupController->Update(player, engine.programTime);
+		turretController->Update(engine.deltaTime);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
