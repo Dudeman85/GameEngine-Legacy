@@ -90,7 +90,7 @@ int main()
 			GLFWgamepadstate state;
 
 			// set player speed
-			float playerSpeed = 500.0f;
+			float playerSpeed = 50000.0f;
 			//define deadzone
 			float deadzoneSize = 0.5f;
 			//calculate deadzone barrier
