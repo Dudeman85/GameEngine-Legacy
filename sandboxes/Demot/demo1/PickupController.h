@@ -31,12 +31,13 @@ public:
 
 			//If floating animate it
 			if (pickup.floating)
-				transform.y += sin(programTime);
+				transform.y += sin(programTime * 3) * 0.5;
 
 			if (collider.collisions.end() != find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) { return collision.a == player; }))
 			{
 				collected++;
 				ecs.destroyEntity(entity);
+				break;
 			}
 		}
 	}

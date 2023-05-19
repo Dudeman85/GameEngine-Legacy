@@ -73,14 +73,12 @@ void Tilemap::draw()
 	for (const auto& layer : mapLayers)
 	{
 		layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
-		//layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 	}
 }
 
 void Tilemap::loadMap(const std::string ownMap)
 {
 	tmx::Map map;
-	//map.load("assets/demo.tmx");
 	map.load(ownMap);
 
 	//create shared resources, shader and tileset textures
@@ -121,8 +119,6 @@ void Tilemap::loadMap(const std::string ownMap)
 			{
 				// Get the custom property from Tiled Layer and place
 				// Custom int property for layer drawing order
-				//unsigned int tileSizeUnsigned = static_cast<unsigned int>(tileSize);
-				//mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures, tileSizeUnsigned));
 				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
 
 				
@@ -148,11 +144,11 @@ unsigned int Tilemap::checkCollision(float x, float y)
 	if (collisionLayer.empty())
 		return 0;
 
-	int xIndex = floor((x - position.x) / tileSize.x);
+	int xIndex = floor((x + position.x) / tileSize.x);
 	int yIndex = floor((-y + position.y) / tileSize.y);
 
 	//Check out of bounds
-	if (abs(xIndex) >= collisionLayer.size() || abs(yIndex) >= collisionLayer[0].size() || y >= position.y || x <= position.x)
+	if (xIndex >= collisionLayer.size() || yIndex >= collisionLayer[0].size() || xIndex < 0 || yIndex < 0)
 		return 0;
 
 	return collisionLayer[xIndex][yIndex];

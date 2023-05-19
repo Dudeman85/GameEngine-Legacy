@@ -135,6 +135,11 @@ public:
 		//Return a reference to entity's component
 		return componentArray[entityToIndex[entity]];
 	}
+
+	bool hasComponent(Entity entity)
+	{
+		return entityToIndex.count(entity) > 0;
+	}
 };
 
 //Stores and manages every component array
@@ -197,6 +202,14 @@ public:
 	{
 		//Call the getComponent method of the correct component array
 		return getComponentArray<T>()->getComponent(entity);
+	}
+
+	//Check if entity has a component
+	template<typename T>
+	bool hasComponent(Entity entity)
+	{
+		//Call the getComponent method of the correct component array
+		return getComponentArray<T>()->hasComponent(entity);
 	}
 
 	void destroyEntity(Entity entity, Signature signature)
@@ -370,6 +383,13 @@ public:
 	T& getComponent(Entity entity)
 	{
 		return componentManager->getComponent<T>(entity);
+	}
+
+	//Returns true if entity has desired component
+	template<typename T>
+	bool hasComponent(Entity entity)
+	{
+		return componentManager->hasComponent<T>(entity);
 	}
 
 	//Returns the id of the component type
