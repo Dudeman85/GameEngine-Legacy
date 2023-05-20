@@ -5,6 +5,9 @@
 #include <chrono>
 #include <thread>
 #include "PlayerController.h"
+#include "PickupController.h"
+#include "TurretController.h"
+
 using namespace std;
 using namespace engine;
 
@@ -30,7 +33,19 @@ int main()
 	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
-	
+	//Register Turret Controller
+	ecs.registerComponent<Turret>();
+	shared_ptr<TurretController> turretController = ecs.registerSystem<TurretController>();
+	Signature turretControllerSignature;
+	turretControllerSignature.set(ecs.getComponentId<Transform>());
+	turretControllerSignature.set(ecs.getComponentId<Turret>());
+	turretControllerSignature.set(ecs.getComponentId<Sprite>());
+	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	ecs.setSystemSignature<TurretController>(turretControllerSignature);
+
+
+
 	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 8;
 
@@ -50,6 +65,10 @@ int main()
 	ecs.addComponent(player, BoxCollider{});
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+
+
+	turretController->player = player;
+	turretController->CreateTurret(1000, -1000);
 	/*
 	Entity hull = ecs.newEntity();
 	Transform& hullTransform = ecs.addComponent(hull, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
@@ -77,7 +96,7 @@ int main()
 	Tilemap map(&cam);
 	map.loadMap("assets/demo2.tmx");
 	engine.physicsSystem->SetTilemap(&map);
-
+	engine.renderSystem->SetTilemap(&map);
 
 
 	//Game Loop
@@ -201,14 +220,13 @@ int main()
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		fireCooldown -= engine.deltaTime;
+
+		turretController->Update(engine.deltaTime);
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-		map.draw();
-		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
-		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
-		
+		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

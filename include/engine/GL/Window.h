@@ -36,10 +36,6 @@ namespace engine
 			}
 		);
 
-		//Enable Depth buffering
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-
 		OPENGL_INITIALIZED = true;
 
 		return window;

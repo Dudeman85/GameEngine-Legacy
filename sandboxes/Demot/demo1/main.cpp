@@ -112,12 +112,12 @@ int main()
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
+	engine.renderSystem->SetTilemap(&map);
 
 	speaker.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
 	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
 	mageSpeaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
 	swordSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
-
 
 	pickupController->CreatePickup(1780, -840);
 	pickupController->CreatePickup(915, -420);
@@ -151,8 +151,6 @@ int main()
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-
-		map.draw();
 
 		//Keep the camera in bounds of the tilemap
 		float camPosX = clamp(playerTransform.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);

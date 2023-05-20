@@ -8,7 +8,9 @@ using namespace engine;
 struct Turret
 {
 	int health = 1;
-	float projectileTimer = 2;
+	float projectileTimer = 0.2f;
+	int shotsBeforeReload = 10;
+	float reloadTime = 3;
 };
 
 struct Projectile
@@ -16,7 +18,7 @@ struct Projectile
 	int damage = 1;
 };
 
-//Pickup controller system requires sprite, transform, rigidbody, box collider, animator and Projectile
+//Pickup controller system requires sprite, transform, rigidbody, box collider and Projectile
 class ProjectileController : public System
 {
 public:
@@ -50,8 +52,8 @@ class TurretController : public System
 public:
 	TurretController()
 	{
-		animation = AnimationsFromSpritesheet("assets/mageattack.png", 4, 1, vector<int>(4 * 1, 250))[0];
-		projectileAnim = AnimationsFromSpritesheet("assets/magebullet.png", 5, 1, vector<int>(5 * 1, 50))[0];
+		defaultTexture = new Texture("assets/Gun_06.png");
+		projectileTexture = new Texture("assets/bullet.png");
 
 		//Register Projectile Controller
 		ecs.registerComponent<Projectile>();
@@ -62,7 +64,6 @@ public:
 		projectileControllerSignature.set(ecs.getComponentId<Sprite>());
 		projectileControllerSignature.set(ecs.getComponentId<Rigidbody>());
 		projectileControllerSignature.set(ecs.getComponentId<BoxCollider>());
-		projectileControllerSignature.set(ecs.getComponentId<Animator>());
 		ecs.setSystemSignature<ProjectileController>(projectileControllerSignature);
 	}
 
@@ -74,24 +75,33 @@ public:
 		{
 			Turret& turret = ecs.getComponent<Turret>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
-			Entity playerAttack = ecs.getComponent<Player>(player).attackHitbox;
+
 
 			if (TransformSystem::Distance(entity, player) < 400)
 			{
-				if (PhysicsSystem::AABBIntersect(entity, playerAttack).type != Collision::Type::miss)
+				transform.zRotation = TransformSystem::Angle(entity, player);
+				if (turret.shotsBeforeReload > 0)
 				{
-					ecs.destroyEntity(entity);
-					break;
-				}
-
-				if (turret.projectileTimer <= 0)
-				{
-					SpawnProjectile(player, transform.x, transform.y, 2000);
-					turret.projectileTimer = 2;
+					if (turret.projectileTimer <= 0)
+					{
+						SpawnProjectile(player, transform.x, transform.y, 5000);
+						turret.projectileTimer = 0.2;
+						turret.shotsBeforeReload--;
+					}
+					else
+					{
+						turret.projectileTimer -= deltaTime;
+					}
 				}
 				else
 				{
-					turret.projectileTimer -= deltaTime;
+					if (turret.reloadTime <= 0)
+					{
+						turret.shotsBeforeReload = 10;
+						turret.reloadTime = 3;
+					}
+					else
+						turret.reloadTime -= deltaTime;
 				}
 			}
 		}
@@ -102,33 +112,27 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 20, .yScale = 20 });
-		ecs.addComponent(projectile, Sprite{});
+		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 10, .yScale = 10 });
+		ecs.addComponent(projectile, Sprite{ .texture = projectileTexture });
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
-		ecs.addComponent(projectile, Animator{});
 		ecs.addComponent(projectile, Projectile{});
-		AnimationSystem::AddAnimation(projectile, projectileAnim, "default");
-		AnimationSystem::PlayAnimation(projectile, "default", true);
 	}
 
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 0, .xScale = 28, .yScale = 37 });
-		ecs.addComponent(turret, Sprite{});
+		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1, .xScale = 40, .yScale = 20 });
+		ecs.addComponent(turret, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
-		ecs.addComponent(turret, BoxCollider{ .scale = Vector2(0.9, 1), .offset = Vector2(0, 2) });
-		ecs.addComponent(turret, Animator{});
+		ecs.addComponent(turret, BoxCollider{});
 		ecs.addComponent(turret, Turret{});
-		AnimationSystem::AddAnimation(turret, animation, "default");
-		AnimationSystem::PlayAnimation(turret, "default", true);
 
 		return turret;
 	}
 
 	Entity player;
 	shared_ptr<ProjectileController> projectileController;
-	Animation animation;
-	Animation projectileAnim;
+	Texture* defaultTexture;
+	Texture* projectileTexture;
 };

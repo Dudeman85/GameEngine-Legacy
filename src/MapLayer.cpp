@@ -64,7 +64,7 @@ MapLayer::~MapLayer()
 //void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc, unsigned int tileSizeLoc)
 void MapLayer::draw(glm::mat4 model, unsigned int modelLoc, unsigned int tilesetCountLoc, unsigned int tileSizeLoc)
 {
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, zOffset));
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, zLayer));
     model = glm::rotate(model, (float)M_PI, glm::vec3(1.0f, 0.0f, 0.0f));
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 

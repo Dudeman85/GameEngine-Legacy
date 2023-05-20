@@ -36,16 +36,14 @@ class MapLayer final
 {
 public:
 	MapLayer(const tmx::Map&, std::size_t, const std::vector <std::shared_ptr<engine::Texture>>& textures);
-	//MapLayer(const tmx::Map&, std::size_t, const std::vector <std::shared_ptr<engine::Texture>>& textures, tmx::Vector2u tileSize);
 	~MapLayer();
-
+	
 	MapLayer(const MapLayer&) = delete;
 	MapLayer& operator = (const MapLayer&) = delete;
-
+	
 	void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, unsigned int);
-	//void draw(glm::mat4 model, unsigned int modelLoc, unsigned int, tmx::Vector2u);
 
-	float zOffset = 0;
+	float zLayer = 0;
 	glm::vec2 tileSize;
 private:
 	std::vector < std::shared_ptr<engine::Texture> > m_allTextures;
@@ -64,5 +62,4 @@ private:
 	std::vector<Subset> m_subsets;
 
 	void createSubsets(const tmx::Map&, std::size_t);
-	//void createSubsets(const tmx::Map&, std::size_t, unsigned int);
 };

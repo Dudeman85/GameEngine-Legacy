@@ -69,5 +69,13 @@ namespace engine
 
 			return sqrt(pow(bTransform.x - aTransform.x, 2) + pow(bTransform.y - aTransform.y, 2));
 		}
+		//Get the angle of b with a as the origin
+		static float Angle(Entity a, Entity b)
+		{
+			Transform& aTransform = ecs.getComponent<Transform>(a);
+			Transform& bTransform = ecs.getComponent<Transform>(b);
+
+			return glm::degrees(atan2(bTransform.y - aTransform.y, bTransform.x - aTransform.x));
+		}
 	};
 }

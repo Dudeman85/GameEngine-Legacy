@@ -50,8 +50,11 @@ Tilemap::~Tilemap()
 {
 }
 
-void Tilemap::draw()
+void Tilemap::draw(float layer)
 {
+	if (mapLayers.count(layer) == 0)
+		return;
+
 	m_shader->use();
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
@@ -69,10 +72,9 @@ void Tilemap::draw()
 
 	unsigned int u_tileSize = glGetUniformLocation(m_shader->ID, "u_tileSize");
 
-
-	for (const auto& layer : mapLayers)
+	for (int i = 0; i < mapLayers[layer].size(); i++)
 	{
-		layer->draw(model, modelLoc, u_tilesetCount, u_tileSize);
+		mapLayers[layer][i]->draw(model, modelLoc, u_tilesetCount, u_tileSize);
 	}
 }
 
@@ -86,6 +88,7 @@ void Tilemap::loadMap(const std::string ownMap)
 
 	bounds = map.getBounds();
 	tileSize = map.getTileSize();
+	zLayers.insert(0);
 
 	//create a drawable object for each tile layer
 	const auto& layers = map.getLayers();
@@ -117,22 +120,22 @@ void Tilemap::loadMap(const std::string ownMap)
 			}
 			else
 			{
-				// Get the custom property from Tiled Layer and place
-				// Custom int property for layer drawing order
-				mapLayers.emplace_back(std::make_unique<MapLayer>(map, i, allTextures));
+				std::shared_ptr<MapLayer> layer = std::make_unique<MapLayer>(map, i, allTextures);
 
-				
 				const auto& properties = layers[i]->getProperties();
 				tmx::Tileset tileset = map.getTilesets()[0];
-				mapLayers.back()->tileSize = glm::vec2(tileset.getTileSize().x, tileset.getTileSize().y);
+				layer->tileSize = glm::vec2(tileset.getTileSize().x, tileset.getTileSize().y);
 				for (const auto& property : properties)
 				{
 					if (property.getName() == "Z")
 					{
-						mapLayers.back()->zOffset = property.getFloatValue();
+						zLayers.insert(property.getFloatValue());
+						layer->zLayer = property.getFloatValue();
 						break;
 					}
 				}
+
+				mapLayers[layer->zLayer].push_back(layer);
 			}
 		}
 	}

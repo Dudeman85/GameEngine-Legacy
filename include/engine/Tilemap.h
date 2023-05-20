@@ -27,6 +27,8 @@ source distribution.
 #pragma once
 
 #include <vector>
+#include <set>
+#include <map>
 #include <string>
 #include <engine/MapLayer.h>
 #include <engine/GL/Texture.h>
@@ -40,23 +42,23 @@ public:
 	~Tilemap();
 	
 	void loadMap(const std::string ownMap);
-	void draw();
+	void draw(float layer);
 
 	unsigned int checkCollision(float x, float y);
 
 	tmx::Vector2u tileSize;
 	glm::vec3 position;
 	tmx::FloatRect bounds;
-private:
 
+	std::set<float> zLayers;
+private:
 	void initGLStuff(const tmx::Map&);
 	std::shared_ptr<engine::Texture> loadTexture(const std::string&);
 
 	//A 2D vector of tile IDs used for simple tile collision checking
 	std::vector<std::vector<unsigned int>> collisionLayer;
 
-
-	std::vector<std::unique_ptr<MapLayer>> mapLayers;
+	std::map<float, std::vector<std::shared_ptr<MapLayer>>> mapLayers;
 	std::vector<std::shared_ptr<engine::Texture>> allTextures;
 	
 	engine::Shader* m_shader;

@@ -7,8 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 //STL
-#include <map>
 #include <vector>
+#include <set>
 
 //Engine
 #include <engine/ECSCore.h>
@@ -16,6 +16,7 @@
 #include <engine/GL/Shader.h>
 #include <engine/GL/Texture.h>
 #include <engine/GL/Camera.h>
+#include <engine/Tilemap.h>
 
 extern ECS ecs;
 
@@ -73,6 +74,9 @@ namespace engine
 			//Enable transparency
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_BLEND);
+			//Enable Depth buffering
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 
 			//Create the default shader
 			defaultShader = Shader();
@@ -121,70 +125,80 @@ namespace engine
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		//Renders evrything. Call this every frame
+		//Renders everything. Call this every frame
 		void Update(Camera* cam)
 		{
 			//Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//Only need to bind the VAO once
-			glBindVertexArray(VAO);
-
-			//Sort the entities by Z
-			vector<Entity> sortedEntities(entities.begin(), entities.end());
-			sort(sortedEntities.begin(), sortedEntities.end(), [](Entity lhs, Entity rhs)
-				{
-					return ecs.getComponent<Transform>(lhs).z < ecs.getComponent<Transform>(rhs).z;
-				});
-
-			for (auto const& entity : sortedEntities)
+			//Sort the entities and tilemap by Z
+			set<float> layersToDraw(tilemap->zLayers.begin(), tilemap->zLayers.end());
+			map<int, vector<Entity>> sortedEntities;
+			for (const Entity& entity : entities)
 			{
-				//Get relevant components
-				Sprite& sprite = ecs.getComponent<Sprite>(entity);
 				Transform& transform = ecs.getComponent<Transform>(entity);
+				sortedEntities[transform.z].push_back(entity);
+				layersToDraw.insert(transform.z);
+			}
 
-				if (!sprite.enabled)
-					continue;
+			//Draw everything by layer
+			for (const float& layer : layersToDraw)
+			{
+				tilemap->draw(layer);
 
-				//If a shader has been specified for this sprite use it, else use the default
-				Shader shader = defaultShader;
-				if (sprite.shader)
-					shader = *sprite.shader;
-				shader.use();
+				//Bind the right VAO after tilemap
+				glBindVertexArray(VAO);
 
-				//Create the model matrix
-				glm::mat4 model = glm::mat4(1.0f);
-				//Position
-				model = glm::translate(model, glm::vec3(transform.x, transform.y, transform.z));
-				
-				//X, Y, Z euler rotations
-				model = glm::rotate(model, glm::radians(transform.xRotation), glm::vec3(1.0f, 0.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.yRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::rotate(model, glm::radians(transform.zRotation), glm::vec3(0.0f, 0.0f, 1.0f));
-				//Scale
-				model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
-				//Give the shader the model matrix
-				unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
-				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+				//Draw entities for this layer
+				for (const Entity& entity : sortedEntities[layer])
+				{
+					//Get relevant components
+					Sprite& sprite = ecs.getComponent<Sprite>(entity);
+					Transform& transform = ecs.getComponent<Transform>(entity);
 
-				//Give the shader the view matrix
-				unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
-				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+					if (!sprite.enabled)
+						continue;
 
-				//Give the shader the projection matrix
-				unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
-				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+					//If a shader has been specified for this sprite use it, else use the default
+					Shader shader = defaultShader;
+					if (sprite.shader)
+						shader = *sprite.shader;
+					shader.use();
 
-				//Bind the texture
-				glActiveTexture(GL_TEXTURE0);
-				if (sprite.texture)
-					sprite.texture->Use();
+					//Create the model matrix
+					glm::mat4 model = glm::mat4(1.0f);
+					//Position
+					model = glm::translate(model, glm::vec3(transform.x, transform.y, transform.z));
 
-				//Draw the sprite
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+					//X, Y, Z euler rotations
+					model = glm::rotate(model, glm::radians(transform.xRotation), glm::vec3(1.0f, 0.0f, 0.0f));
+					model = glm::rotate(model, glm::radians(transform.yRotation), glm::vec3(0.0f, 1.0f, 0.0f));
+					model = glm::rotate(model, glm::radians(transform.zRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+					//Scale
+					model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
+					//Give the shader the model matrix
+					unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-				//Unbind the texture
-				glBindTexture(GL_TEXTURE_2D, 0);
+					//Give the shader the view matrix
+					unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+
+					//Give the shader the projection matrix
+					unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
+					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+
+					//Bind the texture
+					glActiveTexture(GL_TEXTURE0);
+					if (sprite.texture)
+						sprite.texture->Use();
+
+					//Draw the sprite
+					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+					//Unbind the texture
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 			}
 
 			//Unbind vertex array
@@ -197,9 +211,16 @@ namespace engine
 			glClearColor(r, g, b, 1.0f);
 		}
 
+		//Set a tilmap to render
+		void SetTilemap(Tilemap* map)
+		{
+			tilemap = map;
+		}
+
 	private:
 		unsigned int VAO, VBO, EBO;
 		Shader defaultShader;
+		Tilemap* tilemap = nullptr;
 	};
 
 	//Animator system
