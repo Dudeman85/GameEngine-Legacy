@@ -44,28 +44,43 @@ int main()
 	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
 
-
-
 	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 8;
 
 	
+	static SoundSource mySpeaker1;
+	static SoundSource mySpeaker2;
+	static SoundSource mySpeaker3;
+	static SoundSource mySpeaker4;
 
-	Texture texture = Texture("assets/Gun_01.png");
+	///////////////////Texture & audio loading////////////////////
+
+	Texture texture = Texture("assets/hovertank.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
 	Texture texture3 = Texture("assets/bullet.png");
-	Texture texture4 = Texture("assets/Hull.png");
+
+	//load sound from file
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
+	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/bang_05.wav");
+
+	mySpeaker1.setLinearDistance(1, 0.1f, 10.f, 60.f, 1.f);
+	mySpeaker2.setLinearDistance(2, 1.5f, 100.f, 700.f, 0.5f);
+	mySpeaker3.setLinearDistance(3, 1.f, 10.f, 600.f, 1.f);
+
+
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1, .xScale = 30, .yScale = 15 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1, .xScale = 35, .yScale = 35 });
 	ecs.addComponent(player, Sprite{&texture});
 	ecs.addComponent(player, Player{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	ecs.addComponent(player, BoxCollider{});
 	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
 	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
-
+	//play sound files
+	mySpeaker1.Play(sound1);
+	mySpeaker1.SetLooping(1);
 
 	turretController->player = player;
 	turretController->CreateTurret(1000, -1000);
@@ -176,12 +191,15 @@ int main()
 					{
 
 						Entity bullet = ecs.newEntity();
-						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 1, .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 2), .y = playerTransform.y - (aimdirection.y / 2), .z = 1, .xScale = 5, .yScale = 5 });
 						ecs.addComponent(bullet, Sprite{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
 						bullets.push_back(bullet);
 						fireCooldown = 0.4f;
+						engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
+						//shooting sound
+						mySpeaker2.Play(sound2);
 					}
 				}
 				
@@ -221,6 +239,11 @@ int main()
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+
+		//engine sound
+		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, playerTransform.z);
 
 		fireCooldown -= engine.deltaTime;
 
@@ -228,7 +251,7 @@ int main()
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-
+		
 		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
 		//OpenGL stuff, goes very last
