@@ -123,7 +123,7 @@ int main()
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		map.draw();
+		//map.draw();
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

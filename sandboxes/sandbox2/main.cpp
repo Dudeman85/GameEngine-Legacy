@@ -17,6 +17,8 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 
+	
+
 	engine.physicsSystem->gravity = Vector2(0, -400);
 	engine.physicsSystem->step = 4;
 
@@ -70,6 +72,7 @@ int main()
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo.tmx");
+	engine.renderSystem->SetTilemap(&map);
 	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
@@ -119,7 +122,8 @@ int main()
 
 
 		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
-		map.draw();
+		//map.draw(1.0f);
+
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
