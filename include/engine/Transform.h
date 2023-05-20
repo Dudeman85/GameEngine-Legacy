@@ -61,5 +61,13 @@ namespace engine
 			transform.y = position.y;
 			transform.z = position.z;
 		}
+		//Get the distance between two entities
+		static float Distance(Entity a, Entity b)
+		{
+			Transform& aTransform = ecs.getComponent<Transform>(a);
+			Transform& bTransform = ecs.getComponent<Transform>(b);
+
+			return sqrt(pow(bTransform.x - aTransform.x, 2) + pow(bTransform.y - aTransform.y, 2));
+		}
 	};
 }

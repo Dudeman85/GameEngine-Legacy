@@ -74,15 +74,25 @@ public:
 		{
 			Turret& turret = ecs.getComponent<Turret>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
+			Entity playerAttack = ecs.getComponent<Player>(player).attackHitbox;
 
-			if (turret.projectileTimer <= 0)
+			if (TransformSystem::Distance(entity, player) < 400)
 			{
-				SpawnProjectile(player, transform.x, transform.y, 2000);
-				turret.projectileTimer = 2;
-			}
-			else
-			{
-				turret.projectileTimer -= deltaTime;
+				if (PhysicsSystem::AABBIntersect(entity, playerAttack).type != Collision::Type::miss)
+				{
+					ecs.destroyEntity(entity);
+					break;
+				}
+
+				if (turret.projectileTimer <= 0)
+				{
+					SpawnProjectile(player, transform.x, transform.y, 2000);
+					turret.projectileTimer = 2;
+				}
+				else
+				{
+					turret.projectileTimer -= deltaTime;
+				}
 			}
 		}
 	}
@@ -105,7 +115,7 @@ public:
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .xScale = 28, .yScale = 37 });
+		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = -1, .xScale = 28, .yScale = 37 });
 		ecs.addComponent(turret, Sprite{});
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{ .scale = Vector2(0.9, 1), .offset = Vector2(0, 2) });

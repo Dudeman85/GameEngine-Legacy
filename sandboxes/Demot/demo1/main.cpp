@@ -77,12 +77,19 @@ int main()
 
 	//Create the player entity
 	Entity player = ecs.newEntity();
+	Entity playerAttack = ecs.newEntity();
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 0, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
 	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.61), .offset = Vector2(0, -18) });
-	ecs.addComponent(player, Player{});
+	ecs.addComponent(player, Player{ .attackHitbox = playerAttack });
+
+	//Create the player's attack hitbox
+	ecs.addComponent(playerAttack, Sprite{});
+	ecs.addComponent(playerAttack, Transform{ .xScale = 10, .yScale = 20 });
+	ecs.addComponent(playerAttack, Rigidbody{ .kinematic = true });
+	ecs.addComponent(playerAttack, BoxCollider{ .isTrigger = true });
 
 	//Add animation to player
 	vector<Animation> anims = AnimationsFromSpritesheet("assets/warriorsheet.png", 8, 4, vector<int>(8 * 4, 100));
@@ -110,6 +117,8 @@ int main()
 	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
 	mageSpeaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
 	swordSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
+
+
 	pickupController->CreatePickup(1780, -840);
 	pickupController->CreatePickup(915, -420);
 	pickupController->CreatePickup(624, -1250);
@@ -160,7 +169,7 @@ int main()
 		/*engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
-		
+
 		*/engine.soundDevice->SetSourceLocation(3, 500, 0, 1);
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

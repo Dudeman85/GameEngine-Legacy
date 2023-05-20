@@ -31,6 +31,8 @@ struct Player
 	int shouldWallslide = 0;
 
 	static SoundSource speaker;
+
+	Entity attackHitbox;
 };
 
 //Player Controller requires Player, Sprite, Transform, BoxCollider, Rigidbody, Animator
@@ -60,6 +62,10 @@ public:
 				{
 					if (player.attacking < 2)
 					{
+						Transform& swordTransform = ecs.getComponent<Transform>(player.attackHitbox);
+						swordTransform.x = transform.yRotation > 0 ? transform.x - 40 : transform.x + 40;
+						swordTransform.y = transform.y - 10;
+
 						swordSpeaker.Play(swingSound);
 						player.attacking++;
 						AnimationSystem::PlayAnimation(entity, "Attack " + to_string(player.attacking));
@@ -102,7 +108,7 @@ public:
 			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && player.attacking == 0)
 			{
 				//If touching ground play run and walk sound
-				if (collider.sidesCollided[Direction::down])
+				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
 				{
 					AnimationSystem::PlayAnimation(entity, "Run");
 					if (!walkSpeaker.isPlaying())
@@ -127,7 +133,7 @@ public:
 			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && player.attacking == 0)
 			{
 				//If touching ground play run but mirror it
-				if (collider.sidesCollided[Direction::down])
+				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
 				{
 					AnimationSystem::PlayAnimation(entity, "Run");
 					if (!walkSpeaker.isPlaying())
