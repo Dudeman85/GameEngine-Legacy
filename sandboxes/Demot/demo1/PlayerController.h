@@ -41,12 +41,12 @@ class PlayerController : public System
 public:
 	PlayerController()
 	{
-		jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
-		swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
-		stepSound = SoundBuffer::getFile()->addSoundEffect("assets/step.wav");
+		//jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
+		//swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+		//stepSound = SoundBuffer::getFile()->addSoundEffect("assets/step.wav");
 	}
 
-	void Update(GLFWwindow* window, double deltaTime, SoundSource& speaker, SoundSource& walkSpeaker, SoundSource& swordSpeaker)
+	void Update(GLFWwindow* window, double deltaTime/*, SoundSource& speaker, SoundSource& walkSpeaker, SoundSource& swordSpeaker*/)
 	{
 		for (auto const& entity : entities)
 		{
@@ -66,7 +66,7 @@ public:
 						swordTransform.x = transform.yRotation > 0 ? transform.x - 40 : transform.x + 40;
 						swordTransform.y = transform.y - 10;
 
-						swordSpeaker.Play(swingSound);
+						//swordSpeaker.Play(swingSound);
 						player.attacking++;
 						AnimationSystem::PlayAnimation(entity, "Attack " + to_string(player.attacking));
 					}
@@ -111,8 +111,8 @@ public:
 				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
 				{
 					AnimationSystem::PlayAnimation(entity, "Run");
-					if (!walkSpeaker.isPlaying())
-						walkSpeaker.Play(stepSound);
+					/*if (!walkSpeaker.isPlaying())
+						walkSpeaker.Play(stepSound);*/
 				}
 				transform.yRotation = 0;
 
@@ -136,8 +136,8 @@ public:
 				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
 				{
 					AnimationSystem::PlayAnimation(entity, "Run");
-					if (!walkSpeaker.isPlaying())
-						walkSpeaker.Play(stepSound);
+					/*if (!walkSpeaker.isPlaying())
+						walkSpeaker.Play(stepSound);*/
 				}
 				transform.yRotation = 180;
 
@@ -176,12 +176,12 @@ public:
 				if (collider.sidesCollided[Direction::down])
 				{
 					player.jumping = true;
-					speaker.Play(jumpSound);
+					//speaker.Play(jumpSound);
 				}
 				else if (player.canWallJump > 0)
 				{
 					player.wallJumping = true;
-					speaker.Play(jumpSound);
+					//speaker.Play(jumpSound);
 				}
 
 				//Accelerate to max jump speed while holding jump
@@ -261,8 +261,8 @@ public:
 				{
 					if (!player.attackHeld)
 					{
-						if (!swordSpeaker.isPlaying())
-							swordSpeaker.Play(swingSound);
+						/*if (!swordSpeaker.isPlaying())
+							swordSpeaker.Play(swingSound);*/
 						AnimationSystem::PlayAnimation(entity, "Attack 1");
 						player.attacking = 1;
 						player.attackHeld = true;

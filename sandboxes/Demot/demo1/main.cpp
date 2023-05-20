@@ -70,10 +70,12 @@ int main()
 	turretControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
 
-	static SoundSource speaker;
-	static SoundSource walkSpeaker;
-	static SoundSource swordSpeaker;
+	static SoundSource waterSpeaker;
 	static SoundSource mageSpeaker;
+	static SoundSource torchSpeaker;
+	/*static SoundSource speaker;
+	static SoundSource walkSpeaker;
+	static SoundSource swordSpeaker;*/
 
 	//Create the player entity
 	Entity player = ecs.newEntity();
@@ -98,12 +100,34 @@ int main()
 	AnimationSystem::AddAnimations(player, attackAnims, vector<string>{"Jump Attack", "Attack 1", "Attack 2", "Attack 3"});
 
 	Entity waterfall = ecs.newEntity();
-	ecs.addComponent(waterfall, Transform{ .x = 300, .y = -200, .z = 10, .xScale = 80, .yScale = 40 });
+	ecs.addComponent(waterfall, Transform{ .x = 1200, .y = -1154, .z = -10, .xScale = 110, .yScale = 50 });
 	ecs.addComponent(waterfall, Sprite{});
 	ecs.addComponent(waterfall, Animator{});
 	vector<Animation> waterfallAnims = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100));
 	AnimationSystem::AddAnimation(waterfall, waterfallAnims[0], "1");
 	AnimationSystem::PlayAnimation(waterfall, "1", true);
+	Entity waterfall2 = ecs.newEntity();
+	ecs.addComponent(waterfall2, Transform{ .x = 1200, .y = -1251, .z = -15, .xScale = 110, .yScale = 50 });
+	ecs.addComponent(waterfall2, Sprite{});
+	ecs.addComponent(waterfall2, Animator{});
+	vector<Animation> waterfallAnims2 = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100));
+	AnimationSystem::AddAnimation(waterfall2, waterfallAnims2[0], "1");
+	AnimationSystem::PlayAnimation(waterfall2, "1", true);
+	Entity waterfall3 = ecs.newEntity();
+	ecs.addComponent(waterfall3, Transform{ .x = 1200, .y = -1348, .z = -15, .xScale = 110, .yScale = 50 });
+	ecs.addComponent(waterfall3, Sprite{});
+	ecs.addComponent(waterfall3, Animator{});
+	vector<Animation> waterfallAnims3 = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100));
+	AnimationSystem::AddAnimation(waterfall3, waterfallAnims3[0], "1");
+	AnimationSystem::PlayAnimation(waterfall3, "1", true);
+
+	Entity torch = ecs.newEntity();
+	ecs.addComponent(torch, Transform{ .x = 1480, .y = -2000, .z = -10, .xScale = 15, .yScale = 35 });
+	ecs.addComponent(torch, Sprite{});
+	ecs.addComponent(torch, Animator{});
+	vector<Animation> torchAnims = AnimationsFromSpritesheet("assets/torch.png", 9, 1, vector<int>(9 * 1, 40));
+	AnimationSystem::AddAnimation(torch, torchAnims[0], "1");
+	AnimationSystem::PlayAnimation(torch, "1", true);
 
 	RenderSystem::SetBackgroundColor(0, .5, .1);
 
@@ -114,10 +138,13 @@ int main()
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 
-	speaker.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+	waterSpeaker.setLinearDistanceClamped(1, 1.0f, 150.f, 900.f, 1.f);
+	mageSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
+	torchSpeaker.setLinearDistanceClamped(3, 0.5f, 50.f, 500.f, 1.f);
+	/*speaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
 	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
-	mageSpeaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
-	swordSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
+	mageSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
+	swordSpeaker.setLinearDistanceClamped(5, 1.f, 100.f, 600.f, 1.f);*/
 
 	pickupController->CreatePickup(1780, -840);
 	pickupController->CreatePickup(915, -420);
@@ -127,10 +154,18 @@ int main()
 	turretController->player = player;
 	turretController->CreateTurret(500, 0);
 
-	auto swingSound = SoundBuffer::getFile()->addSoundEffect("assets/step.wav");
+	uint32_t swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+	uint32_t waterSound = SoundBuffer::getFile()->addSoundEffect("assets/stream.wav");
+	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
 
 	mageSpeaker.Play(swingSound);
 	mageSpeaker.SetLooping(1);
+
+	waterSpeaker.Play(waterSound);
+	waterSpeaker.SetLooping(1);
+
+	torchSpeaker.Play(torchSound);
+	torchSpeaker.SetLooping(1);
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -144,7 +179,7 @@ int main()
 			cout << playerTransform.x << ", " << playerTransform.y << endl;
 		}
 
-		playerController->Update(window, engine.deltaTime, speaker, walkSpeaker, swordSpeaker);
+		playerController->Update(window, engine.deltaTime /*,speaker, walkSpeaker, swordSpeaker*/);
 		pickupController->Update(player, engine.programTime);
 		turretController->Update(engine.deltaTime);
 
@@ -161,14 +196,15 @@ int main()
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(1, 0, 0, 0);
-		engine.soundDevice->SetSourceLocation(2, 0, 0, 0);
-		engine.soundDevice->SetSourceLocation(4, 0, 0, 0);
-		/*engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, 0);
+
+		engine.soundDevice->SetSourceLocation(1, 1200, -1300, -35);
+		engine.soundDevice->SetSourceLocation(2, 500, 0, 1);
+		engine.soundDevice->SetSourceLocation(3, 1480, -300, 1);
+		/*engine.soundDevice->SetSourceLocation(3, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
 		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
+		engine.soundDevice->SetSourceLocation(4, 500, 0, 1);*/
 
-		*/engine.soundDevice->SetSourceLocation(3, 500, 0, 1);
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
 		glfwPollEvents();
