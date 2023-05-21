@@ -71,7 +71,7 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1, .xScale = 35, .yScale = 35 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1.5, .xScale = 35, .yScale = 35 });
 	ecs.addComponent(player, Sprite{&texture});
 	ecs.addComponent(player, Player{});
 	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
