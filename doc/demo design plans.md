@@ -32,7 +32,7 @@ Demo 1 TODO list
 - [ ] sound effects(walk sounds, attack sound, torch sound, waterfall sound) : Aleksi
 - [x] attack animations and hitboxes : Aleksi
 - [x] turret enemy(animation, projectile) : Aleksi
-- [ ] torch and waterfall effects : Viksteri
+- [x] torch and waterfall effects : Viksteri
 - [ ] music : Viksteri
 - [ ] collectible counter : Aaro
 - [x] collectible animation : Viksteri (Aleksi)
@@ -42,9 +42,9 @@ Demo 1 TODO list
 
 
 #Demo 2 TODO list
-- [ ] player sprite(tank movement, turret movement) : Viksteri
+- [x] player sprite(tank movement, turret movement) : Viksteri
 - [x] turret enemy : Aleksi
-- [ ] sound effects(engine sound, shooting sound, hit sound) : Viksteri
+- [x] sound effects(engine sound, shooting sound, hit sound) : Viksteri
 - [ ] shooting(bullet explotion) : Viksteri
 - [ ] music : Viksteri
 - [ ] expanded tilemap : Aaro
