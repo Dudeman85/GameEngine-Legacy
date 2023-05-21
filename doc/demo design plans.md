@@ -43,7 +43,7 @@ Demo 1 TODO list
 
 #Demo 2 TODO list
 - [x] player sprite(tank movement, turret movement) : Viksteri
-- [ ] turret enemy : Aleksi
+- [x] turret enemy : Aleksi
 - [x] sound effects(engine sound, shooting sound, hit sound) : Viksteri
 - [ ] shooting(bullet explotion) : Viksteri
 - [ ] music : Viksteri
