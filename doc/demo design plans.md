@@ -47,7 +47,7 @@ Demo 1 TODO list
 - [x] sound effects(engine sound, shooting sound, hit sound) : Viksteri
 - [ ] shooting(bullet explotion) : Viksteri
 - [ ] music : Viksteri
-- [ ] expanded tilemap : Aaro
+- [x] expanded tilemap : Aaro
 - [ ] collectibles (random spawn) : Aaro
 - [ ] collectible counter : Aaro
 - [ ] Tank controls : Viksteri
