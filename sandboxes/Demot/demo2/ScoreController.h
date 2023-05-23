@@ -14,10 +14,11 @@ struct Scoreboard
 class ScoreController : public System
 {
 public:
-	ScoreController(int& ref, const char* path, int spritesWide, int spritesHigh, int delays) : collectedRef(ref)
+	ScoreController(int& ref, const char* path, int spritesWide, int spritesHigh, int delays, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f)) : collectedRef(ref)
 	{
 		int spriteSize = spritesWide * spritesHigh;
 		anims = AnimationsFromSpritesheet(path, spritesWide, spritesHigh, vector<int>(spriteSize, delays));
+		position = pos;
 	};
 
 	void Update(Entity player)
@@ -51,6 +52,14 @@ public:
 		return scoreboard;
 	}
 
+	void SetPosition(float x, float y, float z)
+	{
+		position.x = x / 2;
+		position.y = y / 2;
+		position.z = z / 2;
+	}
+
+	glm::vec3 position;
 	Entity scoreboard;
 	vector<Animation> anims;
 	int& collectedRef;
