@@ -84,7 +84,7 @@ int main()
 	//Create the player entity
 	Entity player = ecs.newEntity();
 	Entity playerAttack = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 0, .xScale = 50, .yScale = 50 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 1.5, .xScale = 50, .yScale = 50 });
 	ecs.addComponent(player, Sprite{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
@@ -158,10 +158,10 @@ int main()
 	mageSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
 	swordSpeaker.setLinearDistanceClamped(5, 1.f, 100.f, 600.f, 1.f);*/
 
-	pickupController->CreatePickup(1880, -1105);
-	pickupController->CreatePickup(1010, -686);
-	pickupController->CreatePickup(720, -1520);
-	pickupController->CreatePickup(1860, -1771);
+	pickupController->CreatePickup(1880, -1100);
+	pickupController->CreatePickup(1010, -680);
+	pickupController->CreatePickup(720, -1510);
+	pickupController->CreatePickup(1860, -1765);
 
 	turretController->player = player;
 	turretController->CreateTurret(610, -430);

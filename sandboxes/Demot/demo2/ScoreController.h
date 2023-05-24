@@ -28,16 +28,16 @@ public:
 		{
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
-				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) {return collision.a == player; }))
+			if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) { return collision.a == player; }))
+			{
+				collectedRef = PickupController().collected;
+				if (collectedRef < anims.size())
 				{
-					collectedRef = PickupController().collected;
-					if (collectedRef < anims.size())
-					{
-						string animation = to_string(collectedRef);
-						AnimationSystem::PlayAnimation(scoreboard, animation);
-					}
-					break;
+					string animation = to_string(collectedRef);
+					AnimationSystem::PlayAnimation(scoreboard, animation);
 				}
+				break;
+			}
 		}
 	}
 
