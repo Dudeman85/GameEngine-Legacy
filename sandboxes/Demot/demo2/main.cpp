@@ -15,7 +15,6 @@ ECS ecs;
 
 int main()
 {
-
 	//Create the window and OpenGL context before creating EngineLib
 	GLFWwindow* window = CreateWindow(1000, 800, "Window");
 	//Create the camera
@@ -43,6 +42,16 @@ int main()
 	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
+	//Register Pickup Controller
+	ecs.registerComponent<Pickup>();
+	shared_ptr<PickupController> pickupController = ecs.registerSystem<PickupController>();
+	Signature pickupControllerSignature;
+	pickupControllerSignature.set(ecs.getComponentId<Transform>());
+	pickupControllerSignature.set(ecs.getComponentId<Pickup>());
+	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
+	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
+	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
 
 	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 8;
@@ -117,16 +126,25 @@ int main()
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 
+	pickupController->CreatePickup(600, -500);
+
+	Animation explosion = AnimationsFromSpritesheet("assets/explosion.png", 5, 1, vector<int>(5, 75))[0];
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
 
 
+		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+		{
+			cout << playerTransform.x << ", " << playerTransform.y << endl;
+		}
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
 		playerController->Update(window, engine.deltaTime, engine.physicsSystem);
+		pickupController->Update(player);
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
@@ -207,17 +225,16 @@ int main()
 						ecs.addComponent(bullet, Sprite{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
+						ecs.addComponent(bullet, Animator{});
+						AnimationSystem::AddAnimation(bullet, explosion, "explosion");
+
 						bullets.push_back(bullet);
-						fireCooldown = 0.4f;
+						fireCooldown = 0.8f;
 						engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
 						//shooting sound
 						mySpeaker2.Play(sound2);
 					}
 				}
-
-
-				// set camera location between player and crosshair
-				//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
 			}
 			else
 			{
@@ -226,7 +243,26 @@ int main()
 
 			for (const Entity& bullet : bullets)
 			{
-				auto hit = ecs.getComponent<BoxCollider>(bullet);
+				if (!ecs.entityExists(bullet))
+					continue;
+
+				BoxCollider hit;
+				if (ecs.hasComponent<BoxCollider>(bullet))
+					hit = ecs.getComponent<BoxCollider>(bullet);
+				auto& rb = ecs.getComponent<Rigidbody>(bullet);
+				auto& tf = ecs.getComponent<Transform>(bullet);
+				auto& animator = ecs.getComponent<Animator>(bullet);
+
+				if (!ecs.hasComponent<BoxCollider>(bullet))
+				{
+					if (!animator.playingAnimation)
+					{
+						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+						ecs.destroyEntity(bullet);
+					}
+					continue;
+				}
+
 				for (const Collision& collision : hit.collisions)
 				{
 					if (collision.a == player || collision.b == player)
@@ -234,16 +270,23 @@ int main()
 
 					if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
 					{
+						rb.velocity = Vector2(0, 0);
+						tf.xScale = 20;
+						tf.yScale = 20;
 						ecs.destroyEntity(collision.b);
-						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
-						ecs.destroyEntity(bullet);
-						continue;
+						ecs.removeComponent<BoxCollider>(bullet);
+						AnimationSystem::PlayAnimation(bullet, "explosion");
+
+						break;
 					}
 
 					if (collision.type == Collision::Type::tilemapTrigger)
 					{
-						ecs.destroyEntity(bullet);
-						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+						rb.velocity = Vector2(0, 0);
+						tf.xScale = 20;
+						tf.yScale = 20;
+						ecs.removeComponent<BoxCollider>(bullet);
+						AnimationSystem::PlayAnimation(bullet, "explosion");
 						break;
 					}
 				}

@@ -26,6 +26,8 @@ struct Player
 	int wallJumpDir = 0;
 	float maxWallJumpSpeed = 4000;
 	float wallJumpAccelSpeed = 1500;
+	int jumpSound = 0;
+	int attackSound = 0;
 
 	//Fix because of bad tilemap collision checking
 	int shouldWallslide = 0;
@@ -66,7 +68,7 @@ public:
 						swordTransform.x = transform.yRotation > 0 ? transform.x - 40 : transform.x + 40;
 						swordTransform.y = transform.y - 10;
 
-						//swordSpeaker.Play(swingSound);
+						player.attackSound = 1;
 						player.attacking++;
 						AnimationSystem::PlayAnimation(entity, "Attack " + to_string(player.attacking));
 					}
@@ -176,12 +178,12 @@ public:
 				if (collider.sidesCollided[Direction::down])
 				{
 					player.jumping = true;
-					//speaker.Play(jumpSound);
+					player.jumpSound = 1;
 				}
 				else if (player.canWallJump > 0)
 				{
 					player.wallJumping = true;
-					//speaker.Play(jumpSound);
+					player.jumpSound = 1;
 				}
 
 				//Accelerate to max jump speed while holding jump
@@ -261,8 +263,7 @@ public:
 				{
 					if (!player.attackHeld)
 					{
-						/*if (!swordSpeaker.isPlaying())
-							swordSpeaker.Play(swingSound);*/
+						player.attackSound = 1;
 						AnimationSystem::PlayAnimation(entity, "Attack 1");
 						player.attacking = 1;
 						player.attackHeld = true;

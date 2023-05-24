@@ -9,7 +9,8 @@ using namespace engine;
 
 struct Pickup
 {
-	bool floating = true;
+	bool floating = false;
+	int sound = 0;
 };
 
 //Pickup controller system requires sprite, transform, rigidbody, box collider and Pickup
@@ -18,10 +19,10 @@ class PickupController : public System
 public:
 	PickupController()
 	{
-		defaultTexture = new Texture("assets/strawberry.png");
+		defaultTexture = new Texture("assets/ammo box.png");
 	}
 
-	void Update(Entity player, double programTime)
+	void Update(Entity player)
 	{
 		for (auto const& entity : entities)
 		{
@@ -29,10 +30,7 @@ public:
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 
-			//If floating animate it
-			if (pickup.floating)
-				transform.y += sin(programTime * 3) * 0.5;
-
+			//If collided with the player start the collection animation
 			if (collider.collisions.end() != find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) { return collision.a == player; }))
 			{
 				collected++;
@@ -45,7 +43,7 @@ public:
 	Entity CreatePickup(float x, float y)
 	{
 		Entity pickup = ecs.newEntity();
-		ecs.addComponent(pickup, Transform{ .x = x, .y = y, .xScale = 20, .yScale = 20 });
+		ecs.addComponent(pickup, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 35, .yScale = 25 });
 		ecs.addComponent(pickup, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
 		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
