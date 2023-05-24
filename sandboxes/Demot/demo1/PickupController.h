@@ -68,6 +68,13 @@ public:
 		return pickup;
 	}
 
+	Entity CreateScoreboard(float x, float y)
+	{
+		Entity board = ecs.newEntity();
+		ecs.addComponent(board, Transform{ .x = x, .y = y });
+		ecs.addComponent(board, Animator{});
+	}
+
 	vector<Animation> animations;
 	Texture* defaultTexture;
 	int collected = 0;
