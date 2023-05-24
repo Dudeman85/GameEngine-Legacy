@@ -205,10 +205,10 @@ namespace engine
 			glBindVertexArray(0);
 		}
 
-		//Set the screens clear color to given normalized rgb
+		//Set the screens clear color to given rgb
 		static void SetBackgroundColor(float r, float g, float b)
 		{
-			glClearColor(r, g, b, 1.0f);
+			glClearColor(r / 255, g / 255, b / 255, 1.0f);
 		}
 
 		//Set a tilmap to render

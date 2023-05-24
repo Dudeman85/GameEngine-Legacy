@@ -46,6 +46,7 @@ int main()
 	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
 	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	pickupControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
 	//Register Enemy Controller
 	ecs.registerComponent<Enemy>();
@@ -92,7 +93,7 @@ int main()
 	ecs.addComponent(player, Player{ .attackHitbox = playerAttack });
 
 	//Create the player's attack hitbox
-	ecs.addComponent(playerAttack, Sprite{});
+	//ecs.addComponent(playerAttack, Sprite{});
 	ecs.addComponent(playerAttack, Transform{ .xScale = 10, .yScale = 20 });
 	ecs.addComponent(playerAttack, Rigidbody{ .kinematic = true });
 	ecs.addComponent(playerAttack, BoxCollider{ .isTrigger = true });
@@ -140,7 +141,7 @@ int main()
 	AnimationSystem::AddAnimation(torch1, torchAnims1[0], "1");
 	AnimationSystem::PlayAnimation(torch1, "1", true);
 
-	RenderSystem::SetBackgroundColor(0, 0, 0);
+	RenderSystem::SetBackgroundColor(133 / 2, 117 / 2, 87 / 2);
 
 	Tilemap map(&cam);
 	map.loadMap("assets/level01.tmx");
@@ -201,7 +202,7 @@ int main()
 			cout << playerTransform.x << ", " << playerTransform.y << endl;
 		}
 		myMusic.updateBufferStream();
-		playerController->Update(window, engine.deltaTime /*,speaker, walkSpeaker, swordSpeaker*/);
+		playerController->Update(window, engine.deltaTime);
 		pickupController->Update(player, engine.programTime);
 		turretController->Update(engine.deltaTime);
 

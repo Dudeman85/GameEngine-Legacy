@@ -47,7 +47,7 @@ int main()
 	engine.physicsSystem->gravity = Vector2(0, 0);
 	engine.physicsSystem->step = 8;
 
-	
+
 	static SoundSource mySpeaker1;
 	static SoundSource mySpeaker2;
 	static SoundSource mySpeaker3;
@@ -55,7 +55,8 @@ int main()
 
 	///////////////////Texture & audio loading////////////////////
 
-	Texture texture = Texture("assets/hovertank.png");
+	Texture texture = Texture("assets/Hull.png");
+	Texture turretTexture = Texture("assets/Gun_01.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
 	Texture texture3 = Texture("assets/bullet.png");
 
@@ -71,13 +72,16 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1.5, .xScale = 35, .yScale = 35 });
-	ecs.addComponent(player, Sprite{&texture});
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1.5, .xScale = 40, .yScale = 40 });
+	ecs.addComponent(player, Sprite{ &texture });
 	ecs.addComponent(player, Player{});
-	ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
-	ecs.addComponent(player, BoxCollider{});
-	BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
-	Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
+	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
+	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{});
+
+	Entity playerTurret = ecs.newEntity();
+	Transform& playerTurretTransform = ecs.addComponent(playerTurret, Transform{ .xScale = 50, .yScale = 16.5 });
+	ecs.addComponent(playerTurret, Sprite{ .texture = &turretTexture });
+
 	//play sound files
 	mySpeaker1.Play(sound1);
 	mySpeaker1.SetLooping(1);
@@ -88,7 +92,7 @@ int main()
 	Entity hull = ecs.newEntity();
 	Transform& hullTransform = ecs.addComponent(hull, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
 	ecs.addComponent(hull, Sprite{ &texture4 });
-	
+
 	ecs.addComponent(hull, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	ecs.addComponent(hull, BoxCollider{});
 	ecs.addComponent(hull, Player{});
@@ -117,8 +121,8 @@ int main()
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		
-		
+
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
@@ -127,7 +131,8 @@ int main()
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
 		int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-		if (present == GLFW_TRUE) {
+		if (present == GLFW_TRUE)
+		{
 
 			GLFWgamepadstate state;
 
@@ -158,12 +163,19 @@ int main()
 				engine.physicsSystem->Move(player, movement * engine.deltaTime);
 				//engine.physicsSystem->Move(hull, movement * engine.deltaTime);
 
+				Vector2 leftThumbstick(axes[0], axes[1]);
+				leftThumbstick = (leftThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
+				leftThumbstick -= Vector2(0.5f, 0.5f);
+				leftThumbstick *= 2.0f;
+
+				playerTransform.zRotation = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
 			}
 
 			// sets crosshair position to zero
 			Vector2 crosshairPosition(0, 0);
 			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
 			{
+
 				// Changes joystick cordinates into origo and scales it between -1, 1
 				Vector2 rightThumbstick(axes[2], axes[3]);
 				rightThumbstick = (rightThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
@@ -183,7 +195,7 @@ int main()
 				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
 				TransformSystem::SetPosition(crosshair, crosshairPosition);
 
-				float turretRotation(playerTransform.zRotation = atan2f(-rightThumbstick.y, rightThumbstick.x)*180 /3.14f);
+				playerTurretTransform.zRotation = atan2f(-rightThumbstick.y, rightThumbstick.x) * 180 / 3.14f;
 
 				if (fireCooldown <= 0)
 				{
@@ -191,7 +203,7 @@ int main()
 					{
 
 						Entity bullet = ecs.newEntity();
-						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 2), .y = playerTransform.y - (aimdirection.y / 2), .z = 1, .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 1.5, .xScale = 5, .yScale = 5 });
 						ecs.addComponent(bullet, Sprite{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
@@ -202,7 +214,7 @@ int main()
 						mySpeaker2.Play(sound2);
 					}
 				}
-				
+
 
 				// set camera location between player and crosshair
 				//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
@@ -211,17 +223,28 @@ int main()
 			{
 				ecs.getComponent<Sprite>(crosshair).enabled = false;
 			}
-			
+
 			for (const Entity& bullet : bullets)
 			{
 				auto hit = ecs.getComponent<BoxCollider>(bullet);
 				for (const Collision& collision : hit.collisions)
 				{
+					if (collision.a == player || collision.b == player)
+						continue;
+
 					if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
 					{
 						ecs.destroyEntity(collision.b);
 						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
 						ecs.destroyEntity(bullet);
+						continue;
+					}
+
+					if (collision.type == Collision::Type::tilemapTrigger)
+					{
+						ecs.destroyEntity(bullet);
+						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+						break;
 					}
 				}
 			}
@@ -233,9 +256,7 @@ int main()
 
 		}
 
-		/*
-		*			Occasional crash due to ecs assert is because of bullet hitting player and deleting it
-		*/
+		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 3));
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +272,7 @@ int main()
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-		
+
 		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
 
 		//OpenGL stuff, goes very last
