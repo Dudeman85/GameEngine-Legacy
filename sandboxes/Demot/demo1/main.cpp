@@ -76,6 +76,7 @@ int main()
 	static SoundSource torchSpeaker2;
 	static SoundSource mageSpeaker;
 	static SoundSource pickSpeaker;
+	static SoundSource jumpSpeaker;
 	/*static SoundSource walkSpeaker;
 	static SoundSource swordSpeaker;*/
 	MusicBuffer myMusic("assets/forest.wav");
@@ -177,7 +178,7 @@ int main()
 	uint32_t waterSound = SoundBuffer::getFile()->addSoundEffect("assets/stream.wav");
 	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
 	uint32_t pickSound = SoundBuffer::getFile()->addSoundEffect("assets/strawberry_touch.wav");
-
+	uint32_t jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 
 	mageSpeaker.Play(swingSound);
 	mageSpeaker.SetLooping(1);
@@ -228,7 +229,14 @@ int main()
 				pickup.sound = 0;
 			}
 		};
-
+		for (Entity entity : playerController->entities) {
+			Player& player = ecs.getComponent<Player>(entity);
+			if (player.jumpSound == 1) {
+				if (!jumpSpeaker.isPlaying())
+					jumpSpeaker.Play(jumpSound);
+				player.jumpSound = 0;
+			}
+		};
 		engine.soundDevice->SetSourceLocation(1, 1296, -1556, -35);
 		engine.soundDevice->SetSourceLocation(2, 1480, -2036, 1);
 		engine.soundDevice->SetSourceLocation(3, 850, -2336, 1);

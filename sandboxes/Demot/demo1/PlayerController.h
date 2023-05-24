@@ -26,6 +26,8 @@ struct Player
 	int wallJumpDir = 0;
 	float maxWallJumpSpeed = 4000;
 	float wallJumpAccelSpeed = 1500;
+	int jumpSound = 0;
+	int attackSound = 0;
 
 	//Fix because of bad tilemap collision checking
 	int shouldWallslide = 0;
@@ -176,12 +178,12 @@ public:
 				if (collider.sidesCollided[Direction::down])
 				{
 					player.jumping = true;
-					//speaker.Play(jumpSound);
+					player.jumpSound = 1;
 				}
 				else if (player.canWallJump > 0)
 				{
 					player.wallJumping = true;
-					//speaker.Play(jumpSound);
+					player.jumpSound = 1;
 				}
 
 				//Accelerate to max jump speed while holding jump
