@@ -180,7 +180,7 @@ int main()
 	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
 	uint32_t pickSound = SoundBuffer::getFile()->addSoundEffect("assets/strawberry_touch.wav");
 	uint32_t jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
-	uint32_t attackSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+	uint32_t attackSound = SoundBuffer::getFile()->addSoundEffect("assets/stereoswing.wav");
 
 	mageSpeaker.Play(swingSound);
 	mageSpeaker.SetLooping(1);
