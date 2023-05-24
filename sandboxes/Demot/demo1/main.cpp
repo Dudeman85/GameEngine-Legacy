@@ -46,6 +46,7 @@ int main()
 	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
 	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
+	pickupControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
 	//Register Enemy Controller
 	ecs.registerComponent<Enemy>();
@@ -74,8 +75,8 @@ int main()
 	static SoundSource torchSpeaker;
 	static SoundSource torchSpeaker2;
 	static SoundSource mageSpeaker;
-	/*static SoundSource speaker;
-	static SoundSource walkSpeaker;
+	static SoundSource pickSpeaker;
+	/*static SoundSource walkSpeaker;
 	static SoundSource swordSpeaker;*/
 	MusicBuffer myMusic("assets/forest.wav");
 	myMusic.SetVolume(0.5f);
@@ -92,7 +93,7 @@ int main()
 	ecs.addComponent(player, Player{ .attackHitbox = playerAttack });
 
 	//Create the player's attack hitbox
-	ecs.addComponent(playerAttack, Sprite{});
+	//ecs.addComponent(playerAttack, Sprite{});
 	ecs.addComponent(playerAttack, Transform{ .xScale = 10, .yScale = 20 });
 	ecs.addComponent(playerAttack, Rigidbody{ .kinematic = true });
 	ecs.addComponent(playerAttack, BoxCollider{ .isTrigger = true });
@@ -140,7 +141,7 @@ int main()
 	AnimationSystem::AddAnimation(torch1, torchAnims1[0], "1");
 	AnimationSystem::PlayAnimation(torch1, "1", true);
 
-	RenderSystem::SetBackgroundColor(0, 0, 0);
+	RenderSystem::SetBackgroundColor(133 / 2, 117 / 2, 87 / 2);
 
 	Tilemap map(&cam);
 	map.loadMap("assets/level01.tmx");
@@ -175,6 +176,8 @@ int main()
 	uint32_t swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
 	uint32_t waterSound = SoundBuffer::getFile()->addSoundEffect("assets/stream.wav");
 	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
+	uint32_t pickSound = SoundBuffer::getFile()->addSoundEffect("assets/strawberry_touch.wav");
+
 
 	mageSpeaker.Play(swingSound);
 	mageSpeaker.SetLooping(1);
@@ -199,7 +202,7 @@ int main()
 			cout << playerTransform.x << ", " << playerTransform.y << endl;
 		}
 		myMusic.updateBufferStream();
-		playerController->Update(window, engine.deltaTime /*,speaker, walkSpeaker, swordSpeaker*/);
+		playerController->Update(window, engine.deltaTime);
 		pickupController->Update(player, engine.programTime);
 		turretController->Update(engine.deltaTime);
 
@@ -216,6 +219,15 @@ int main()
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
 		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
+
+		for (Entity entity : pickupController->entities) {
+			Pickup& pickup = ecs.getComponent<Pickup>(entity);
+			if (pickup.sound == 1) {
+				if (!pickSpeaker.isPlaying())
+					pickSpeaker.Play(pickSound);
+				pickup.sound = 0;
+			}
+		};
 
 		engine.soundDevice->SetSourceLocation(1, 1296, -1556, -35);
 		engine.soundDevice->SetSourceLocation(2, 1480, -2036, 1);

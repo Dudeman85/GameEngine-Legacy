@@ -31,9 +31,9 @@ public:
 
 			if (collider.collisions.size() > 0)
 			{
-				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [projectile](const Collision& collision)
+				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [](const Collision& collision)
 					{
-						return ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b);
+						return (ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b)) && collision.type != Collision::Type::tilemapTrigger;
 					}))
 				{
 					ecs.destroyEntity(entity);
@@ -50,7 +50,7 @@ class TurretController : public System
 public:
 	TurretController()
 	{
-		animation = AnimationsFromSpritesheet("assets/mageattack.png", 4, 1, vector<int>(4 * 1, 250))[0];
+		animations = AnimationsFromSpritesheet("assets/mageattack.png", 4, 2, vector<int>(4 * 2, 250));
 		projectileAnim = AnimationsFromSpritesheet("assets/magebullet.png", 5, 1, vector<int>(5 * 1, 50))[0];
 
 		//Register Projectile Controller
@@ -74,11 +74,21 @@ public:
 		{
 			Turret& turret = ecs.getComponent<Turret>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
+			Animator& animator = ecs.getComponent<Animator>(entity);
 			Entity playerAttack = ecs.getComponent<Player>(player).attackHitbox;
 
+			//Only active when player is near
 			if (TransformSystem::Distance(entity, player) < 400)
 			{
-				if (PhysicsSystem::AABBIntersect(entity, playerAttack).type != Collision::Type::miss)
+				//When hit by player play dying animation
+				if (PhysicsSystem::AABBIntersect(entity, playerAttack).type != Collision::Type::miss && animator.playingAnimation)
+				{
+					AnimationSystem::PlayAnimation(entity, "die");
+					turret.projectileTimer = 999;
+				}
+
+				//When done dying
+				if (!animator.playingAnimation)
 				{
 					ecs.destroyEntity(entity);
 					break;
@@ -89,11 +99,8 @@ public:
 					SpawnProjectile(player, transform.x, transform.y, 2000);
 					turret.projectileTimer = 2;
 				}
-				else
-				{
-					turret.projectileTimer -= deltaTime;
-				}
 			}
+			turret.projectileTimer -= deltaTime;
 		}
 	}
 
@@ -102,7 +109,7 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 20, .yScale = 20 });
+		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 20, .yScale = 20 });
 		ecs.addComponent(projectile, Sprite{});
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
@@ -121,7 +128,7 @@ public:
 		ecs.addComponent(turret, BoxCollider{ .scale = Vector2(0.9, 1), .offset = Vector2(0, 2) });
 		ecs.addComponent(turret, Animator{});
 		ecs.addComponent(turret, Turret{});
-		AnimationSystem::AddAnimation(turret, animation, "default");
+		AnimationSystem::AddAnimations(turret, animations, vector<string>{"default", "die"});
 		AnimationSystem::PlayAnimation(turret, "default", true);
 
 		return turret;
@@ -129,6 +136,6 @@ public:
 
 	Entity player;
 	shared_ptr<ProjectileController> projectileController;
-	Animation animation;
+	vector<Animation> animations;
 	Animation projectileAnim;
 };

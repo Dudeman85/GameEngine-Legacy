@@ -10,6 +10,7 @@ using namespace engine;
 struct Pickup
 {
 	bool floating = true;
+	int sound = 0;
 };
 
 //Pickup controller system requires sprite, transform, rigidbody, box collider, Animator and Pickup
@@ -39,7 +40,7 @@ public:
 			if (collider.collisions.end() != find_if(collider.collisions.begin(), collider.collisions.end(), [player](const Collision& collision) { return collision.a == player; }))
 			{
 				AnimationSystem::PlayAnimation(entity, "collect");
-				//PUT SOUND HERE
+				pickup.sound = 1;
 			}
 
 			//When the collection animation is over

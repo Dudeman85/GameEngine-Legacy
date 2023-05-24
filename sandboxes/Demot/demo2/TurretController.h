@@ -112,7 +112,7 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 10, .yScale = 10 });
+		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 7, .yScale = 7 });
 		ecs.addComponent(projectile, Sprite{ .texture = projectileTexture });
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
@@ -122,7 +122,7 @@ public:
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1, .xScale = 40, .yScale = 20 });
+		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1, .xScale = 60, .yScale = 20 });
 		ecs.addComponent(turret, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{});
