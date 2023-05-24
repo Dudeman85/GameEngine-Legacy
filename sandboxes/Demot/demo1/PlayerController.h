@@ -68,7 +68,7 @@ public:
 						swordTransform.x = transform.yRotation > 0 ? transform.x - 40 : transform.x + 40;
 						swordTransform.y = transform.y - 10;
 
-						//swordSpeaker.Play(swingSound);
+						player.attackSound = 1;
 						player.attacking++;
 						AnimationSystem::PlayAnimation(entity, "Attack " + to_string(player.attacking));
 					}
@@ -263,8 +263,7 @@ public:
 				{
 					if (!player.attackHeld)
 					{
-						/*if (!swordSpeaker.isPlaying())
-							swordSpeaker.Play(swingSound);*/
+						player.attackSound = 1;
 						AnimationSystem::PlayAnimation(entity, "Attack 1");
 						player.attacking = 1;
 						player.attackHeld = true;
