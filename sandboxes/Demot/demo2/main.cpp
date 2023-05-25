@@ -2,6 +2,7 @@
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
 #include <vector>
+#include <set>
 #include <chrono>
 #include <thread>
 #include "PlayerController.h"
@@ -114,7 +115,7 @@ int main()
 	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 500, .y = 500, .xScale = 20, .yScale = 20 });
 	ecs.addComponent(crosshair, Sprite{ &texture2 });
 
-	vector <Entity>bullets;
+	set<Entity>bullets;
 
 
 	float fireCooldown = 0.04f;
@@ -221,16 +222,15 @@ int main()
 					{
 
 						Entity bullet = ecs.newEntity();
-						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 1.5, .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 5, .xScale = 5, .yScale = 5 });
 						ecs.addComponent(bullet, Sprite{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
 						ecs.addComponent(bullet, Animator{});
 						AnimationSystem::AddAnimation(bullet, explosion, "explosion");
 
-						bullets.push_back(bullet);
-						fireCooldown = 0.8f;
-						engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
+						bullets.emplace(bullet);
+						fireCooldown = 0.5f;
 						//shooting sound
 						mySpeaker2.Play(sound2);
 					}
@@ -241,7 +241,7 @@ int main()
 				ecs.getComponent<Sprite>(crosshair).enabled = false;
 			}
 
-			for (const Entity& bullet : bullets)
+			for (Entity bullet : bullets)
 			{
 				if (!ecs.entityExists(bullet))
 					continue;
@@ -257,10 +257,10 @@ int main()
 				{
 					if (!animator.playingAnimation)
 					{
-						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+						bullets.erase(bullets.find(bullet));
 						ecs.destroyEntity(bullet);
 					}
-					continue;
+					break;
 				}
 
 				for (const Collision& collision : hit.collisions)
@@ -291,13 +291,8 @@ int main()
 					}
 				}
 			}
-
-			if (buttons[0] == GLFW_PRESS)
-			{
-				//tapahtuu jotain
-			}
-
 		}
+		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
 
 		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 3));
 

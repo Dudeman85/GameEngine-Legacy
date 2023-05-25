@@ -16,13 +16,16 @@ struct Turret
 struct Projectile
 {
 	int damage = 1;
+	bool destroy = false;
 };
 
-//Pickup controller system requires sprite, transform, rigidbody, box collider and Projectile
+//Projectile controller system requires sprite, transform, rigidbody, box collider, Animator and Projectile
 class ProjectileController : public System
 {
 public:
-	ProjectileController() {};
+	ProjectileController()
+	{
+	};
 
 	void Update()
 	{
@@ -30,17 +33,30 @@ public:
 		{
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Projectile& projectile = ecs.getComponent<Projectile>(entity);
+			Animator& animator = ecs.getComponent<Animator>(entity);
+			Rigidbody& rb = ecs.getComponent<Rigidbody>(entity);
+			Transform& tf = ecs.getComponent<Transform>(entity);
 
-			if (collider.collisions.size() > 0)
+			if (collider.collisions.size() > 0 && !projectile.destroy)
 			{
 				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [projectile](const Collision& collision)
 					{
-						return ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b);
+						return ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b) || (ecs.hasComponent<Projectile>(collision.a) && ecs.hasComponent<Projectile>(collision.b));
 					}))
 				{
-					ecs.destroyEntity(entity);
-					break;
+					projectile.destroy = true;
+					rb.velocity = Vector2(0, 0);
+					tf.xScale = 20;
+					tf.yScale = 20;
+					AnimationSystem::PlayAnimation(entity, "explosion");
+					continue;
 				}
+			}
+
+			if (projectile.destroy == true && !animator.playingAnimation)
+			{
+				ecs.destroyEntity(entity);
+				break;
 			}
 		}
 	}
@@ -52,6 +68,7 @@ class TurretController : public System
 public:
 	TurretController()
 	{
+		explosion = AnimationsFromSpritesheet("assets/explosion.png", 5, 1, vector<int>(5, 75))[0];
 		defaultTexture = new Texture("assets/Gun_06.png");
 		projectileTexture = new Texture("assets/bullet.png");
 
@@ -64,6 +81,7 @@ public:
 		projectileControllerSignature.set(ecs.getComponentId<Sprite>());
 		projectileControllerSignature.set(ecs.getComponentId<Rigidbody>());
 		projectileControllerSignature.set(ecs.getComponentId<BoxCollider>());
+		projectileControllerSignature.set(ecs.getComponentId<Animator>());
 		ecs.setSystemSignature<ProjectileController>(projectileControllerSignature);
 	}
 
@@ -112,11 +130,14 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 7, .yScale = 7 });
+		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 5, .xScale = 7, .yScale = 7 });
 		ecs.addComponent(projectile, Sprite{ .texture = projectileTexture });
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(projectile, Projectile{});
+		ecs.addComponent(projectile, Animator{});
+
+		AnimationSystem::AddAnimation(projectile, explosion, "explosion");
 	}
 
 	Entity CreateTurret(float x, float y)
@@ -132,6 +153,7 @@ public:
 	}
 
 	Entity player;
+	Animation explosion;
 	shared_ptr<ProjectileController> projectileController;
 	Texture* defaultTexture;
 	Texture* projectileTexture;
