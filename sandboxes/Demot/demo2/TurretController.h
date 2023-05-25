@@ -11,6 +11,7 @@ struct Turret
 	float projectileTimer = 0.2f;
 	int shotsBeforeReload = 5;
 	float reloadTime = 3;
+	int fireSound = 0;
 };
 
 struct Projectile
@@ -110,6 +111,7 @@ public:
 						SpawnProjectile(player, transform.x, transform.y, 5000);
 						turret.projectileTimer = 0.2;
 						turret.shotsBeforeReload--;
+						turret.fireSound = 1;
 					}
 					else
 					{
