@@ -28,16 +28,19 @@ public:
 		defaultTexture = new Texture("assets/strawberry.png");
 		winner = new Texture("assets/winner.png");
 		animations = AnimationsFromSpritesheet("assets/Strawberry Animation.png", 7, 2, vector<int>(7*2, 100));
-scoreAnims = AnimationsFromSpritesheet("assets/");winScreen = ecs.newEntity();
+		//scoreAnims = AnimationsFromSpritesheet("assets/");
+		winScreen = ecs.newEntity();
 		ecs.addComponent(winScreen, Transform{.z = 20, .xScale = 200, .yScale = 200});
-		ecs.addComponent(winScreen, Sprite{.texture = winner, .enabled = false});	}
+		ecs.addComponent(winScreen, Sprite{.texture = winner, .enabled = false});
+	}
 
 	void Update(Entity player, double programTime)
 	{
+		//Board& board = ecs.getComponent<Board>(entity);
 		for (auto const& entity : entities)
 		{
 			Pickup& pickup = ecs.getComponent<Pickup>(entity);
-			Board& board = ecs.getComponent<Board>(entity);
+			
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Animator& animator = ecs.getComponent<Animator>(entity);
@@ -57,7 +60,7 @@ scoreAnims = AnimationsFromSpritesheet("assets/");winScreen = ecs.newEntity();
 			if (!animator.playingAnimation)
 			{
 				collected++;
-				AnimationSystem::PlayAnimation(en, to_string(collected));
+				//AnimationSystem::PlayAnimation(board, to_string(collected));
 				ecs.destroyEntity(entity);
 				break;
 			}
@@ -96,10 +99,10 @@ scoreAnims = AnimationsFromSpritesheet("assets/");winScreen = ecs.newEntity();
 			"5", "6", "7", "8", "9", });
 		AnimationSystem::PlayAnimation(board, "0", true);
 	}
-
-Entity winScreen;
+	
+	Entity winScreen;
 	Texture* winner;
-vector<Animation> scoreAnims;
+	vector<Animation> scoreAnims;
 	vector<Animation> animations;
 	Texture* defaultTexture;
 	int collected = 0;
