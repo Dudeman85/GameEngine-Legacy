@@ -119,6 +119,8 @@ public:
 		ecs.addComponent(projectile, Projectile{});
 		AnimationSystem::AddAnimation(projectile, projectileAnim, "default");
 		AnimationSystem::PlayAnimation(projectile, "default", true);
+
+		playSound = true;
 	}
 
 	Entity CreateTurret(float x, float y)
@@ -136,6 +138,7 @@ public:
 		return turret;
 	}
 
+	bool playSound = false;
 	Entity player;
 	shared_ptr<ProjectileController> projectileController;
 	vector<Animation> animations;
