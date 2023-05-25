@@ -133,7 +133,7 @@ namespace engine
 
 			//Sort the entities and tilemap by Z
 			set<float> layersToDraw(tilemap->zLayers.begin(), tilemap->zLayers.end());
-			map<int, vector<Entity>> sortedEntities;
+			map<float, vector<Entity>> sortedEntities;
 			for (const Entity& entity : entities)
 			{
 				Transform& transform = ecs.getComponent<Transform>(entity);

@@ -160,10 +160,11 @@ int main()
 	pickupController->CreatePickup(1010, -680);
 	pickupController->CreatePickup(720, -1510);
 	pickupController->CreatePickup(1860, -1765);
-	pickupController->CreatePickup(1920, -2630);
+	pickupController->CreatePickup(1890, -2620);
 
+	//Make all the mage enemies
 	turretController->player = player;
-	turretController->CreateTurret(610, -430);
+	turretController->CreateTurret(1110, -430);
 	turretController->CreateTurret(600, -1520);
 	turretController->CreateTurret(580, -1100);
 	turretController->CreateTurret(730, -2285);

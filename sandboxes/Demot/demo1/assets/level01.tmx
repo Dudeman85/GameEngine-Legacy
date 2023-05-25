@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="images/tilemap/32x32.tsx"/>
  <layer id="2" name="collider" width="65" height="90">
   <data encoding="base64" compression="zlib">
-   eJzt2VGKwzAMBND8LnuBHigX25svhhZCsGPZGtmSOgOipbSJ8nBsh57HcZzvypZzorKFBjQooQENSmhAgxIa0KCEBjQoocGcQTYLGsxd++vy6rFWGngsGtQNei6eDaRjP7tBLxID1HVnM6j9lgY08GzQW/+zG0jGRc1Aul/KanC3+EaDkT1zZgNpaKA3aO1Vv8Wg5rDrubhn8PncwsBLdo4DL9EYaO9NL9EYPIUGOgOUz9+tWoliIJnfZzNqgFzXW1l1nzyt2dJEN/jE49pIA5kBcn7wZnDtY8U+2bOBRT0ZzI6pLAa9PPW7ykAThMFTaBDjuZEGNgav23saYA00x5LML1Z7jhVz4q7jrSga0GC3gVVo0D8vDWgQ2aD2fU2fXg1mfbR7ppGeo9wLkccBKtYGyJ6sQoNYBlYWCIPoiWqA7GmHgSfLEhrsN/hpFCqS3kcNEFbRx0G0uVOSDAba82Yw0IYGNCixMtjtIekH8Z+Tt+u+ptZHq7esBiOJaIA+/m+j0AZItxXjzMIAkZXjjQb+DHbMO5EMrBwQBiwWi8XKWf8ulcpW
+   eJzt2VGKwzAMBND8LnuBHigX25svhhZCsGPZGtmSOgOipbSJ8nBsh57HcZzvypZzorKFBjQooQENSmhAgxIa0KCEBjQoocGcQTYLGsxd++vy6rFWGngsGtQNei6eDaRjP7tBLxID1HVnM6j9lgY08GzQW/+zG0jGRc1Aul/KanC3+EaDkT1zZgNpaKA3aO1Vv8Wg5rDrubhn8PncwsBLdo4DL9EYaO9NL9EYPIUGOgOUz9+tWoliIJnfZzNqgFzXW1l1nzyt2dJEN/jE49pIA5kBcn7wZnDtY8U+2bOBRT0ZzI6pLAa9PPW7ykAThMFTaBDjuZEGNgav23saYA00x5LML1Z7jhVz4q7jrSga0GC3gVVo0D8vDWgQ2aD2fU2fXg1mfbR7ppGeo9wLkccBKtYGyJ6sQoNYBlYWCIPoiWqA7GmHgSfLEhrsN/hpFCqS3kcNEFbRx0G0uVOSDAba82Yw0IYGNCixMtjtIekH8Z+Tt+u+ptZHq7esBiOJaIA+/m+j0AZIN7RBba9uYYDIqvPQwKfBautoBhYOKAMWi8Vi5ax/EHrKpw==
   </data>
  </layer>
  <layer id="5" name="Tile Layer 4" width="65" height="90">

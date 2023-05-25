@@ -13,6 +13,12 @@ struct Pickup
 	int sound = 0;
 };
 
+struct  Board
+{
+	int vicCondition = 0;
+	glm::vec3 position = glm::vec3(0.f, 0.f, 0.f);
+};
+
 //Pickup controller system requires sprite, transform, rigidbody, box collider, Animator and Pickup
 class PickupController : public System
 {
@@ -20,14 +26,21 @@ public:
 	PickupController()
 	{
 		defaultTexture = new Texture("assets/strawberry.png");
+		winner = new Texture("assets/winner.png");
 		animations = AnimationsFromSpritesheet("assets/Strawberry Animation.png", 7, 2, vector<int>(7*2, 100));
+		//scoreAnims = AnimationsFromSpritesheet("assets/");
+		winScreen = ecs.newEntity();
+		ecs.addComponent(winScreen, Transform{.z = 20, .xScale = 200, .yScale = 200});
+		ecs.addComponent(winScreen, Sprite{.texture = winner, .enabled = false});
 	}
 
 	void Update(Entity player, double programTime)
 	{
+		//Board& board = ecs.getComponent<Board>(entity);
 		for (auto const& entity : entities)
 		{
 			Pickup& pickup = ecs.getComponent<Pickup>(entity);
+			
 			Transform& transform = ecs.getComponent<Transform>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Animator& animator = ecs.getComponent<Animator>(entity);
@@ -47,10 +60,17 @@ public:
 			if (!animator.playingAnimation)
 			{
 				collected++;
+				//AnimationSystem::PlayAnimation(board, to_string(collected));
 				ecs.destroyEntity(entity);
 				break;
 			}
 		}
+
+		if (collected >= total)
+		{
+			ecs.getComponent<Sprite>(winScreen).enabled = true;
+		}
+		TransformSystem::SetPosition(winScreen, Vector3(ecs.getComponent<Transform>(player).x, ecs.getComponent<Transform>(player).y, 20));
 	}
 
 	Entity CreatePickup(float x, float y)
@@ -64,6 +84,7 @@ public:
 		ecs.addComponent(pickup, Animator{});
 		AnimationSystem::AddAnimations(pickup, animations, vector<string>{"default", "collect"});
 		AnimationSystem::PlayAnimation(pickup, "default", true);
+		total++;
 
 		return pickup;
 	}
@@ -73,9 +94,17 @@ public:
 		Entity board = ecs.newEntity();
 		ecs.addComponent(board, Transform{ .x = x, .y = y });
 		ecs.addComponent(board, Animator{});
+		ecs.addComponent(board, Board{});
+		AnimationSystem::AddAnimations(board, scoreAnims, vector<string>{"0", "1", "2", "3", "4",
+			"5", "6", "7", "8", "9", });
+		AnimationSystem::PlayAnimation(board, "0", true);
 	}
-
+	
+	Entity winScreen;
+	Texture* winner;
+	vector<Animation> scoreAnims;
 	vector<Animation> animations;
 	Texture* defaultTexture;
 	int collected = 0;
+	int total = 0;
 };

@@ -9,20 +9,23 @@ struct Turret
 {
 	int health = 1;
 	float projectileTimer = 0.2f;
-	int shotsBeforeReload = 10;
+	int shotsBeforeReload = 5;
 	float reloadTime = 3;
 };
 
 struct Projectile
 {
 	int damage = 1;
+	bool destroy = false;
 };
 
-//Pickup controller system requires sprite, transform, rigidbody, box collider and Projectile
+//Projectile controller system requires sprite, transform, rigidbody, box collider, Animator and Projectile
 class ProjectileController : public System
 {
 public:
-	ProjectileController() {};
+	ProjectileController()
+	{
+	};
 
 	void Update()
 	{
@@ -30,17 +33,36 @@ public:
 		{
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Projectile& projectile = ecs.getComponent<Projectile>(entity);
+			Animator& animator = ecs.getComponent<Animator>(entity);
+			Rigidbody& rb = ecs.getComponent<Rigidbody>(entity);
+			Transform& tf = ecs.getComponent<Transform>(entity);
 
-			if (collider.collisions.size() > 0)
+			if (collider.collisions.size() > 0 && !projectile.destroy)
 			{
 				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [projectile](const Collision& collision)
 					{
-						return ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b);
+						return collision.type == Collision::Type::tilemapTrigger || (ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b) || (ecs.hasComponent<Projectile>(collision.a) && ecs.hasComponent<Projectile>(collision.b)));
 					}))
 				{
-					ecs.destroyEntity(entity);
-					break;
+					projectile.destroy = true;
+					rb.velocity = Vector2(0, 0);
+					tf.xScale = 20;
+					tf.yScale = 20;
+					AnimationSystem::PlayAnimation(entity, "explosion");
+					continue;
 				}
+			}
+
+			if (projectile.destroy == true && !animator.playingAnimation)
+			{
+				ecs.destroyEntity(entity);
+				break;
+			}
+
+			if (tf.x < -1000 || tf.y > 1000 || tf.x > 3000 || tf.y < -3000)
+			{
+				ecs.destroyEntity(entity);
+				break;
 			}
 		}
 	}
@@ -52,6 +74,7 @@ class TurretController : public System
 public:
 	TurretController()
 	{
+		explosion = AnimationsFromSpritesheet("assets/explosion.png", 5, 1, vector<int>(5, 75))[0];
 		defaultTexture = new Texture("assets/Gun_06.png");
 		projectileTexture = new Texture("assets/bullet.png");
 
@@ -64,6 +87,7 @@ public:
 		projectileControllerSignature.set(ecs.getComponentId<Sprite>());
 		projectileControllerSignature.set(ecs.getComponentId<Rigidbody>());
 		projectileControllerSignature.set(ecs.getComponentId<BoxCollider>());
+		projectileControllerSignature.set(ecs.getComponentId<Animator>());
 		ecs.setSystemSignature<ProjectileController>(projectileControllerSignature);
 	}
 
@@ -75,7 +99,6 @@ public:
 		{
 			Turret& turret = ecs.getComponent<Turret>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
-
 
 			if (TransformSystem::Distance(entity, player) < 400)
 			{
@@ -97,7 +120,7 @@ public:
 				{
 					if (turret.reloadTime <= 0)
 					{
-						turret.shotsBeforeReload = 10;
+						turret.shotsBeforeReload = 5;
 						turret.reloadTime = 3;
 					}
 					else
@@ -112,17 +135,20 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1, .xScale = 7, .yScale = 7 });
+		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 5, .xScale = 7, .yScale = 7 });
 		ecs.addComponent(projectile, Sprite{ .texture = projectileTexture });
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(projectile, Projectile{});
+		ecs.addComponent(projectile, Animator{});
+
+		AnimationSystem::AddAnimation(projectile, explosion, "explosion");
 	}
 
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1, .xScale = 60, .yScale = 20 });
+		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 60, .yScale = 20 });
 		ecs.addComponent(turret, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{});
@@ -132,6 +158,7 @@ public:
 	}
 
 	Entity player;
+	Animation explosion;
 	shared_ptr<ProjectileController> projectileController;
 	Texture* defaultTexture;
 	Texture* projectileTexture;

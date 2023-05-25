@@ -20,6 +20,11 @@ public:
 	PickupController()
 	{
 		defaultTexture = new Texture("assets/ammo box.png");
+		winner = new Texture("assets/winner.png");
+
+		winScreen = ecs.newEntity();
+		ecs.addComponent(winScreen, Transform{ .z = 20, .xScale = 200, .yScale = 200 });
+		ecs.addComponent(winScreen, Sprite{ .texture = winner, .enabled = false });
 	}
 
 	void Update(Entity player)
@@ -38,6 +43,12 @@ public:
 				break;
 			}
 		}
+
+		if (collected >= total)
+		{
+			ecs.getComponent<Sprite>(winScreen).enabled = true;
+		}
+		TransformSystem::SetPosition(winScreen, Vector3(ecs.getComponent<Transform>(player).x, ecs.getComponent<Transform>(player).y, 20));
 	}
 
 	Entity CreatePickup(float x, float y)
@@ -48,10 +59,14 @@ public:
 		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
 		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(pickup, Pickup{});
+		total++;
 
 		return pickup;
 	}
 
+	Entity winScreen;
+	Texture* winner;
 	Texture* defaultTexture;
 	int collected = 0;
+	int total = 0;
 };
