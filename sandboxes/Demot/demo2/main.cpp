@@ -116,7 +116,7 @@ int main()
 	float fireCooldown = 0.04f;
 	bool canFire = true;
 
-	RenderSystem::SetBackgroundColor(0.3f, 0.3f, 0.1f);
+	RenderSystem::SetBackgroundColor(68, 154, 141);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo2.tmx");
 	engine.physicsSystem->SetTilemap(&map);
