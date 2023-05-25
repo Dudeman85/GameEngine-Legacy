@@ -313,10 +313,10 @@ namespace engine
 						//TODO figure out the actual fix for this instead of the +0.0001 hack
 						//Calculate the bounds for the collided tile
 						std::array<float, 4> tileBounds{
-							-tileIndex.y * tilemap->tileSize.y + 0.0001,
+							-tileIndex.y * tilemap->tileSize.y + 0.0001f,
 							(tileIndex.x + 1) * tilemap->tileSize.x,
 							-(tileIndex.y + 1) * tilemap->tileSize.y,
-							tileIndex.x * tilemap->tileSize.x - 0.0001 };
+							tileIndex.x * tilemap->tileSize.x - 0.0001f };
 
 						collision.intersects = GetIntersects(bounds, tileBounds);
 

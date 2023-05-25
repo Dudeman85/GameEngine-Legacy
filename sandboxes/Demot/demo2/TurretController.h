@@ -59,7 +59,7 @@ public:
 				break;
 			}
 
-			if (tf.x < -10 || tf.y > 10 || tf.x > 2000 || tf.y < -2000)
+			if (tf.x < -1000 || tf.y > 1000 || tf.x > 3000 || tf.y < -3000)
 			{
 				ecs.destroyEntity(entity);
 				break;
