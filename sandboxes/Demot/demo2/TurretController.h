@@ -9,7 +9,7 @@ struct Turret
 {
 	int health = 1;
 	float projectileTimer = 0.2f;
-	int shotsBeforeReload = 10;
+	int shotsBeforeReload = 5;
 	float reloadTime = 3;
 };
 
@@ -41,7 +41,7 @@ public:
 			{
 				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [projectile](const Collision& collision)
 					{
-						return ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b) || (ecs.hasComponent<Projectile>(collision.a) && ecs.hasComponent<Projectile>(collision.b));
+						return collision.type == Collision::Type::tilemapTrigger || (ecs.hasComponent<Turret>(collision.a) || ecs.hasComponent<Turret>(collision.b) || (ecs.hasComponent<Projectile>(collision.a) && ecs.hasComponent<Projectile>(collision.b)));
 					}))
 				{
 					projectile.destroy = true;
@@ -54,6 +54,12 @@ public:
 			}
 
 			if (projectile.destroy == true && !animator.playingAnimation)
+			{
+				ecs.destroyEntity(entity);
+				break;
+			}
+
+			if (tf.x < -10 || tf.y > 10 || tf.x > 2000 || tf.y < -2000)
 			{
 				ecs.destroyEntity(entity);
 				break;
@@ -94,7 +100,6 @@ public:
 			Turret& turret = ecs.getComponent<Turret>(entity);
 			Transform& transform = ecs.getComponent<Transform>(entity);
 
-
 			if (TransformSystem::Distance(entity, player) < 400)
 			{
 				transform.zRotation = TransformSystem::Angle(entity, player);
@@ -115,7 +120,7 @@ public:
 				{
 					if (turret.reloadTime <= 0)
 					{
-						turret.shotsBeforeReload = 10;
+						turret.shotsBeforeReload = 5;
 						turret.reloadTime = 3;
 					}
 					else
@@ -143,7 +148,7 @@ public:
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1, .xScale = 60, .yScale = 20 });
+		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 60, .yScale = 20 });
 		ecs.addComponent(turret, Sprite{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{});

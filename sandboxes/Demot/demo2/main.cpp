@@ -82,7 +82,7 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 325, .y = -305, .z = 1.5, .xScale = 40, .yScale = 40 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 168, .y = -150, .z = 1.5, .xScale = 40, .yScale = 40 });
 	ecs.addComponent(player, Sprite{ &texture });
 	ecs.addComponent(player, Player{});
 	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
@@ -98,17 +98,12 @@ int main()
 
 	turretController->player = player;
 	turretController->CreateTurret(1000, -1000);
-	/*
-	Entity hull = ecs.newEntity();
-	Transform& hullTransform = ecs.addComponent(hull, Transform{ .x = 325, .y = -305, .z = 0, .xScale = 30, .yScale = 15 });
-	ecs.addComponent(hull, Sprite{ &texture4 });
+	turretController->CreateTurret(360, -690);
+	turretController->CreateTurret(1395, -1010);
+	turretController->CreateTurret(1448, -376);
+	turretController->CreateTurret(1066, -168);
+	turretController->CreateTurret(350, -1280);
 
-	ecs.addComponent(hull, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
-	ecs.addComponent(hull, BoxCollider{});
-	ecs.addComponent(hull, Player{});
-	BoxCollider& hullCollider = ecs.getComponent<BoxCollider>(hull);
-	Rigidbody& hullRigidbody = ecs.getComponent<Rigidbody>(hull);
-	*/
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
@@ -127,7 +122,10 @@ int main()
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 
-	pickupController->CreatePickup(600, -500);
+	pickupController->CreatePickup(600, -75);
+	pickupController->CreatePickup(325, -1400);
+	pickupController->CreatePickup(1340, -1375);
+	pickupController->CreatePickup(1450, -100);
 
 	Animation explosion = AnimationsFromSpritesheet("assets/explosion.png", 5, 1, vector<int>(5, 75))[0];
 
@@ -190,8 +188,6 @@ int main()
 				playerTransform.zRotation = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
 			}
 
-			// sets crosshair position to zero
-			Vector2 crosshairPosition(0, 0);
 			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
 			{
 
@@ -211,7 +207,7 @@ int main()
 				ecs.getComponent<Sprite>(crosshair).enabled = true;
 				// crosshair position based on player position
 				Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
+				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 10);
 				TransformSystem::SetPosition(crosshair, crosshairPosition);
 
 				playerTurretTransform.zRotation = atan2f(-rightThumbstick.y, rightThumbstick.x) * 180 / 3.14f;
@@ -294,7 +290,7 @@ int main()
 		}
 		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
 
-		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 3));
+		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 1.6));
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////

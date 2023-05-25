@@ -50,7 +50,7 @@ class TurretController : public System
 public:
 	TurretController()
 	{
-		animations = AnimationsFromSpritesheet("assets/mageattack.png", 4, 2, vector<int>(4 * 2, 250));
+		animations = AnimationsFromSpritesheet("assets/mageattack.png", 4, 2, vector<int>{250, 250, 250, 250, 150, 150, 150, 150});
 		projectileAnim = AnimationsFromSpritesheet("assets/magebullet.png", 5, 1, vector<int>(5 * 1, 50))[0];
 
 		//Register Projectile Controller
