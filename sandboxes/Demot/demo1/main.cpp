@@ -74,7 +74,7 @@ int main()
 	static SoundSource waterSpeaker;
 	static SoundSource torchSpeaker;
 	static SoundSource torchSpeaker2;
-	static SoundSource mageSpeaker;
+	static SoundSource playerSpeaker;
 	static SoundSource pickSpeaker;
 	static SoundSource jumpSpeaker;
 	static SoundSource attackSpeaker;
@@ -155,7 +155,7 @@ int main()
 	waterSpeaker.setLinearDistanceClamped(1, 1.0f, 150.f, 700.f, 1.f);
 	torchSpeaker.setLinearDistanceClamped(2, 0.5f, 50.f, 500.f, 1.f);
 	torchSpeaker2.setLinearDistanceClamped(3, 0.5f, 50.f, 500.f, 1.f);
-	mageSpeaker.setLinearDistanceClamped(4, 1.f, 50.f, 500.f, 1.f);
+	playerSpeaker.setLinearDistanceClamped(4, 1.f, 50.f, 500.f, 1.f);
 	/*speaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
 	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
 	mageSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
@@ -175,15 +175,15 @@ int main()
 	turretController->CreateTurret(1590, -2360);
 	turretController->CreateTurret(1790, -2640);
 
-	uint32_t swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+	//uint32_t swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
 	uint32_t waterSound = SoundBuffer::getFile()->addSoundEffect("assets/stream.wav");
 	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
 	uint32_t pickSound = SoundBuffer::getFile()->addSoundEffect("assets/strawberry_touch.wav");
 	uint32_t jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
-	uint32_t attackSound = SoundBuffer::getFile()->addSoundEffect("assets/stereoswing.wav");
+	uint32_t attackSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
 
-	mageSpeaker.Play(swingSound);
-	mageSpeaker.SetLooping(1);
+	//mageSpeaker.Play(swingSound);
+	//mageSpeaker.SetLooping(1);
 
 	waterSpeaker.Play(waterSound);
 	waterSpeaker.SetLooping(1);
@@ -231,31 +231,37 @@ int main()
 				pickup.sound = 0;
 			}
 		};
+		
+
+		engine.soundDevice->SetSourceLocation(1, 1296, -1556, -35);
+		engine.soundDevice->SetSourceLocation(2, 1480, -2036, 1);
+		engine.soundDevice->SetSourceLocation(3, 850, -2336, 1);
+		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
+		/*engine.soundDevice->SetSourceLocation(3, playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
+		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
+		engine.soundDevice->SetSourceLocation(4, 500, 0, 1);*/
+
 		for (Entity entity : playerController->entities) {
 			Player& player = ecs.getComponent<Player>(entity);
 			if (player.jumpSound == 1) {
-				if (!jumpSpeaker.isPlaying())
-					jumpSpeaker.Play(jumpSound);
+				if (!playerSpeaker.isPlaying())
+					playerSpeaker.Play(jumpSound);
 				player.jumpSound = 0;
 			}
 		};
 		for (Entity entity : playerController->entities) {
 			Player& player = ecs.getComponent<Player>(entity);
 			if (player.attackSound == 1) {
-				
-				attackSpeaker.Play(attackSound);
+
+				playerSpeaker.Play(attackSound);
 				player.attackSound = 0;
 			}
 		};
 
-		engine.soundDevice->SetSourceLocation(1, 1296, -1556, -35);
-		engine.soundDevice->SetSourceLocation(2, 1480, -2036, 1);
-		engine.soundDevice->SetSourceLocation(3, 850, -2336, 1);
-		engine.soundDevice->SetSourceLocation(4, 610, -430, 1);
-		/*engine.soundDevice->SetSourceLocation(3, playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
-		engine.soundDevice->SetSourceLocation(4, 500, 0, 1);*/
+
+
+
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
