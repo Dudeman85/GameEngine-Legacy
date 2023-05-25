@@ -156,17 +156,15 @@ int main()
 	torchSpeaker.setLinearDistanceClamped(2, 0.5f, 50.f, 500.f, 1.f);
 	torchSpeaker2.setLinearDistanceClamped(3, 0.5f, 50.f, 500.f, 1.f);
 	playerSpeaker.setLinearDistanceClamped(4, 1.f, 50.f, 500.f, 1.f);
-	/*speaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
-	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
-	mageSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
-	swordSpeaker.setLinearDistanceClamped(5, 1.f, 100.f, 600.f, 1.f);*/
-
+	
+	//Make all the strawberies
 	pickupController->CreatePickup(1880, -1100);
 	pickupController->CreatePickup(1010, -680);
 	pickupController->CreatePickup(720, -1510);
 	pickupController->CreatePickup(1860, -1765);
 	pickupController->CreatePickup(1890, -2620);
 
+	//Make all the mage enemies
 	turretController->player = player;
 	turretController->CreateTurret(1110, -430);
 	turretController->CreateTurret(600, -1520);
