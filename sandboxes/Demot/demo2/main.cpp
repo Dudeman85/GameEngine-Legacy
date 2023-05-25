@@ -58,10 +58,10 @@ int main()
 	engine.physicsSystem->step = 8;
 
 
-	static SoundSource mySpeaker1;
-	static SoundSource mySpeaker2;
-	static SoundSource mySpeaker3;
-	static SoundSource mySpeaker4;
+	static SoundSource tankSpeaker;
+	static SoundSource shootSpeaker;
+	static SoundSource explosionSpeaker;
+	static SoundSource enemySpeaker;
 
 	///////////////////Texture & audio loading////////////////////
 
@@ -73,10 +73,12 @@ int main()
 	//load sound from file
 	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
 	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/bang_05.wav");
+	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/bang_09.wav");
 
-	mySpeaker1.setLinearDistance(0.1f, 10.f, 60.f, 1.f);
-	mySpeaker2.setLinearDistance(1.5f, 100.f, 700.f, 0.5f);
-	mySpeaker3.setLinearDistance(1.f, 10.f, 600.f, 1.f);
+	tankSpeaker.setLinearDistance(0.1f, 50.f, 60.f, 1.f);
+	shootSpeaker.setLinearDistance(1.5f, 100.f, 700.f, 0.5f);
+	explosionSpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
+	enemySpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
 
 
 
@@ -93,8 +95,8 @@ int main()
 	ecs.addComponent(playerTurret, Sprite{ .texture = &turretTexture });
 
 	//play sound files
-	mySpeaker1.Play(sound1);
-	mySpeaker1.SetLooping(1);
+	tankSpeaker.Play(sound1);
+	tankSpeaker.SetLooping(1);
 
 	turretController->player = player;
 	turretController->CreateTurret(1000, -1000);
@@ -144,7 +146,8 @@ int main()
 
 		playerController->Update(window, engine.deltaTime, engine.physicsSystem);
 		pickupController->Update(player);
-
+		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
 		int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
@@ -227,9 +230,9 @@ int main()
 
 						bullets.emplace(bullet);
 						fireCooldown = 0.5f;
-						engine.soundDevice->SetSourceLocation(mySpeaker2, playerTransform.x, playerTransform.y, playerTransform.z);
+						
 						//shooting sound
-						mySpeaker2.Play(sound2);
+						shootSpeaker.Play(sound2);
 					}
 				}
 			}
@@ -256,6 +259,7 @@ int main()
 					{
 						bullets.erase(bullets.find(bullet));
 						ecs.destroyEntity(bullet);
+						
 					}
 					break;
 				}
@@ -273,6 +277,11 @@ int main()
 						ecs.destroyEntity(collision.b);
 						ecs.removeComponent<BoxCollider>(bullet);
 						AnimationSystem::PlayAnimation(bullet, "explosion");
+						
+						
+						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.x, tf.y, 1);
+						explosionSpeaker.Play(sound3);
+						
 
 						break;
 					}
@@ -284,22 +293,25 @@ int main()
 						tf.yScale = 20;
 						ecs.removeComponent<BoxCollider>(bullet);
 						AnimationSystem::PlayAnimation(bullet, "explosion");
+						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.x, tf.y, 1);
+						explosionSpeaker.Play(sound3);
 						break;
 					}
 				}
 			}
 		}
-		engine.soundDevice->SetSourceLocation(mySpeaker2, playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetSourceLocation(shootSpeaker, playerTransform.x, playerTransform.y, playerTransform.z);
 
 		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 1.6));
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
-		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
+		
 
 		//engine sound
-		engine.soundDevice->SetSourceLocation(mySpeaker1, playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.x, playerTransform.y, 50);
+		
+
 
 		fireCooldown -= engine.deltaTime;
 
