@@ -20,7 +20,7 @@ int main()
 	GLFWwindow* window = CreateWindow(1000, 800, "Window");
 
 	//Create the camera
-	Camera cam = Camera(1000, 800);
+	Camera cam = Camera(1066, 600);
 
 	//Initialize the default engine library
 	EngineLib engine;
