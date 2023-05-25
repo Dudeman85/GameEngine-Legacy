@@ -22,9 +22,9 @@ void SoundDevice::GetLocation(float& x, float& y, float& z)
 	alGetListener3f(AL_POSITION, &x, &y, &z);
 }
 
-void SoundDevice::GetSourceLocation(const ALuint &sourceID, float& x, float& y, float& z)
+void SoundDevice::GetSourceLocation(const SoundSource& source, float& x, float& y, float& z)
 {
-	alGetSource3f(sourceID, AL_POSITION, &x, &y, &z);
+	alGetSource3f(source.getSourceId(), AL_POSITION, &x, &y, &z);
 	
 }
 
@@ -53,9 +53,9 @@ void SoundDevice::SetLocation(const float& x, const float& y, const float& z)
 	alListener3f(AL_POSITION, x, y, z);
 }
 
-void SoundDevice::SetSourceLocation(const ALuint &sourceID, const float& x, const float& y, const float& z)
+void SoundDevice::SetSourceLocation(const SoundSource& source, const float& x, const float& y, const float& z)
 {
-	alSource3f(sourceID, AL_POSITION, x, y, z);
+	alSource3f(source.getSourceId(), AL_POSITION, x, y, z);
 }
 
 void SoundDevice::SetOrientation(const float& horx, const float& hory, const float& horz,

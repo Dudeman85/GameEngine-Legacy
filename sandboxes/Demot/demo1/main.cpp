@@ -71,15 +71,12 @@ int main()
 	turretControllerSignature.set(ecs.getComponentId<Animator>());
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
 
-	static SoundSource waterSpeaker;
-	static SoundSource torchSpeaker;
-	static SoundSource torchSpeaker2;
-	static SoundSource playerSpeaker;
-	static SoundSource pickSpeaker;
-	static SoundSource jumpSpeaker;
-	static SoundSource attackSpeaker;
-	/*static SoundSource walkSpeaker;
-	static SoundSource swordSpeaker;*/
+	SoundSource waterSpeaker;
+	SoundSource torchSpeaker;
+	SoundSource torchSpeaker2;
+	SoundSource playerSpeaker;
+	SoundSource pickSpeaker;
+	SoundSource magicSpeaker;
 	MusicBuffer myMusic("assets/forest.wav");
 	myMusic.SetVolume(0.5f);
 	myMusic.Play();
@@ -152,19 +149,18 @@ int main()
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 
-	waterSpeaker.setLinearDistanceClamped(1, 1.0f, 150.f, 700.f, 1.f);
-	torchSpeaker.setLinearDistanceClamped(2, 0.5f, 50.f, 500.f, 1.f);
-	torchSpeaker2.setLinearDistanceClamped(3, 0.5f, 50.f, 500.f, 1.f);
-	playerSpeaker.setLinearDistanceClamped(4, 1.f, 50.f, 500.f, 1.f);
-	/*speaker.setLinearDistanceClamped(3, 1.f, 100.f, 600.f, 1.f);
-	walkSpeaker.setLinearDistanceClamped(2, 1.f, 100.f, 600.f, 1.f);
-	mageSpeaker.setLinearDistanceClamped(4, 1.f, 100.f, 600.f, 1.f);
-	swordSpeaker.setLinearDistanceClamped(5, 1.f, 100.f, 600.f, 1.f);*/
+	waterSpeaker.setLinearDistanceClamped(1.0f, 150.f, 700.f, 1.f);
+	torchSpeaker.setLinearDistanceClamped(0.5f, 50.f, 500.f, 1.f);
+	torchSpeaker2.setLinearDistanceClamped(0.5f, 50.f, 500.f, 1.f);
+	playerSpeaker.setLinearDistanceClamped(1.f, 50.f, 500.f, 1.f);
+	magicSpeaker.setLinearDistanceClamped(1.f, 50.f, 400.f, 1.f);
+	
 
 	pickupController->CreatePickup(1880, -1100);
 	pickupController->CreatePickup(1010, -680);
 	pickupController->CreatePickup(720, -1510);
 	pickupController->CreatePickup(1860, -1765);
+	pickupController->CreatePickup(1920, -2630);
 
 	turretController->player = player;
 	turretController->CreateTurret(610, -430);
@@ -175,15 +171,13 @@ int main()
 	turretController->CreateTurret(1590, -2360);
 	turretController->CreateTurret(1790, -2640);
 
-	//uint32_t swingSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
+	
 	uint32_t waterSound = SoundBuffer::getFile()->addSoundEffect("assets/stream.wav");
 	uint32_t torchSound = SoundBuffer::getFile()->addSoundEffect("assets/fire.wav");
 	uint32_t pickSound = SoundBuffer::getFile()->addSoundEffect("assets/strawberry_touch.wav");
 	uint32_t jumpSound = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
 	uint32_t attackSound = SoundBuffer::getFile()->addSoundEffect("assets/swing.wav");
-
-	//mageSpeaker.Play(swingSound);
-	//mageSpeaker.SetLooping(1);
+	uint32_t magicSound = SoundBuffer::getFile()->addSoundEffect("assets/Magic.wav");
 
 	waterSpeaker.Play(waterSound);
 	waterSpeaker.SetLooping(1);
@@ -233,14 +227,11 @@ int main()
 		};
 		
 
-		engine.soundDevice->SetSourceLocation(1, 1296, -1556, -35);
-		engine.soundDevice->SetSourceLocation(2, 1480, -2036, 1);
-		engine.soundDevice->SetSourceLocation(3, 850, -2336, 1);
-		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
-		/*engine.soundDevice->SetSourceLocation(3, playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, 0);
-		engine.soundDevice->SetSourceLocation(4, playerTransform.x, playerTransform.y, 1);
-		engine.soundDevice->SetSourceLocation(4, 500, 0, 1);*/
+		engine.soundDevice->SetSourceLocation(waterSpeaker, 1296, -1556, -35);
+		engine.soundDevice->SetSourceLocation(torchSpeaker, 1480, -2036, 1);
+		engine.soundDevice->SetSourceLocation(torchSpeaker2, 850, -2336, 1);
+		engine.soundDevice->SetSourceLocation(playerSpeaker, playerTransform.x, playerTransform.y, 1);
+		
 
 		for (Entity entity : playerController->entities) {
 			Player& player = ecs.getComponent<Player>(entity);
@@ -259,9 +250,25 @@ int main()
 			}
 		};
 
+		Entity closestProjectile =0;
+		for (Entity entity : turretController->entities) 
+		{
+			if (!ecs.entityExists(closestProjectile)) 
+			{
+				closestProjectile = entity;
+				continue;
+			}
 
-
-
+			if (TransformSystem::Distance(player, entity) < TransformSystem::Distance(player, closestProjectile))
+				closestProjectile = entity;
+		};
+		Transform closestProjectileTransform = ecs.getComponent<Transform>(closestProjectile);
+		
+		engine.soundDevice->SetSourceLocation(magicSpeaker, closestProjectileTransform.x, closestProjectileTransform.y, 0);
+		magicSpeaker.Play(magicSound);
+		
+		
+		
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

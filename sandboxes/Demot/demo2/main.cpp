@@ -73,9 +73,9 @@ int main()
 	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
 	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/bang_05.wav");
 
-	mySpeaker1.setLinearDistance(1, 0.1f, 10.f, 60.f, 1.f);
-	mySpeaker2.setLinearDistance(2, 1.5f, 100.f, 700.f, 0.5f);
-	mySpeaker3.setLinearDistance(3, 1.f, 10.f, 600.f, 1.f);
+	mySpeaker1.setLinearDistance(0.1f, 10.f, 60.f, 1.f);
+	mySpeaker2.setLinearDistance(1.5f, 100.f, 700.f, 0.5f);
+	mySpeaker3.setLinearDistance(1.f, 10.f, 600.f, 1.f);
 
 
 
@@ -230,7 +230,7 @@ int main()
 
 						bullets.push_back(bullet);
 						fireCooldown = 0.8f;
-						engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
+						engine.soundDevice->SetSourceLocation(mySpeaker2, playerTransform.x, playerTransform.y, playerTransform.z);
 						//shooting sound
 						mySpeaker2.Play(sound2);
 					}
@@ -307,7 +307,7 @@ int main()
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
 		//engine sound
-		engine.soundDevice->SetSourceLocation(1, playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetSourceLocation(mySpeaker1, playerTransform.x, playerTransform.y, playerTransform.z);
 
 		fireCooldown -= engine.deltaTime;
 

@@ -9,6 +9,7 @@ struct Turret
 {
 	int health = 1;
 	float projectileTimer = 2;
+	int magicSound = 0;
 };
 
 struct Projectile
@@ -28,7 +29,7 @@ public:
 		{
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Projectile& projectile = ecs.getComponent<Projectile>(entity);
-
+			
 			if (collider.collisions.size() > 0)
 			{
 				if (collider.collisions.end() == find_if(collider.collisions.begin(), collider.collisions.end(), [](const Collision& collision)
@@ -98,6 +99,7 @@ public:
 				{
 					SpawnProjectile(player, transform.x, transform.y, 2000);
 					turret.projectileTimer = 2;
+					turret.magicSound = 1;
 				}
 			}
 			turret.projectileTimer -= deltaTime;

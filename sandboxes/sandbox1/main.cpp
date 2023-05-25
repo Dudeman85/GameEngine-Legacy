@@ -52,10 +52,10 @@ int main()
 
 	MusicBuffer myMusic("assets/forest.wav");
 	myMusic.SetVolume(0.2f);
-	mySpeaker1.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
-	mySpeaker2.setLinearDistanceClamped(2, 1.f, 20.f, 200.f, 1.f);
-	mySpeaker3.setLinearDistanceClamped(3, 1.f, 20.f, 400.f, 2.4f);
-	mySpeaker4.setLinearDistanceClamped(4, 1.f, 20.f, 300.f, 1.f);
+	mySpeaker1.setLinearDistanceClamped(1.f, 100.f, 600.f, 1.f);
+	mySpeaker2.setLinearDistanceClamped(1.f, 20.f, 200.f, 1.f);
+	mySpeaker3.setLinearDistanceClamped(1.f, 20.f, 400.f, 2.4f);
+	mySpeaker4.setLinearDistanceClamped(1.f, 20.f, 300.f, 1.f);
 	//Load a new texture
 	Texture texture = Texture("assets/strawberry.png");
 	Texture texture2 = Texture("assets/crosshairEdit.png");
@@ -226,10 +226,10 @@ int main()
 		{
 			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
 			mySpeaker1.Play(sound3);
-			engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
+			//engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
 			mySpeaker1.SetLooping(0);
 			Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
-			engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
+			//engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
 			mySpeaker3.Play(sound4);
 		}
 
@@ -240,9 +240,9 @@ int main()
 		{
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 			mySpeaker2.Play(sound2);
-			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+			//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
-		engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
+		//engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
 		mySpeaker4.Play(sound2);
 		}
 
@@ -251,7 +251,7 @@ Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
 		{
 			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 			mySpeaker2.Play(sound1);
-			engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+			//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 		}
 		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 
@@ -363,7 +363,7 @@ Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
 			{
 				Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
 				mySpeaker2.Play(sound2);
-				engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+				//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
 			}
 
 		}
