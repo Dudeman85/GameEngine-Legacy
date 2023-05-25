@@ -289,7 +289,7 @@ int main()
 				}
 			}
 		}
-		engine.soundDevice->SetSourceLocation(2, playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetSourceLocation(mySpeaker2, playerTransform.x, playerTransform.y, playerTransform.z);
 
 		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 1.6));
 
