@@ -12,6 +12,11 @@ add_subdirectory("ext/libsndfile-master")
 include_directories("include")
 include_directories("ext/STB")
 include_directories("ext/libsndfile-master/include")
+
+# freetype-2.13.1 library
+add_subdirectory("ext/freetype-2.13.1")
+include_directories("ext/freetype-2.13.1/include")
+
 # tmxlite-master library
 SET(TMXLITE_STATIC_LIB TRUE CACHE BOOL "")
 add_subdirectory("ext/tmxlite-master/tmxlite")
@@ -27,7 +32,7 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/G
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
-target_link_libraries(engine glfw OpenAL tmxlite glm sndfile)
+target_link_libraries(engine glfw OpenAL tmxlite glm sndfile freetype)
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
