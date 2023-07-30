@@ -1,3 +1,7 @@
+int main()
+{}
+
+
 //#include <iostream>
 //#include <engine/Application.h>
 //#include <engine/Tilemap.h>
