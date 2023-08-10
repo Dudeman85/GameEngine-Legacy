@@ -11,6 +11,7 @@ using namespace std;
 
 void TextRender::FontLoad(const char* filepathname, FT_Long face_index)
 {
+
 	
 	// Initialize FreeType library
 	FT_Library ft;

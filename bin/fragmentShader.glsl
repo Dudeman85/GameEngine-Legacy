@@ -8,6 +8,11 @@ in vec2 v_texCoord;
 uniform usampler2D u_lookupMap;
 uniform sampler2D u_tileMap;
 
+// Text sampler
+uniform sampler2D u_textTexture;
+// Text's color
+uniform vec4 u_textColor;
+
 uniform vec2 u_tileSize;
 uniform vec2 u_tilesetCount;
 uniform vec2 u_tilesetScale = vec2(1.0);
@@ -62,6 +67,11 @@ void main()
 	}
 	else
 	{
-		 colour = vec4(0.0);
+		// Texts drawing
+		vec4 textColor = texture(u_textTexture, v_texCoord);
+		vec4 sampled = vec4(1.0, 1.0, 1.0, texture(u_textTexture, v_texCoord).r);
+		colour = vec4(u_textColor.rgb, 1.0) * sampled;
+		colour.a = min(colour.a, u_opacity);
+		 //colour = vec4(0.0);
 	}
 }
