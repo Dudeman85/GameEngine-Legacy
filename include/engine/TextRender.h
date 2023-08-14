@@ -22,6 +22,8 @@ class TextRender
 private:
 	
 	void initGLStuff();
+
+	unsigned int VAO, VBO;
 //	/*
 //	* bitmap properties that are needed to store characters into
 //	* struct map:
