@@ -136,7 +136,11 @@ int main()
 
 		// Update all engine systems, this usually should go last in the game loop
 		// For greater control of system execution, you can update each one manually
-		engine.Update(&cam);		
+		engine.Update(&cam);
+
+		// Text Rendering functions
+		//RenderText(m_shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		//RenderText(m_shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 		// OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
