@@ -1,14 +1,11 @@
 #include <iostream>
 #include <engine/Application.h>
 #include <engine/Tilemap.h>
+#include <engine/TextRender.h>
 #include <vector>
 #include <map>
 #include <chrono>
 #include <thread>
-
-// Freetype headers
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 using namespace std;
 using namespace engine;
@@ -90,6 +87,9 @@ int main()
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	// Text
+
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
