@@ -89,15 +89,9 @@ int main()
 	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	// Text
-	// TODO: Fix the appearing errors
-	// Severity	Code	Description	Project	File	Line	Suppression State
-	// Error	LNK2005	"bool engine::OPENGL_INITIALIZED" (? OPENGL_INITIALIZED@engine@@3_NA) already defined in main.obj	sandbox2	C : \Users\aarol\Desktop\Projektit\tiimi4\build\sandboxes\sandbox2\engine.lib(TextRender.obj)	1
-	//	Error	LNK2005	"class std::vector<class engine::Texture *,class std::allocator<class engine::Texture *> > __cdecl engine::SliceSpritesheet(char const *,int,int)" (? SliceSpritesheet@engine@@YA ? AV ? $vector@PEAVTexture@engine@@V ? $allocator@PEAVTexture@engine@@@std@@@std@@PEBDHH@Z) already defined in main.obj	sandbox2	C : \Users\aarol\Desktop\Projektit\tiimi4\build\sandboxes\sandbox2\engine.lib(TextRender.obj)	1
-	//	Error	LNK2005	"class std::vector<struct engine::Animation,class std::allocator<struct engine::Animation> > __cdecl engine::AnimationsFromSpritesheet(char const *,int,int,class std::vector<int,class std::allocator<int> >)" (? AnimationsFromSpritesheet@engine@@YA ? AV ? $vector@UAnimation@engine@@V ? $allocator@UAnimation@engine@@@std@@@std@@PEBDHHV ? $vector@HV ? $allocator@H@std@@@3@@Z) already defined in main.obj	sandbox2	C : \Users\aarol\Desktop\Projektit\tiimi4\build\sandboxes\sandbox2\engine.lib(TextRender.obj)	1
-	//	Error	LNK2005	"struct GLFWwindow * __cdecl engine::CreateWindow(int,int,char const *)" (? CreateWindow@engine@@YAPEAUGLFWwindow@@HHPEBD@Z) already defined in main.obj	sandbox2	C : \Users\aarol\Desktop\Projektit\tiimi4\build\sandboxes\sandbox2\engine.lib(TextRender.obj)	1
-	//	Error	LNK1169	one or more multiply defined symbols found	sandbox2	C : \Users\aarol\Desktop\Projektit\tiimi4\build\sandboxes\sandbox2\Debug\sandbox2.exe	1
-	//TextRender textRenderer(&cam);
-	//textRenderer.LoadText("assets/fonts/ARIAL.TTF", 0);
+	TextRender textRenderer(&cam);
+	textRenderer.LoadText("assets/fonts/ARIAL.TTF", 0);
+	
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -148,8 +142,8 @@ int main()
 
 		// Text Rendering functions
 		//textRenderer.RenderText("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		//RenderText(m_shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		//RenderText(m_shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		textRenderer.RenderText("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		textRenderer.RenderText("(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 		// OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
