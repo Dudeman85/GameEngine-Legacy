@@ -40,7 +40,7 @@ source distribution.
 
 Tilemap::Tilemap(engine::Camera* cam)
 {
-	m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
+	m_shader = new engine::Shader("tilemapVertexShader.glsl", "tilemapFragmentShader.glsl");
 	camera = cam;
 	collisionLayer = std::vector<std::vector<unsigned int>>();
 	position = glm::vec3(0);

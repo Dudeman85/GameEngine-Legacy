@@ -83,11 +83,12 @@ int main()
 
 	// Tilemap
 	Tilemap map(&cam);
-	map.loadMap("assets/Tiled/Tilemaps/demo.tmx");
+	map.loadMap("assets/level.tmx");
 	engine.physicsSystem->SetTilemap(&map);
 	engine.renderSystem->SetTilemap(&map);
 	map.position = glm::vec3(0.0f, 0.0f, 0.0f);
-
+	
+	
 	// Text
 	TextRender textRenderer(&cam);
 	textRenderer.LoadText("assets/fonts/ARIAL.TTF", 0);
@@ -133,8 +134,8 @@ int main()
 			}
 		}
 
-	//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
-	//map.draw(1.0f);
+		//TODO add view matrix and get projection matrix from camera so that tilemap is rendered in the correct place
+		//map.draw(1.0f);
 
 		// Update all engine systems, this usually should go last in the game loop
 		// For greater control of system execution, you can update each one manually

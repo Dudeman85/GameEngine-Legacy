@@ -132,7 +132,9 @@ namespace engine
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			//Sort the entities and tilemap by Z
-			set<float> layersToDraw(tilemap->zLayers.begin(), tilemap->zLayers.end());
+			set<float> layersToDraw;
+			if(tilemap)
+				layersToDraw.insert(tilemap->zLayers.begin(), tilemap->zLayers.end());
 			map<float, vector<Entity>> sortedEntities;
 			for (const Entity& entity : entities)
 			{
@@ -144,7 +146,8 @@ namespace engine
 			//Draw everything by layer
 			for (const float& layer : layersToDraw)
 			{
-				tilemap->draw(layer);
+				if(tilemap)
+					tilemap->draw(layer);
 
 				//Bind the right VAO after tilemap
 				glBindVertexArray(VAO);

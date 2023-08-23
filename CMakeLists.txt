@@ -39,22 +39,22 @@ target_include_directories(engine PUBLIC
 )
 
 # vertexShader copy
-configure_file("bin/vertexShader.glsl" "sandboxes/sandbox1/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/sandbox2/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/sandbox3/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/sandbox4/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/sandbox5/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/Demot/demo1/vertexShader.glsl" COPYONLY)
-configure_file("bin/vertexShader.glsl" "sandboxes/Demot/demo2/vertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox1/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox2/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox3/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox4/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox5/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/Demot/demo1/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/Demot/demo2/tilemapVertexShader.glsl" COPYONLY)
 
 # fragmentShader copy
-configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox1/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox2/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox3/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox4/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/sandbox5/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/Demot/demo1/fragmentShader.glsl" COPYONLY)
-configure_file("bin/fragmentShader.glsl" "sandboxes/Demot/demo2/fragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox1/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox2/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox3/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox4/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox5/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/Demot/demo1/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/Demot/demo2/tilemapFragmentShader.glsl" COPYONLY)
 
 # OpenAL32 copy
 IF (WIN32)
