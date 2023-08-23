@@ -22,7 +22,7 @@
 
 	TextRender::TextRender(engine::Camera* cam)
 	{
-		m_shader = new engine::Shader("vertexShader.glsl", "fragmentShader.glsl");
+		m_shader = new engine::Shader("textVertexShader.glsl", "textFragmentShader.glsl");
 		camera = cam;
 	}
 
