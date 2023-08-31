@@ -13,6 +13,10 @@ include_directories("include")
 include_directories("ext/STB")
 include_directories("ext/libsndfile-master/include")
 
+# enet-1.3.17 library
+add_subdirectory("ext/enet-1.3.17")
+include_directories("ext/enet-1.3.17/include")
+
 # freetype-2.13.1 library
 add_subdirectory("ext/freetype-2.13.1")
 include_directories("ext/freetype-2.13.1/include")
