@@ -212,7 +212,6 @@ int main()
 		//Update all engine systems
 		engine.Update(&cam);
 
-
 		//Keep the camera in bounds of the tilemap
 		float camPosX = clamp(playerTransform.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
 		float camPosY = clamp(playerTransform.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
