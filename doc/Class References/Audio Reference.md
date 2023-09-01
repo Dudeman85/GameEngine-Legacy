@@ -82,14 +82,14 @@ Please note you can only use one model in your application.
 ```cpp
 // different attenuation models, only use 1
 //Linear models
-mySpeaker1.setLinearDistance(1, 1.f, 100.f, 600.f, 1.f);
-mySpeaker1.setLinearDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setLinearDistance(1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setLinearDistanceClamped(1.f, 100.f, 600.f, 1.f);
 //Inverse models
-mySpeaker1.setInverseDistance(1, 1.f, 100.f, 600.f, 1.f);
-mySpeaker1.setInverseDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setInverseDistance(1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setInverseDistanceClamped(1.f, 100.f, 600.f, 1.f);
 //Exponential models
-mySpeaker1.setExponentialDistance(1, 1.f, 100.f, 600.f, 1.f);
-mySpeaker1.setExponentialDistanceClamped(1, 1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setExponentialDistance(1.f, 100.f, 600.f, 1.f);
+mySpeaker1.setExponentialDistanceClamped(1.f, 100.f, 600.f, 1.f);
 ```
 Parameters given in the example are following:
 sourceID, volume, reference distance, max distance, rolloff factor
@@ -102,15 +102,15 @@ Roll off dictates how fast volume decreases, larger value = faster drop.
 To set sound location in your application, use following:
 ```cpp
 //sets source location.
-engine.soundDevice->SetSourceLocation(1, 0.f, 0.f, 0.f);
+engine.soundDevice->SetSourceLocation(mySpeaker1, 0.f, 0.f, 0.f);
 ```
 Given parameters are: SourceId, x, y, z values.
-Source id needs to be same as in distance model in order to work properly.
+Source id needs to be same as soundSource in order to work properly.
 If you want to bind sound to a moving object in application, you need to make definition inside game loop, for example:
 ```cpp
 //sets source location to sprite2
 Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
-engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
+engine.soundDevice->SetSourceLocation(mySpeaker1, sprite2Transform.x, sprite2Transform.y, 20.f);
 ```
 Adding small z value balances sound orientation changes in very close ranges.
 
