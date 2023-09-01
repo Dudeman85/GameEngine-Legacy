@@ -1,6 +1,4 @@
 #include <engine/Application.h>
-#include <string>
-
 
 
 
@@ -21,12 +19,12 @@ void main(){
  engine::RenderSystem::SetBackgroundColor(0, 0, 0); // tämä toimii decimali rgb codi 
 
 
- Texture textura("assets/strawberry.png", GL_NEAREST); // pixel arte es mejor usasr el friltrado (GL_NEAREST)
+ Texture textura("assets/strawberry.png", GL_NEAREST);
  Texture textura1("assets/laatikko.png", GL_LINEAR);
  Texture textura2("assets/latikko.png", GL_LINEAR);
  //Texture textura3("assets/lentoKone.png", GL_LINEAR);
 
- Shader shader = Shader( "meshFragmentShader.glsl");
+
 
  // Tee uusi Entiteetti. crea una nueva entida 
  Entity sprite = ecs.newEntity();

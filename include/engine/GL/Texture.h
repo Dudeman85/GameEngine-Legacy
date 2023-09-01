@@ -49,10 +49,15 @@ namespace engine
 				{
 					colorFormat = GL_RGBA;
 				}
-				else
+				else if (nrChannels == 3)
 				{
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 					colorFormat = GL_RGB;
+				}
+				else
+				{
+					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+					colorFormat = GL_RED;
 				}
 
 				//Generate and bind texture
