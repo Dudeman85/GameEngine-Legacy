@@ -28,7 +28,8 @@ add_subdirectory("ext/tmxlite-master/tmxlite")
 # Assimp model loading library
 option(ASSIMP_BUILD_TESTS OFF)
 option(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-include_directories("ext/assimp-master/include")
+add_subdirectory("ext/assimp-master")
+#include_directories("ext/assimp-master/include")
 
 # OpenGL
 add_subdirectory("ext/glfw-3.3.2")

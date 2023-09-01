@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <engine/GL/Shader.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace engine
 {
