@@ -4,6 +4,7 @@
 #include <vector>
 #include <engine/GL/Shader.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <engine/GL/Texture.h>
 
 namespace engine
 {
@@ -14,26 +15,18 @@ namespace engine
 		glm::vec2 TexCoords;
 	};
 
-	struct ModelTexture
-	{
-		unsigned int id;
-		std::string type;
-	};
-
 	class Mesh
 	{
 	public:
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<ModelTexture> textures);
-		void Draw(Shader& shader);
+		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture*> textures);
+		void Draw(Shader* shader);
 
 		//Mesh data
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<ModelTexture> textures;
+		std::vector<Texture*> textures;
 
 	private:
-		void setupMesh();
-
 		//Buffer Data
 		unsigned int VAO, VBO, EBO;
 	};
