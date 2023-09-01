@@ -147,7 +147,7 @@ int main()
 	
 
 
-	RenderSystem::SetBackgroundColor(0, .5, .1);
+	RenderSystem::SetBackgroundColor(100, 50, 1);
 
 	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
 	myMusic.Play();
