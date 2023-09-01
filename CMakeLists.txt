@@ -42,7 +42,7 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES "./include/engine/*.h" "./include/engine/G
 
 # engine -library
 add_library(engine ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES} ${GLAD_GL} ${STB})
-target_link_libraries(engine glfw OpenAL tmxlite glm sndfile freetype assimp)
+target_link_libraries(engine glfw OpenAL tmxlite glm sndfile freetype assimp enet)
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
