@@ -1,136 +1,76 @@
 #include <engine/Application.h>
-#include <engine/Tilemap.h>
+#include <string>
 
-#include <chrono>
-#include <thread>
 
-using namespace std;
+
+
+
 using namespace engine;
 
 ECS ecs;
 
-int main()
-{
-	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
+void main(){
 
-	//Initialize the default engine library
-	EngineLib engine;
+	GLFWwindow * window = engine::CreateWindow(800, 600, "Windos");
 
-	engine.physicsSystem->gravity = Vector2(0, 000);
-	engine.physicsSystem->step = 4;
+ engine::EngineLib engine;
 
-	//Create the camera
-	Camera cam = Camera(800, 600);
+ engine::Camera cam = engine::Camera(800, 600);
 
-	//Load a new texture
-	Texture texture = Texture("strawberry.png");
 
-	//Create a new entity
-	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .z = -1, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(player, Sprite{});
-	ecs.addComponent(player, Animator{});
-	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
-	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{ .isTrigger = true });
+ engine::RenderSystem::SetBackgroundColor(0, 0, 0); // tämä toimii decimali rgb codi 
 
-	//Define the test animation
-	Animator& animator = ecs.getComponent<Animator>(player);
-	auto testAnims = AnimationsFromSpritesheet("gradient.png", 2, 2, vector<int>(4, 200));
-	AnimationSystem::AddAnimation(player, testAnims[0], "1");
-	AnimationSystem::AddAnimation(player, testAnims[1], "2");
-	AnimationSystem::PlayAnimation(player, "2", true);
 
-	//Top-Right
-	Entity sprite2 = ecs.newEntity();
-	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite2, Sprite{ &texture });
-	ecs.addComponent(sprite2, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
-	//Bottom-Left
-	Entity sprite3 = ecs.newEntity();
-	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite3, Sprite{ &texture });
-	ecs.addComponent(sprite3, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite3, BoxCollider{});
-	Entity sprite6 = ecs.newEntity();
-	ecs.addComponent(sprite6, Transform{ .x = -270, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite6, Sprite{ &texture });
-	ecs.addComponent(sprite6, Rigidbody{ .kinematic = true });
-	ecs.addComponent(sprite6, BoxCollider{});
-	//Top-Left
-	Entity sprite4 = ecs.newEntity();
-	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite4, Sprite{ &texture });
-	ecs.addComponent(sprite4, Rigidbody{ .gravityScale = 1, .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .kinematic = false });
-	ecs.addComponent(sprite4, BoxCollider{});
-	//Bottom-Right
-	Entity sprite5 = ecs.newEntity();
-	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(sprite5, Sprite{ &texture });
-	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 2000), .drag = 0.25, .elasticity = 0.625, .kinematic = false });
-	ecs.addComponent(sprite5, BoxCollider{});
+ Texture textura("assets/strawberry.png", GL_NEAREST); // pixel arte es mejor usasr el friltrado (GL_NEAREST)
+ Texture textura1("assets/laatikko.png", GL_LINEAR);
+ Texture textura2("assets/latikko.png", GL_LINEAR);
+ //Texture textura3("assets/lentoKone.png", GL_LINEAR);
 
-	RenderSystem::SetBackgroundColor(0, .5, .1);
+ Shader shader = Shader( "meshFragmentShader.glsl");
 
-	Tilemap map(&cam);
-	map.loadMap("assets/demo.tmx");
+ // Tee uusi Entiteetti. crea una nueva entida 
+ Entity sprite = ecs.newEntity();
+ Entity sprite1 = ecs.newEntity();
+ Entity sprite2 = ecs.newEntity();
+ 
+ // Add the sprite component with a texture and default shader
+ // agregae el componente sprite con una textura y un shader predecterminado
+ ecs.addComponent(sprite, Sprite{ &textura });
+ ecs.addComponent(sprite1, Sprite{ &textura1 });
+ ecs.addComponent(sprite2, Sprite{ &textura2 });
 
-	engine.physicsSystem->SetTilemap(&map);
-
-	bool jumpHeld = false;
-
-	//Game Loop
-	while (!glfwWindowShouldClose(window))
-	{
-		//std::this_thread::sleep_for(std::chrono::milliseconds{100});
-
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
-
-		//test movement
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		{
-			engine.physicsSystem->Move(player, Vector2(500, 0) * engine.deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		{
-			engine.physicsSystem->Move(player, Vector2(-500, 0) * engine.deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		{
-			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
-		}
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		{
-			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
-		}
+ //Add the transform component which is required for the Render System
+ // Agregar el componente de trasformacion, que es nesesario para el Render System
+ // dentro de clase Transform estan los componetes relacionados con la (rotacion , escala y posicion)
+ ecs.addComponent(sprite, Transform{.x = 100, .y =100, .xScale  = 100, .yScale = 100  });
+ ecs.addComponent(sprite1, Transform{.x = 10, .y = -100, .xScale  = 100, .yScale = 100 });
+ ecs.addComponent(sprite2, Transform{.x = -100, .y= 100, .xScale  = 100, .yScale = 100 });
 
 
 
-		if (playerCollider.collisions.size() > 0)
-		{
-			for (const Collision& c : playerCollider.collisions)
-			{
-				if (c.side == Direction::down)
-					cout << "Player touching ground\n";
-			}
-		}
 
-		cam.SetPosition(playerTransform.x, playerTransform.y, 10);
+ 
 
-		//Update all engine systems, this usually should go last in the game loop
-		//For greater control of system execution, you can update each one manually
-		engine.Update(&cam);
+ while (!glfwWindowShouldClose(window))
+ {
+	 if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		 glfwSetWindowShouldClose(window, true);
 
-		//map.draw();
 
-		//OpenGL stuff, goes very last
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+	 engine.Update(&cam);
 
-	glfwTerminate();
 
-	return 0;
-}
+
+	 glfwSwapBuffers(window);
+	 glfwPollEvents();
+
+ }
+
+
+
+ glfwTerminate();
+
+
+
+};
+
