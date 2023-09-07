@@ -138,7 +138,7 @@ int main()
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
-	engine.renderSystem->SetTilemap(&map);
+	engine.spriteRenderSystem->SetTilemap(&map);
 	//Background color
 	RenderSystem::SetBackgroundColor(133 / 2, 117 / 2, 87 / 2);
 

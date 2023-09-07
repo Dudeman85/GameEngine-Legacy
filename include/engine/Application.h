@@ -6,6 +6,7 @@
 #include <engine/Sprite.h>
 #include <engine/Transform.h>
 #include <engine/Physics.h>
+#include <engine/ModelSystem.h>
 
 //Other engine libs
 #include <engine/GL/Window.h>
@@ -28,9 +29,10 @@ namespace engine
 		double deltaTime = 0;
 		double programTime = 0;
 
-		shared_ptr<AnimationSystem> animationSystem;
-		shared_ptr<RenderSystem> renderSystem;
 		shared_ptr<TransformSystem> transformSystem;
+		shared_ptr<RenderSystem> spriteRenderSystem;
+		shared_ptr<ModelRenderSystem> modelRenderSystem;
+		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<PhysicsSystem> physicsSystem;
 
 		EngineLib()
@@ -43,6 +45,7 @@ namespace engine
 
 			//Register all default engine components here
 			ecs.registerComponent<Sprite>();
+			ecs.registerComponent<ModelRenderer>();
 			ecs.registerComponent<Transform>();
 			ecs.registerComponent<Animator>();
 			ecs.registerComponent<Rigidbody>();
@@ -55,12 +58,19 @@ namespace engine
 			transformSystemSignature.set(ecs.getComponentId<Transform>());
 			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
 
-			//Render System
-			renderSystem = ecs.registerSystem<RenderSystem>();
-			Signature renderSystemSignature;
-			renderSystemSignature.set(ecs.getComponentId<Sprite>());
-			renderSystemSignature.set(ecs.getComponentId<Transform>());
-			ecs.setSystemSignature<RenderSystem>(renderSystemSignature);
+			//Sprite Render System
+			spriteRenderSystem = ecs.registerSystem<RenderSystem>();
+			Signature spriteRenderSystemSignature;
+			spriteRenderSystemSignature.set(ecs.getComponentId<Sprite>());
+			spriteRenderSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<RenderSystem>(spriteRenderSystemSignature);
+
+			//Model Render System
+			modelRenderSystem = ecs.registerSystem<ModelRenderSystem>();
+			Signature modelRenderSystemSignature;
+			modelRenderSystemSignature.set(ecs.getComponentId<ModelRenderer>());
+			modelRenderSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<ModelRenderSystem>(modelRenderSystemSignature);
 
 			//Animation System
 			animationSystem = ecs.registerSystem<AnimationSystem>();
@@ -87,7 +97,8 @@ namespace engine
 			transformSystem->Update();
 			physicsSystem->Update(deltaTime);
 			animationSystem->Update(deltaTime);
-			renderSystem->Update(cam);
+			spriteRenderSystem->Update(cam);
+			modelRenderSystem->Update(cam);
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();
