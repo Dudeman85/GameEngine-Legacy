@@ -5,6 +5,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <engine/ModelSystem.h>
+
 using namespace engine;
 
 //Creates a global instance of the ECS manager
@@ -18,16 +20,24 @@ int main()
 	//Initialize the default engine library
 	EngineLib engine;
 	//Create the camera
-	Camera cam = Camera(400, 300);
+	Camera cam = Camera(800, 600);
 	cam.perspective = false;
-	cam.SetPosition(0, 0, 90);
+	cam.SetPosition(0, 0, 500);
 
 	//changes window backround color
 	RenderSystem::SetBackgroundColor(0, 120, 0);
 
 
+	//MODEL SYSTEM TESTING
+	//Register Model Renderer
+	ecs.registerComponent<ModelRenderer>();
+	shared_ptr<ModelRenderSystem> modelRender = ecs.registerSystem<ModelRenderSystem>();
+	Signature modelRenderSystemSignature;
+	modelRenderSystemSignature.set(ecs.getComponentId<Transform>());
+	modelRenderSystemSignature.set(ecs.getComponentId<ModelRenderer>());
+	ecs.setSystemSignature<ModelRenderSystem>(modelRenderSystemSignature);
+
 	//MODEL TESTING
-	Model suzanne("assets/suzanne.obj");
 	Shader s(R"(
 		#version 330 core
 		layout(location = 0) in vec3 aPos;
@@ -60,12 +70,21 @@ int main()
 		}
 		)", false);
 
-	
+	/*
 	Entity sprite = ecs.newEntity();
 	Texture texture("assets/strawberry.png");
 	ecs.addComponent(sprite, Transform{.xScale = 1, .yScale = 1});
 	ecs.addComponent(sprite, Sprite{ .texture = &texture });
-	
+	*/
+	Model model("assets/suzanne.obj");
+
+	Entity suzanne = ecs.newEntity();
+	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 10, .yScale = 10, .yRotation = 0 });
+	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
+
+	Entity suzanne2 = ecs.newEntity();
+	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{ .x = 100, .y = -100, .xScale = 7, .yScale = 7, .yRotation = 0 });
+	ecs.addComponent(suzanne2, ModelRenderer{ .model = &model });
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -79,7 +98,15 @@ int main()
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		suzanne.Draw(&s);
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			suzanneTransform.yRotation += -1;
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			suzanneTransform.yRotation += 1;
+
+		suzanne2Transform.zRotation += 1;
+		suzanne2Transform.yRotation += 1;
+
+		modelRender->Update(&cam);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

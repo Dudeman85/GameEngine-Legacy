@@ -37,38 +37,4 @@ namespace engine
 		//Unbind VAO
 		glBindVertexArray(0);
 	}
-
-	void Mesh::Draw(Shader* shader)
-	{
-		//Texture uniforms are named: uniform sampler2D texture_diffuseN, or texture_specularN
-		unsigned int diffuseNr = 1;
-		unsigned int specularNr = 1;
-
-		for (unsigned int i = 0; i < textures.size(); i++)
-		{
-			//Activate proper texture unit before binding
-			glActiveTexture(GL_TEXTURE0 + i);
-
-			//Retrieve texture number and type (the N in texture_{type}N)
-			std::string number;
-			std::string name = textures[i]->type;
-			if (name == "texture_diffuse")
-				number = std::to_string(diffuseNr++);
-			else if (name == "texture_specular")
-				number = std::to_string(specularNr++);
-
-			//Set the uniform for the material texture
-			glUniform1i(glGetUniformLocation(shader->ID, ("material." + name + number).c_str()), i);
-
-			glBindTexture(GL_TEXTURE_2D, textures[i]->ID());
-		}
-
-		//Unbind texture
-		glActiveTexture(GL_TEXTURE0);
-
-		//Draw mesh
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
-	}
 }

@@ -14,7 +14,9 @@ namespace engine
 		{
 			LoadModel(path);
 		}
-		void Draw(Shader* shader);
+
+		//Model data
+		std::vector<Mesh> meshes;
 
 	private:
 		void LoadModel(std::string path);
@@ -22,8 +24,6 @@ namespace engine
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 		std::vector<Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
-		//Model data
-		std::vector<Mesh> meshes;
 		//Model file path
 		std::string directory;
 		//Store all the already loaded textures for efficiency

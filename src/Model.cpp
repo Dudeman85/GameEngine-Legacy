@@ -2,13 +2,6 @@
 
 namespace engine
 {
-	void Model::Draw(Shader* shader)
-	{
-		//Call the Draw function of every mesh
-		for (unsigned int i = 0; i < meshes.size(); i++)
-			meshes[i].Draw(shader);
-	}
-
 	void Model::LoadModel(std::string path)
 	{
 		//Load model with Assimp, convert all primitives to triangles and flip texture UVs for OpenGL
@@ -28,7 +21,7 @@ namespace engine
 		ProcessNode(scene->mRootNode, scene);
 	}
 	
-	//Call ProcessMesh on every mesh originating from node
+	//Call ProcessNode recursively on every child node of root node
 	void Model::ProcessNode(aiNode* node, const aiScene* scene)
 	{
 		//Process all the node's meshes (if any)
@@ -44,16 +37,17 @@ namespace engine
 		}
 	}
 
+	//Call ProcessMesh on every mesh originating from node
 	Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	{
-		std::vector<Vertex> vertices;
+		std::vector<Mesh::Vertex> vertices;
 		std::vector<unsigned int> indices;
 		std::vector<Texture*> textures;
 
 		//For each vertex in the mesh
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			Vertex vertex;
+			Mesh::Vertex vertex;
 			//Process vertex positions
 			glm::vec3 vector;
 			vector.x = mesh->mVertices[i].x;
@@ -108,6 +102,7 @@ namespace engine
 		return Mesh(vertices, indices, textures);
 	}
 
+	//Loads every texture of specific type in a material
 	std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 	{
 		std::vector<Texture*> textures;
