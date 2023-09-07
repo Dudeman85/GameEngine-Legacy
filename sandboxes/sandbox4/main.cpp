@@ -17,18 +17,16 @@ int main()
 	engine::EngineLib engine;
 	//Create the camera
 	engine::Camera cam = engine::Camera(800, 600);
+	cam.SetPosition(0, 0, -90);
 
-	//changes window backround color, values 0-1, RGB
-	engine::RenderSystem::SetBackgroundColor(0, .5, .1);
+
+	//changes window backround color
+	engine::RenderSystem::SetBackgroundColor(0, 120, 0);
 
 
 	//MODEL TESTING
-	//engine::Model suzanne("assets/suzanne.obj");
-	engine::Shader s;
-
-
-	//This gives 566 linker errors
-	//Assimp::Importer importer;
+	engine::Model suzanne("assets/suzanne.obj");
+	engine::Shader s("", "");
 
 
 	//Game Loop
@@ -38,11 +36,12 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 
-		//suzanne.Draw(s);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
+
+		suzanne.Draw(&s);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
