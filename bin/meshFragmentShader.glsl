@@ -1,11 +1,4 @@
-#include <string>           // Inlude std::string
-
-#include <kgfw/GLUtils.h>	// Include GLUtils for checkGLError
-#include <glad/gl.h>		// Include glad
-#include <GLFW/glfw3.h>		// Include glfw
-#include <glm/glm.hpp>      // Include glm
-#include <kgfw/Object.h>
-
+#version 330 core
 
 
 void main()
