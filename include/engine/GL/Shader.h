@@ -11,7 +11,9 @@ namespace engine
 	class Shader
 	{
 	public:
-		Shader(std::string vertexShaderPath = "", std::string fragmentShaderPath = "")
+		//Give the vertex and fragment shader sources directly or if fromFile = true load them from given directories. 
+		//Otherwise if no strings given,load the default shaders
+		Shader(std::string vertexShaderPath = "", std::string fragmentShaderPath = "", bool fromFile = true)
 		{
 			//Load Vertex shader
 			std::string vertexShaderString;
@@ -33,10 +35,17 @@ namespace engine
 					"	TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
 					"}\0";
 			}
+			else if (!fromFile)
+			{
+				//Load the Vertex shader from string
+				vertexShaderSource = vertexShaderPath.c_str();
+			}
 			else
 			{
 				//Load the Vertex shader from file if given
 				std::ifstream file(vertexShaderPath);
+				if (!file)
+					std::cout << "Error Loading Vertex Shader from path: " << vertexShaderPath << "!\n";
 				std::stringstream buffer;
 				buffer << file.rdbuf();
 				vertexShaderString = buffer.str();
@@ -75,10 +84,17 @@ namespace engine
 					"   FragColor = texture(texture1, TexCoord);\n"
 					"}\0";
 			}
+			else if (!fromFile)
+			{
+				//Load the Fragment shader from string
+				fragmentShaderSource = fragmentShaderPath.c_str();
+			}
 			else
 			{
 				//Load the Fragment shader from file if given
 				std::ifstream file(fragmentShaderPath);
+				if (!file)
+					std::cout << "Error Loading Fragment Shader from path: " << vertexShaderPath << "!\n";
 				std::stringstream buffer;
 				buffer << file.rdbuf();
 				fragmentShaderString = buffer.str();
