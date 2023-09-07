@@ -24,7 +24,7 @@ int main()
 	ENetEvent event;
 	ENetPeer* peer;
 
-	enet_address_set_host(&address, "127.0.0.1");
+	enet_address_set_host(&address, "193.167.124.3");
 	address.port = 1234;
 	peer = enet_host_connect(client, &address, 1, 0);
 	if (peer == NULL)
@@ -36,12 +36,12 @@ int main()
 	if (enet_host_service(client, &event, 5000) > 0 &&
 		event.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		puts("Connection to 127.0.0.1:1234 succeeded.");
+		puts("Connection to 193.167.124.3:1234 succeeded.");
 	}
 	else
 	{
 		enet_peer_reset(peer);
-		puts("Connection to 127.0.0.1:1234 failed.");
+		puts("Connection to 193.167.124.3:1234 failed.");
 		return EXIT_SUCCESS;
 	}
 
