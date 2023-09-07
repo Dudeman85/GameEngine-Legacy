@@ -4,9 +4,9 @@
 //ECS modules
 #include <engine/ECSCore.h>	
 #include <engine/Sprite.h>
+#include <engine/Model.h>
 #include <engine/Transform.h>
 #include <engine/Physics.h>
-#include <engine/ModelSystem.h>
 
 //Other engine libs
 #include <engine/GL/Window.h>
@@ -30,7 +30,7 @@ namespace engine
 		double programTime = 0;
 
 		shared_ptr<TransformSystem> transformSystem;
-		shared_ptr<RenderSystem> spriteRenderSystem;
+		shared_ptr<SpriteRenderSystem> spriteRenderSystem;
 		shared_ptr<ModelRenderSystem> modelRenderSystem;
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<PhysicsSystem> physicsSystem;
@@ -44,7 +44,7 @@ namespace engine
 			lastFrame = chrono::high_resolution_clock::now();
 
 			//Register all default engine components here
-			ecs.registerComponent<Sprite>();
+			ecs.registerComponent<SpriteRenderer>();
 			ecs.registerComponent<ModelRenderer>();
 			ecs.registerComponent<Transform>();
 			ecs.registerComponent<Animator>();
@@ -59,11 +59,11 @@ namespace engine
 			ecs.setSystemSignature<TransformSystem>(transformSystemSignature);
 
 			//Sprite Render System
-			spriteRenderSystem = ecs.registerSystem<RenderSystem>();
+			spriteRenderSystem = ecs.registerSystem<SpriteRenderSystem>();
 			Signature spriteRenderSystemSignature;
-			spriteRenderSystemSignature.set(ecs.getComponentId<Sprite>());
+			spriteRenderSystemSignature.set(ecs.getComponentId<SpriteRenderer>());
 			spriteRenderSystemSignature.set(ecs.getComponentId<Transform>());
-			ecs.setSystemSignature<RenderSystem>(spriteRenderSystemSignature);
+			ecs.setSystemSignature<SpriteRenderSystem>(spriteRenderSystemSignature);
 
 			//Model Render System
 			modelRenderSystem = ecs.registerSystem<ModelRenderSystem>();
@@ -75,7 +75,7 @@ namespace engine
 			//Animation System
 			animationSystem = ecs.registerSystem<AnimationSystem>();
 			Signature animationSystemSignature;
-			animationSystemSignature.set(ecs.getComponentId<Sprite>());
+			animationSystemSignature.set(ecs.getComponentId<SpriteRenderer>());
 			animationSystemSignature.set(ecs.getComponentId<Animator>());
 			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
 

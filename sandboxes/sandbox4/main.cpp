@@ -1,11 +1,8 @@
 #include <engine/Application.h>
-#include <engine/GL/Model.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include <engine/ModelSystem.h>
 
 using namespace engine;
 
@@ -25,13 +22,13 @@ int main()
 	cam.SetPosition(0, 0, 500);
 
 	//changes window backround color
-	RenderSystem::SetBackgroundColor(0, 120, 0);
+	SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
 
 	//Model loading
 	Model model("assets/suzanne.obj");
 
 	Entity suzanne = ecs.newEntity();
-	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 10, .yScale = 10, .yRotation = 0 });
+	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 10, .yScale = 10, .zScale = 10, .yRotation = 0 });
 	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
 
 	Entity suzanne2 = ecs.newEntity();

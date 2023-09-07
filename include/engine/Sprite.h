@@ -24,8 +24,8 @@ using namespace std;
 
 namespace engine
 {
-	//Sprite component
-	struct Sprite
+	//2D Sprite Renderer component
+	struct SpriteRenderer
 	{
 		Texture* texture;
 		Shader* shader = nullptr;
@@ -61,12 +61,12 @@ namespace engine
 		float animationTimer = 0;
 	};
 
-	//Render system
+	//2D Sprite Render system
 	//Requires Sprite and Transform
-	class RenderSystem : public System
+	class SpriteRenderSystem : public System
 	{
 	public:
-		RenderSystem()
+		SpriteRenderSystem()
 		{
 			//Set the screen clear color to black
 			glClearColor(0, 0, 0, 1.0f);
@@ -156,7 +156,7 @@ namespace engine
 				for (const Entity& entity : sortedEntities[layer])
 				{
 					//Get relevant components
-					Sprite& sprite = ecs.getComponent<Sprite>(entity);
+					SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
 					Transform& transform = ecs.getComponent<Transform>(entity);
 
 					if (!sprite.enabled)
@@ -262,7 +262,7 @@ namespace engine
 		{
 			//Get the relevant components from entity
 			Animator& animator = ecs.getComponent<Animator>(entity);
-			Sprite& sprite = ecs.getComponent<Sprite>(entity);
+			SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
 
 			//Change Sprites texture
 			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];

@@ -28,7 +28,7 @@ int main()
 	
 
 	//Add the sprite component with a texture and custom shader
-	Sprite& spriteComponent = ecs.addComponent(sprite, Sprite{});
+	SpriteRenderer& spriteComponent = ecs.addComponent(sprite, SpriteRenderer{});
 	ecs.addComponent(sprite, Animator{});
 	
 
@@ -67,7 +67,7 @@ int main()
 
 
 
-	RenderSystem::SetBackgroundColor(.6, .5, .1);
+	SpriteRenderSystem::SetBackgroundColor(.6, .5, .1);
 
 
 

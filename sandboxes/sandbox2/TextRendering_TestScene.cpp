@@ -39,7 +39,7 @@ int main()
 	EngineLib engine;
 
 	// Window background colour
-	RenderSystem::SetBackgroundColor(68, 154, 141);
+	SpriteRenderSystem::SetBackgroundColor(68, 154, 141);
 
 	// OpenGL state
 	glEnable(GL_CULL_FACE);

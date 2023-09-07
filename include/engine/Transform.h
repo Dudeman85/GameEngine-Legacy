@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 #include <engine/ECSCore.h>
 #include <engine/Vector.h>
 
@@ -9,9 +10,9 @@ namespace engine
 	//Transform component
 	struct Transform
 	{
-		float x, y, z;
-		float xScale, yScale, zScale;
-		float xRotation, yRotation, zRotation;
+		float x = 0, y = 0, z = 0;
+		float xScale = 1, yScale = 1, zScale = 1;
+		float xRotation = 0, yRotation = 0, zRotation = 0;
 	};
 
 	//Transform system

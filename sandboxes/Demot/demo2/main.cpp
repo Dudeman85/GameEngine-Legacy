@@ -29,7 +29,7 @@ int main()
 	Signature playerControllerSignature;
 	playerControllerSignature.set(ecs.getComponentId<Transform>());
 	playerControllerSignature.set(ecs.getComponentId<Player>());
-	playerControllerSignature.set(ecs.getComponentId<Sprite>());
+	playerControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
@@ -39,7 +39,7 @@ int main()
 	Signature turretControllerSignature;
 	turretControllerSignature.set(ecs.getComponentId<Transform>());
 	turretControllerSignature.set(ecs.getComponentId<Turret>());
-	turretControllerSignature.set(ecs.getComponentId<Sprite>());
+	turretControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<TurretController>(turretControllerSignature);
@@ -49,7 +49,7 @@ int main()
 	Signature pickupControllerSignature;
 	pickupControllerSignature.set(ecs.getComponentId<Transform>());
 	pickupControllerSignature.set(ecs.getComponentId<Pickup>());
-	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
+	pickupControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
@@ -85,14 +85,14 @@ int main()
 	//Create a new entity
 	Entity player = ecs.newEntity();
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 168, .y = -150, .z = 1.5, .xScale = 40, .yScale = 40 });
-	ecs.addComponent(player, Sprite{ &texture });
+	ecs.addComponent(player, SpriteRenderer{ &texture });
 	ecs.addComponent(player, Player{});
 	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{});
 
 	Entity playerTurret = ecs.newEntity();
 	Transform& playerTurretTransform = ecs.addComponent(playerTurret, Transform{ .xScale = 50, .yScale = 16.5 });
-	ecs.addComponent(playerTurret, Sprite{ .texture = &turretTexture });
+	ecs.addComponent(playerTurret, SpriteRenderer{ .texture = &turretTexture });
 
 	//play sound files
 	tankSpeaker.Play(sound1);
@@ -110,7 +110,7 @@ int main()
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
 	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 500, .y = 500, .xScale = 20, .yScale = 20 });
-	ecs.addComponent(crosshair, Sprite{ &texture2 });
+	ecs.addComponent(crosshair, SpriteRenderer{ &texture2 });
 
 	set<Entity>bullets;
 
@@ -118,11 +118,11 @@ int main()
 	float fireCooldown = 0.04f;
 	bool canFire = true;
 
-	RenderSystem::SetBackgroundColor(68, 154, 141);
+	SpriteRenderSystem::SetBackgroundColor(68, 154, 141);
 	Tilemap map(&cam);
 	map.loadMap("assets/demo2.tmx");
 	engine.physicsSystem->SetTilemap(&map);
-	engine.renderSystem->SetTilemap(&map);
+	engine.spriteRenderSystem->SetTilemap(&map);
 
 	pickupController->CreatePickup(600, -75);
 	pickupController->CreatePickup(325, -1400);
@@ -207,7 +207,7 @@ int main()
 				// normalizes vector and sets crosshair distance
 				aimdirection.Normalize();
 				aimdirection *= 150.0f;
-				ecs.getComponent<Sprite>(crosshair).enabled = true;
+				ecs.getComponent<SpriteRenderer>(crosshair).enabled = true;
 				// crosshair position based on player position
 				Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
 				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 10);
@@ -222,7 +222,7 @@ int main()
 
 						Entity bullet = ecs.newEntity();
 						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 5, .xScale = 5, .yScale = 5 });
-						ecs.addComponent(bullet, Sprite{ &texture3 });
+						ecs.addComponent(bullet, SpriteRenderer{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
 						ecs.addComponent(bullet, Animator{});
@@ -238,7 +238,7 @@ int main()
 			}
 			else
 			{
-				ecs.getComponent<Sprite>(crosshair).enabled = false;
+				ecs.getComponent<SpriteRenderer>(crosshair).enabled = false;
 			}
 
 			for (Entity bullet : bullets)
