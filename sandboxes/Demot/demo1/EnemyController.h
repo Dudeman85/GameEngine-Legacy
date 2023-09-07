@@ -32,7 +32,7 @@ public:
 	{
 		Entity enemy = ecs.newEntity();
 		ecs.addComponent(enemy, Transform{ .x = x, .y = y, .xScale = 20, .yScale = 20 });
-		ecs.addComponent(enemy, Sprite{});
+		ecs.addComponent(enemy, SpriteRenderer{});
 		ecs.addComponent(enemy, Rigidbody{});
 		ecs.addComponent(enemy, BoxCollider{});
 		ecs.addComponent(enemy, Enemy{});

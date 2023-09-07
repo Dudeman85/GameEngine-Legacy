@@ -31,7 +31,7 @@ public:
 		//scoreAnims = AnimationsFromSpritesheet("assets/");
 		winScreen = ecs.newEntity();
 		ecs.addComponent(winScreen, Transform{.z = 20, .xScale = 200, .yScale = 200});
-		ecs.addComponent(winScreen, Sprite{.texture = winner, .enabled = false});
+		ecs.addComponent(winScreen, SpriteRenderer{.texture = winner, .enabled = false});
 	}
 
 	void Update(Entity player, double programTime)
@@ -68,7 +68,7 @@ public:
 
 		if (collected >= total)
 		{
-			ecs.getComponent<Sprite>(winScreen).enabled = true;
+			ecs.getComponent<SpriteRenderer>(winScreen).enabled = true;
 		}
 		TransformSystem::SetPosition(winScreen, Vector3(ecs.getComponent<Transform>(player).x, ecs.getComponent<Transform>(player).y, 20));
 	}
@@ -77,7 +77,7 @@ public:
 	{
 		Entity pickup = ecs.newEntity();
 		ecs.addComponent(pickup, Transform{ .x = x, .y = y, .z = 5, .xScale = 30, .yScale = 25 });
-		ecs.addComponent(pickup, Sprite{ .texture = defaultTexture });
+		ecs.addComponent(pickup, SpriteRenderer{ .texture = defaultTexture });
 		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
 		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(pickup, Pickup{});

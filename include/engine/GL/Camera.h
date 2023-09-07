@@ -43,9 +43,9 @@ namespace engine
 		glm::mat4 GetProjectionMatrix()
 		{
 			if (perspective)
-				return glm::perspective(glm::radians(fov), width / height, 0.f, farPlane);
+				return glm::perspective(glm::radians(fov), width / height, 0.01f, farPlane);
 			else
-				return glm::ortho(position.x - width / 2, position.x + width / 2, position.y - height / 2, position.y + height / 2, 0.f, farPlane);
+				return glm::ortho(position.x - width / 2, position.x + width / 2, position.y - height / 2, position.y + height / 2, 0.01f, farPlane);
 		}
 	
 

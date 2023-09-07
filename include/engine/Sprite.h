@@ -24,8 +24,8 @@ using namespace std;
 
 namespace engine
 {
-	//Sprite component
-	struct Sprite
+	//2D Sprite Renderer component
+	struct SpriteRenderer
 	{
 		Texture* texture;
 		Shader* shader = nullptr;
@@ -61,12 +61,12 @@ namespace engine
 		float animationTimer = 0;
 	};
 
-	//Render system
+	//2D Sprite Render system
 	//Requires Sprite and Transform
-	class RenderSystem : public System
+	class SpriteRenderSystem : public System
 	{
 	public:
-		RenderSystem()
+		SpriteRenderSystem()
 		{
 			//Set the screen clear color to black
 			glClearColor(0, 0, 0, 1.0f);
@@ -156,7 +156,7 @@ namespace engine
 				for (const Entity& entity : sortedEntities[layer])
 				{
 					//Get relevant components
-					Sprite& sprite = ecs.getComponent<Sprite>(entity);
+					SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
 					Transform& transform = ecs.getComponent<Transform>(entity);
 
 					if (!sprite.enabled)
@@ -172,13 +172,13 @@ namespace engine
 					glm::mat4 model = glm::mat4(1.0f);
 					//Position
 					model = glm::translate(model, glm::vec3(transform.x, transform.y, transform.z));
-
 					//X, Y, Z euler rotations
 					model = glm::rotate(model, glm::radians(transform.xRotation), glm::vec3(1.0f, 0.0f, 0.0f));
 					model = glm::rotate(model, glm::radians(transform.yRotation), glm::vec3(0.0f, 1.0f, 0.0f));
 					model = glm::rotate(model, glm::radians(transform.zRotation), glm::vec3(0.0f, 0.0f, 1.0f));
 					//Scale
 					model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
+
 					//Give the shader the model matrix
 					unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
 					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -262,7 +262,7 @@ namespace engine
 		{
 			//Get the relevant components from entity
 			Animator& animator = ecs.getComponent<Animator>(entity);
-			Sprite& sprite = ecs.getComponent<Sprite>(entity);
+			SpriteRenderer& sprite = ecs.getComponent<SpriteRenderer>(entity);
 
 			//Change Sprites texture
 			sprite.texture = animator.animations[animator.currentAnimation].textures[animator.animationFrame];

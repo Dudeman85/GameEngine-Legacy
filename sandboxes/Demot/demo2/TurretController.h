@@ -85,7 +85,7 @@ public:
 		Signature projectileControllerSignature;
 		projectileControllerSignature.set(ecs.getComponentId<Transform>());
 		projectileControllerSignature.set(ecs.getComponentId<Projectile>());
-		projectileControllerSignature.set(ecs.getComponentId<Sprite>());
+		projectileControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 		projectileControllerSignature.set(ecs.getComponentId<Rigidbody>());
 		projectileControllerSignature.set(ecs.getComponentId<BoxCollider>());
 		projectileControllerSignature.set(ecs.getComponentId<Animator>());
@@ -138,7 +138,7 @@ public:
 
 		Entity projectile = ecs.newEntity();
 		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 5, .xScale = 7, .yScale = 7 });
-		ecs.addComponent(projectile, Sprite{ .texture = projectileTexture });
+		ecs.addComponent(projectile, SpriteRenderer{ .texture = projectileTexture });
 		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(projectile, Projectile{});
@@ -151,7 +151,7 @@ public:
 	{
 		Entity turret = ecs.newEntity();
 		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 60, .yScale = 20 });
-		ecs.addComponent(turret, Sprite{ .texture = defaultTexture });
+		ecs.addComponent(turret, SpriteRenderer{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{});
 		ecs.addComponent(turret, Turret{});

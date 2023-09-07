@@ -33,7 +33,7 @@ int main()
 	Signature playerControllerSignature;
 	playerControllerSignature.set(ecs.getComponentId<Transform>());
 	playerControllerSignature.set(ecs.getComponentId<Player>());
-	playerControllerSignature.set(ecs.getComponentId<Sprite>());
+	playerControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	playerControllerSignature.set(ecs.getComponentId<Animator>());
@@ -44,7 +44,7 @@ int main()
 	Signature pickupControllerSignature;
 	pickupControllerSignature.set(ecs.getComponentId<Transform>());
 	pickupControllerSignature.set(ecs.getComponentId<Pickup>());
-	pickupControllerSignature.set(ecs.getComponentId<Sprite>());
+	pickupControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	pickupControllerSignature.set(ecs.getComponentId<Animator>());
@@ -55,7 +55,7 @@ int main()
 	Signature enemyControllerSignature;
 	enemyControllerSignature.set(ecs.getComponentId<Transform>());
 	enemyControllerSignature.set(ecs.getComponentId<Enemy>());
-	enemyControllerSignature.set(ecs.getComponentId<Sprite>());
+	enemyControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	enemyControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	enemyControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	enemyControllerSignature.set(ecs.getComponentId<Animator>());
@@ -66,7 +66,7 @@ int main()
 	Signature turretControllerSignature;
 	turretControllerSignature.set(ecs.getComponentId<Transform>());
 	turretControllerSignature.set(ecs.getComponentId<Turret>());
-	turretControllerSignature.set(ecs.getComponentId<Sprite>());
+	turretControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
 	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
 	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
 	turretControllerSignature.set(ecs.getComponentId<Animator>());
@@ -77,7 +77,7 @@ int main()
 	Entity player = ecs.newEntity();
 	Entity playerAttack = ecs.newEntity();
 	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 1.5, .xScale = 50, .yScale = 50 });
-	ecs.addComponent(player, Sprite{});
+	ecs.addComponent(player, SpriteRenderer{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
 	ecs.addComponent(player, BoxCollider{ .scale = Vector2(0.2, 0.61), .offset = Vector2(0, -18) });
@@ -99,19 +99,19 @@ int main()
 	Animation waterfallAnims = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100))[0];
 	Entity waterfall = ecs.newEntity();
 	ecs.addComponent(waterfall, Transform{ .x = 1296, .y = -1410, .z = -10, .xScale = 110, .yScale = 50 });
-	ecs.addComponent(waterfall, Sprite{});
+	ecs.addComponent(waterfall, SpriteRenderer{});
 	ecs.addComponent(waterfall, Animator{});
 	AnimationSystem::AddAnimation(waterfall, waterfallAnims, "1");
 	AnimationSystem::PlayAnimation(waterfall, "1", true);
 	Entity waterfall2 = ecs.newEntity();
 	ecs.addComponent(waterfall2, Transform{ .x = 1296, .y = -1507, .z = -15, .xScale = 110, .yScale = 50 });
-	ecs.addComponent(waterfall2, Sprite{});
+	ecs.addComponent(waterfall2, SpriteRenderer{});
 	ecs.addComponent(waterfall2, Animator{});
 	AnimationSystem::AddAnimation(waterfall2, waterfallAnims, "1");
 	AnimationSystem::PlayAnimation(waterfall2, "1", true);
 	Entity waterfall3 = ecs.newEntity();
 	ecs.addComponent(waterfall3, Transform{ .x = 1296, .y = -1604, .z = -15, .xScale = 110, .yScale = 50 });
-	ecs.addComponent(waterfall3, Sprite{});
+	ecs.addComponent(waterfall3, SpriteRenderer{});
 	ecs.addComponent(waterfall3, Animator{});
 	AnimationSystem::AddAnimation(waterfall3, waterfallAnims, "1");
 	AnimationSystem::PlayAnimation(waterfall3, "1", true);
@@ -120,13 +120,13 @@ int main()
 	Animation torchAnims = AnimationsFromSpritesheet("assets/torch.png", 9, 1, vector<int>(9 * 1, 40))[0];
 	Entity torch = ecs.newEntity();
 	ecs.addComponent(torch, Transform{ .x = 1480,  .y = -2036, .z = -10, .xScale = 15, .yScale = 35 });
-	ecs.addComponent(torch, Sprite{});
+	ecs.addComponent(torch, SpriteRenderer{});
 	ecs.addComponent(torch, Animator{});
 	AnimationSystem::AddAnimation(torch, torchAnims, "main");
 	AnimationSystem::PlayAnimation(torch, "main", true);
 	Entity torch1 = ecs.newEntity();
 	ecs.addComponent(torch1, Transform{ .x = 850, .y = -2336, .z = -10, .xScale = 15, .yScale = 35 });
-	ecs.addComponent(torch1, Sprite{});
+	ecs.addComponent(torch1, SpriteRenderer{});
 	ecs.addComponent(torch1, Animator{});
 	AnimationSystem::AddAnimation(torch1, torchAnims, "main");
 	AnimationSystem::PlayAnimation(torch1, "main", true);
@@ -138,9 +138,9 @@ int main()
 	//Set the gravity and tilemap collider
 	engine.physicsSystem->gravity = Vector2(0, -10000);
 	engine.physicsSystem->SetTilemap(&map);
-	engine.renderSystem->SetTilemap(&map);
+	engine.spriteRenderSystem->SetTilemap(&map);
 	//Background color
-	RenderSystem::SetBackgroundColor(133 / 2, 117 / 2, 87 / 2);
+	SpriteRenderSystem::SetBackgroundColor(133 / 2, 117 / 2, 87 / 2);
 
 
 	//Sounds

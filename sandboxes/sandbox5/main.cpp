@@ -17,7 +17,7 @@ int main()
 	engine::Camera cam = engine::Camera(800, 600);
 
 
-	engine::RenderSystem::SetBackgroundColor(0, 0, 0); // tämä toimii decimali rgb codi 
+	engine::SpriteRenderSystem::SetBackgroundColor(0, 0, 0); // tämä toimii decimali rgb codi 
 
 
 	Texture textura("assets/strawberry.png", GL_NEAREST);
@@ -34,9 +34,9 @@ int main()
 
 	// Add the sprite component with a texture and default shader
 	// agregae el componente sprite con una textura y un shader predecterminado
-	ecs.addComponent(sprite, Sprite{ &textura });
-	ecs.addComponent(sprite1, Sprite{ &textura1 });
-	ecs.addComponent(sprite2, Sprite{ &textura2 });
+	ecs.addComponent(sprite, SpriteRenderer{ &textura });
+	ecs.addComponent(sprite1, SpriteRenderer{ &textura1 });
+	ecs.addComponent(sprite2, SpriteRenderer{ &textura2 });
 
 	//Add the transform component which is required for the Render System
 	// Agregar el componente de trasformacion, que es nesesario para el Render System
