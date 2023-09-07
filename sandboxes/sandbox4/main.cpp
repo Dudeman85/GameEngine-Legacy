@@ -5,6 +5,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+using namespace engine;
+
 //Creates a global instance of the ECS manager
 ECS ecs;
 
@@ -12,21 +14,21 @@ int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
 	//Paraeters define window size(x,y) and name
-	GLFWwindow* window = engine::CreateWindow(800, 600, "Window");
+	GLFWwindow* window = CreateWindow(800, 600, "Window");
 	//Initialize the default engine library
-	engine::EngineLib engine;
+	EngineLib engine;
 	//Create the camera
-	engine::Camera cam = engine::Camera(800, 600);
-	cam.SetPosition(0, 0, -90);
-
+	Camera cam = Camera(400, 300);
+	cam.perspective = false;
+	cam.SetPosition(0, 0, 90);
 
 	//changes window backround color
-	engine::RenderSystem::SetBackgroundColor(0, 120, 0);
+	RenderSystem::SetBackgroundColor(0, 120, 0);
 
 
 	//MODEL TESTING
-	engine::Model suzanne("assets/suzanne.obj");
-	engine::Shader s(R"(
+	Model suzanne("assets/suzanne.obj");
+	Shader s(R"(
 		#version 330 core
 		layout(location = 0) in vec3 aPos;
 		layout(location = 1) in vec3 aNormal;
@@ -58,6 +60,12 @@ int main()
 		}
 		)", false);
 
+	
+	Entity sprite = ecs.newEntity();
+	Texture texture("assets/strawberry.png");
+	ecs.addComponent(sprite, Transform{.xScale = 1, .yScale = 1});
+	ecs.addComponent(sprite, Sprite{ .texture = &texture });
+	
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))

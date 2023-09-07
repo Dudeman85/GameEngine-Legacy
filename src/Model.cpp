@@ -98,7 +98,6 @@ namespace engine
 			//Get the scene material vector
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-
 			std::vector<Texture*> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
