@@ -282,10 +282,10 @@ namespace engine
 				Vector2(bounds[1], bounds[2]),
 				Vector2(bounds[3], bounds[2]),
 				Vector2(bounds[3], bounds[0]),
-				Vector2(transform.x + collider.offset.x, bounds[0]),
-				Vector2(transform.x + collider.offset.x, bounds[2]),
-				Vector2(bounds[1], transform.y + collider.offset.y),
-				Vector2(bounds[3], transform.y + collider.offset.y) };
+				Vector2(transform.position.x + collider.offset.x, bounds[0]),
+				Vector2(transform.position.x + collider.offset.x, bounds[2]),
+				Vector2(bounds[1], transform.position.y + collider.offset.y),
+				Vector2(bounds[3], transform.position.y + collider.offset.y) };
 
 			//Log each tile collision index, so it will only be counted once
 			vector<Vector2> loggedTiles;
@@ -394,13 +394,13 @@ namespace engine
 			std::array<float, 4> bounds;
 
 			//Top
-			bounds[0] = transform.y + transform.yScale * collider.scale.y + collider.offset.y;
+			bounds[0] = transform.position.y + transform.scale.y * collider.scale.y + collider.offset.y;
 			//Right
-			bounds[1] = transform.x + transform.xScale * collider.scale.x + collider.offset.x;
+			bounds[1] = transform.position.x + transform.scale.x * collider.scale.x + collider.offset.x;
 			//Bottom
-			bounds[2] = transform.y - transform.yScale * collider.scale.y + collider.offset.y;
+			bounds[2] = transform.position.y - transform.scale.y * collider.scale.y + collider.offset.y;
 			//Right
-			bounds[3] = transform.x - transform.xScale * collider.scale.x + collider.offset.x;
+			bounds[3] = transform.position.x - transform.scale.x * collider.scale.x + collider.offset.x;
 
 			return bounds;
 		}

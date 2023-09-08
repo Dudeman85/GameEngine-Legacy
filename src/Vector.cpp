@@ -82,6 +82,12 @@ namespace engine
 		y = 0;
 		z = 0;
 	}
+	Vector3::Vector3(float all)
+	{
+		x = all;
+		y = all;
+		z = all;
+	}
 	Vector3::Vector3(float _x, float _y, float _z)
 	{
 		x = _x;
@@ -122,9 +128,18 @@ namespace engine
 		return *this;
 	}
 
+	Vector3 Vector3::Pow(float power)
+	{
+		return Vector3(pow(x, power), pow(y, power), pow(z, power));
+	}
+
 	Vector3 Vector3::Normalize() {
 		float length = sqrt(x * x + y * y + z * z);
 		return Vector3(x / length, y / length, z / length);
 	}
 
+	glm::vec3 Vector3::ToGlm()
+	{
+		return glm::vec3(x, y, z);
+	}
 }

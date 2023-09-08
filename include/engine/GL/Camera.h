@@ -7,11 +7,12 @@ namespace engine
 	class Camera
 	{
 	public:
-		Camera(float w, float h, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f))
+		Camera(float w, float h, glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f), glm::vec3 rot = glm::vec3(0.f, 0.f, 0.f))
 		{
 			width = w;
 			height = h;
 			position = pos;
+			rotation = rot;
 		}
 
 		//Sets the camera position in word space
@@ -30,6 +31,22 @@ namespace engine
 			position.x += dx / 2;
 			position.y += dy / 2;
 			position.z += dz / 2;
+		}
+
+		//Set the rotation of the camera the camera in world space
+		void SetRotation(float x, float y, float z)
+		{
+			rotation.x = x;
+			rotation.y = y;
+			rotation.z = z;
+		}
+
+		//Rotate the camera in world space
+		void Rotate(float dx, float dy, float dz)
+		{
+			rotation.x += dx;
+			rotation.y += dy;
+			rotation.z += dz;
 		}
 
 		//Sets the width and height of the camera
@@ -52,10 +69,19 @@ namespace engine
 		//Get the model matrix for this camera, aka the view matrix
 		glm::mat4 GetViewMatrix()
 		{
-			return glm::translate(glm::mat4(1.0f), -position);
+			glm::mat4 model = glm::mat4(1.0f);
+			//Position
+			model = glm::translate(model, -position);
+			//X, Y, Z euler rotations
+			model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+			return model;
 		}
 
 		glm::vec3 position;
+		glm::vec3 rotation;
 		bool perspective = false;
 		float width;
 		float height;

@@ -129,10 +129,10 @@ namespace engine
 			if (!skip)
 			{
 				//Load the texture from location relative to model
-				Texture texture((directory + "/" + textureLoc.C_Str()).c_str());
-				texture.type = typeName;
-				texture.path = textureLoc.C_Str();
-				textures.push_back(&texture);
+				Texture* texture = new Texture((directory + "/" + textureLoc.C_Str()).c_str(), GL_LINEAR, false);
+				texture->type = typeName;
+				texture->path = textureLoc.C_Str();
+				textures.push_back(texture);
 			}
 		}
 		return textures;

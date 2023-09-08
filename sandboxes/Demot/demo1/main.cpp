@@ -76,7 +76,7 @@ int main()
 	//Create the player entity
 	Entity player = ecs.newEntity();
 	Entity playerAttack = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 110, .y = 200, .z = 1.5, .xScale = 50, .yScale = 50 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .position = Vector3(110, 200, 1.5), .scale = Vector3(50, 50, 0) });
 	ecs.addComponent(player, SpriteRenderer{});
 	ecs.addComponent(player, Animator{});
 	ecs.addComponent(player, Rigidbody{});
@@ -84,7 +84,7 @@ int main()
 	ecs.addComponent(player, Player{ .attackHitbox = playerAttack });
 
 	//Create the player's attack hitbox
-	ecs.addComponent(playerAttack, Transform{ .xScale = 10, .yScale = 20 });
+	ecs.addComponent(playerAttack, Transform{ .scale = Vector3(10, 20, 0) });
 	ecs.addComponent(playerAttack, Rigidbody{ .kinematic = true });
 	ecs.addComponent(playerAttack, BoxCollider{ .isTrigger = true });
 
@@ -98,19 +98,19 @@ int main()
 	//Make the waterfall sprites
 	Animation waterfallAnims = AnimationsFromSpritesheet("assets/waterfall01.png", 4, 1, vector<int>(4 * 1, 100))[0];
 	Entity waterfall = ecs.newEntity();
-	ecs.addComponent(waterfall, Transform{ .x = 1296, .y = -1410, .z = -10, .xScale = 110, .yScale = 50 });
+	ecs.addComponent(waterfall, Transform{ .position = Vector3(1296, -1410, -10), .scale = Vector3(110, 50, 0) });
 	ecs.addComponent(waterfall, SpriteRenderer{});
 	ecs.addComponent(waterfall, Animator{});
 	AnimationSystem::AddAnimation(waterfall, waterfallAnims, "1");
 	AnimationSystem::PlayAnimation(waterfall, "1", true);
 	Entity waterfall2 = ecs.newEntity();
-	ecs.addComponent(waterfall2, Transform{ .x = 1296, .y = -1507, .z = -15, .xScale = 110, .yScale = 50 });
+	ecs.addComponent(waterfall2, Transform{ .position = Vector3(1296, -1507, -15), .scale = Vector3(110, 50, 0) });
 	ecs.addComponent(waterfall2, SpriteRenderer{});
 	ecs.addComponent(waterfall2, Animator{});
 	AnimationSystem::AddAnimation(waterfall2, waterfallAnims, "1");
 	AnimationSystem::PlayAnimation(waterfall2, "1", true);
 	Entity waterfall3 = ecs.newEntity();
-	ecs.addComponent(waterfall3, Transform{ .x = 1296, .y = -1604, .z = -15, .xScale = 110, .yScale = 50 });
+	ecs.addComponent(waterfall3, Transform{ .position = Vector3(1296, -1604, -15), .scale = Vector3(110, 50, 0) });
 	ecs.addComponent(waterfall3, SpriteRenderer{});
 	ecs.addComponent(waterfall3, Animator{});
 	AnimationSystem::AddAnimation(waterfall3, waterfallAnims, "1");
@@ -119,13 +119,13 @@ int main()
 	//Make the static torches
 	Animation torchAnims = AnimationsFromSpritesheet("assets/torch.png", 9, 1, vector<int>(9 * 1, 40))[0];
 	Entity torch = ecs.newEntity();
-	ecs.addComponent(torch, Transform{ .x = 1480,  .y = -2036, .z = -10, .xScale = 15, .yScale = 35 });
+	ecs.addComponent(torch, Transform{ .position = Vector3(1480, -2036, -10), .scale = Vector3(15, 35, 0) });
 	ecs.addComponent(torch, SpriteRenderer{});
 	ecs.addComponent(torch, Animator{});
 	AnimationSystem::AddAnimation(torch, torchAnims, "main");
 	AnimationSystem::PlayAnimation(torch, "main", true);
 	Entity torch1 = ecs.newEntity();
-	ecs.addComponent(torch1, Transform{ .x = 850, .y = -2336, .z = -10, .xScale = 15, .yScale = 35 });
+	ecs.addComponent(torch1, Transform{ .position = Vector3(850, -2336, -10), .scale = Vector3(15, 35, 0) });
 	ecs.addComponent(torch1, SpriteRenderer{});
 	ecs.addComponent(torch1, Animator{});
 	AnimationSystem::AddAnimation(torch1, torchAnims, "main");
@@ -214,8 +214,8 @@ int main()
 		engine.Update(&cam);
 
 		//Keep the camera in bounds of the tilemap
-		float camPosX = clamp(playerTransform.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
-		float camPosY = clamp(playerTransform.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
+		float camPosX = clamp(playerTransform.position.x, map.position.x + cam.width / 2, map.position.x + map.bounds.width - cam.width / 2);
+		float camPosY = clamp(playerTransform.position.y, map.position.y - map.bounds.height + cam.height / 2, map.position.y - cam.height / 2);
 		cam.SetPosition(camPosX, camPosY, 100);
 
 
@@ -223,10 +223,10 @@ int main()
 		{
 			myMusic.updateBufferStream();
 			engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
-			engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, 0);
+			engine.soundDevice->SetLocation(playerTransform.position.x, playerTransform.position.y, 0);
 
 			//Set player speaker location
-			engine.soundDevice->SetSourceLocation(playerSpeaker, playerTransform.x, playerTransform.y, 1);
+			engine.soundDevice->SetSourceLocation(playerSpeaker, playerTransform.position.x, playerTransform.position.y, 1);
 
 			//Player jump and sword
 			for (Entity entity : playerController->entities)
@@ -279,7 +279,7 @@ int main()
 
 				Transform closestEnemyTransform = ecs.getComponent<Transform>(closestEnemy);
 
-				engine.soundDevice->SetSourceLocation(magicSpeaker, closestEnemyTransform.x, closestEnemyTransform.y, 0);
+				engine.soundDevice->SetSourceLocation(magicSpeaker, closestEnemyTransform.position.x, closestEnemyTransform.position.y, 0);
 
 				turretController->playSound = false;
 				if (!magicSpeaker.isPlaying())

@@ -1,6 +1,6 @@
-
 #pragma once
 #include <cmath>
+#include <glm/glm.hpp>
 
 namespace engine
 {
@@ -38,6 +38,7 @@ namespace engine
 	{
 	public:
 		Vector3();
+		Vector3(float all);
 		Vector3(float _x, float _y, float _z);
 		Vector3(Vector2 vec2, float _z = 0);
 		Vector3 operator+(float add);
@@ -47,7 +48,8 @@ namespace engine
 		Vector3 operator*(Vector3 mult);
 		Vector3& operator*=(float mult);
 		Vector3 Normalize();
+		Vector3 Pow(float power);
+		glm::vec3 ToGlm();
 		float x, y, z;
 	};
 }
-

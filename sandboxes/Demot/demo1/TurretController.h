@@ -97,7 +97,7 @@ public:
 
 				if (turret.projectileTimer <= 0)
 				{
-					SpawnProjectile(player, transform.x, transform.y, 2000);
+					SpawnProjectile(player, transform.position.x, transform.position.y, 2000);
 					turret.projectileTimer = 2;
 					turret.magicSound = 1;
 				}
@@ -111,9 +111,9 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 20, .yScale = 20 });
+		ecs.addComponent(projectile, Transform{ .position = Vector3(x, y, 1.5), .scale = Vector3(20, 20, 0)});
 		ecs.addComponent(projectile, SpriteRenderer{});
-		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
+		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.position.x - x, targetTranform.position.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(projectile, Animator{});
 		ecs.addComponent(projectile, Projectile{});
@@ -126,7 +126,7 @@ public:
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 0, .xScale = 28, .yScale = 37 });
+		ecs.addComponent(turret, Transform{ .position = Vector3(x, y, 0), .scale = Vector3(28, 37, 0) });
 		ecs.addComponent(turret, SpriteRenderer{});
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{ .scale = Vector2(0.9, 1), .offset = Vector2(0, 2) });

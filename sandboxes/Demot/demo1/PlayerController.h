@@ -65,8 +65,8 @@ public:
 					if (player.attacking < 2)
 					{
 						Transform& swordTransform = ecs.getComponent<Transform>(player.attackHitbox);
-						swordTransform.x = transform.yRotation > 0 ? transform.x - 40 : transform.x + 40;
-						swordTransform.y = transform.y - 10;
+						swordTransform.position.x = transform.rotation.y > 0 ? transform.position.x - 40 : transform.position.x + 40;
+						swordTransform.position.y = transform.position.y - 10;
 
 						player.attackSound = 1;
 						player.attacking++;
@@ -116,7 +116,7 @@ public:
 					/*if (!walkSpeaker.isPlaying())
 						walkSpeaker.Play(stepSound);*/
 				}
-				transform.yRotation = 0;
+				transform.rotation.y = 0;
 
 				if (rigidbody.velocity.x < player.maxSpeed)
 				{
@@ -141,7 +141,7 @@ public:
 					/*if (!walkSpeaker.isPlaying())
 						walkSpeaker.Play(stepSound);*/
 				}
-				transform.yRotation = 180;
+				transform.rotation.y = 180;
 
 				if (rigidbody.velocity.x > -player.maxSpeed)
 				{
