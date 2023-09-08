@@ -28,6 +28,13 @@ namespace engine
 		{
 			LoadModel(path);
 		}
+		~Model()
+		{
+			for (Texture* tex : textures_loaded)
+			{
+				delete tex;
+			}
+		}
 
 		//Model data
 		std::vector<Mesh> meshes;
