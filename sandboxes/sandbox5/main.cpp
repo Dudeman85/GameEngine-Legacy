@@ -36,7 +36,7 @@ int main()
 	// Add the sprite component with a texture and default shader
 	// agregae el componente sprite con una textura y un shader predecterminado
 
-	Transform& suzanneTransform = ecs.addComponent(zuzanne, Transform{ .x = 0, .y = 0, .xScale = 100, .yScale = 100, .zScale = 100 , .yRotation = 0 });
+	Transform& suzanneTransform = ecs.addComponent(zuzanne, Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0,0,0), .scale = Vector3(100, 100, 100)  });
 
 	//Add the transform component which is required for the Render System
 	// Agregar el componente de trasformacion, que es nesesario para el Render System
@@ -92,9 +92,9 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			suzanneTransform.yRotation += -1;
+			suzanneTransform.rotation.y += -1;
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			suzanneTransform.yRotation += 1;
+			suzanneTransform.rotation.y += 1;
 
 
 		engine.Update(&cam);

@@ -10,9 +10,9 @@ namespace engine
 	//Transform component
 	struct Transform
 	{
-		float x = 0, y = 0, z = 0;
-		float xScale = 1, yScale = 1, zScale = 1;
-		float xRotation = 0, yRotation = 0, zRotation = 0;
+		Vector3 position;
+		Vector3 rotation;
+		Vector3 scale = Vector3(1.0f);
 	};
 
 	//Transform system
@@ -33,34 +33,30 @@ namespace engine
 		static void Translate(Entity entity, float dx, float dy, float dz = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
-			transform.x += dx;
-			transform.y += dy;
-			transform.z += dz;
+			transform.position.x += dx;
+			transform.position.y += dy;
+			transform.position.z += dz;
 		}
 		//Translate an entity by dt
 		static void Translate(Entity entity, Vector3 dt)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
-			transform.x += dt.x;
-			transform.y += dt.y;
-			transform.z += dt.z;
+			transform.position += dt;
 		}
 
 		//Set the absolute position of entity
 		static void SetPosition(Entity entity, float x, float y, float z = 0)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
-			transform.x = x;
-			transform.y = y;
-			transform.z = z;
+			transform.position.x = x;
+			transform.position.y = y;
+			transform.position.z = z;
 		}
 		//Set the absolute position of entity
 		static void SetPosition(Entity entity, Vector3 position)
 		{
 			Transform& transform = ecs.getComponent<Transform>(entity);
-			transform.x = position.x;
-			transform.y = position.y;
-			transform.z = position.z;
+			transform.position = position;
 		}
 		//Get the distance between two entities
 		static float Distance(Entity a, Entity b)
@@ -68,15 +64,17 @@ namespace engine
 			Transform& aTransform = ecs.getComponent<Transform>(a);
 			Transform& bTransform = ecs.getComponent<Transform>(b);
 
-			return sqrt(pow(bTransform.x - aTransform.x, 2) + pow(bTransform.y - aTransform.y, 2));
+			return sqrt(pow(bTransform.position.x - aTransform.position.x, 2) + pow(bTransform.position.y - aTransform.position.y, 2) + pow(bTransform.position.z - aTransform.position.z, 2));
 		}
+
 		//Get the angle of b with a as the origin
+		//TODO Fix this to work in 3D
 		static float Angle(Entity a, Entity b)
 		{
 			Transform& aTransform = ecs.getComponent<Transform>(a);
 			Transform& bTransform = ecs.getComponent<Transform>(b);
 
-			return glm::degrees(atan2(bTransform.y - aTransform.y, bTransform.x - aTransform.x));
+			return glm::degrees(atan2(bTransform.position.y - aTransform.position.y, bTransform.position.x - aTransform.position.x));
 		}
 	};
 }

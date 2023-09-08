@@ -19,7 +19,7 @@ int main()
 	//Create a new entity
 	Entity sprite = ecs.newEntity();
 	
-	ecs.addComponent(sprite, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
+	ecs.addComponent(sprite, Transform{ });
 	
 	
 

@@ -28,11 +28,11 @@ int main()
 	Model model("assets/suzanne.obj");
 
 	Entity suzanne = ecs.newEntity();
-	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 3, .yScale = 3, .zScale = 3, .yRotation = 0 });
+	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{  });
 	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
 
 	Entity suzanne2 = ecs.newEntity();
-	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{ .x = 100, .y = -100, .xScale = 7, .yScale = 7, .yRotation = 0 });
+	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{  });
 	ecs.addComponent(suzanne2, ModelRenderer{ .model = &model });
 
 	//Game Loop
@@ -43,16 +43,15 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			suzanneTransform.yRotation += -1;
+			suzanneTransform.rotation.y += -1;
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			suzanneTransform.yRotation += 1;
+			suzanneTransform.rotation.y += 1;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-
-		suzanne2Transform.zRotation += 1;
-		suzanne2Transform.yRotation += 1;
+				
+		cam.Rotate(1, 0, 0);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

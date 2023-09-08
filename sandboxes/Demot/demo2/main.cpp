@@ -84,14 +84,14 @@ int main()
 
 	//Create a new entity
 	Entity player = ecs.newEntity();
-	Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 168, .y = -150, .z = 1.5, .xScale = 40, .yScale = 40 });
+	Transform& playerTransform = ecs.addComponent(player, Transform{ .position = Vector3(168, -150, 1.5), .scale = Vector3(40, 40, 0) });
 	ecs.addComponent(player, SpriteRenderer{ &texture });
 	ecs.addComponent(player, Player{});
 	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
 	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{});
 
 	Entity playerTurret = ecs.newEntity();
-	Transform& playerTurretTransform = ecs.addComponent(playerTurret, Transform{ .xScale = 50, .yScale = 16.5 });
+	Transform& playerTurretTransform = ecs.addComponent(playerTurret, Transform{ .scale = Vector3(50, 16.5, 0) });
 	ecs.addComponent(playerTurret, SpriteRenderer{ .texture = &turretTexture });
 
 	//play sound files
@@ -109,7 +109,7 @@ int main()
 	// create entity crosshair for gamepad
 	Entity crosshair = ecs.newEntity();
 	// adds crosshair texture
-	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 500, .y = 500, .xScale = 20, .yScale = 20 });
+	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .position = Vector3(500, 500, 0), .scale = Vector3(20, 20, 0) });
 	ecs.addComponent(crosshair, SpriteRenderer{ &texture2 });
 
 	set<Entity>bullets;
@@ -138,7 +138,7 @@ int main()
 
 		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 		{
-			cout << playerTransform.x << ", " << playerTransform.y << endl;
+			cout << playerTransform.position.x << ", " << playerTransform.position.y << endl;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -146,7 +146,7 @@ int main()
 
 		playerController->Update(window, engine.deltaTime, engine.physicsSystem);
 		pickupController->Update(player);
-		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetLocation(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z);
 		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ int main()
 				leftThumbstick -= Vector2(0.5f, 0.5f);
 				leftThumbstick *= 2.0f;
 
-				playerTransform.zRotation = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
+				playerTransform.rotation.z = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
 			}
 
 			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
@@ -209,11 +209,11 @@ int main()
 				aimdirection *= 150.0f;
 				ecs.getComponent<SpriteRenderer>(crosshair).enabled = true;
 				// crosshair position based on player position
-				Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
+				Vector3 playerPosition = playerTransform.position;
 				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 10);
 				TransformSystem::SetPosition(crosshair, crosshairPosition);
 
-				playerTurretTransform.zRotation = atan2f(-rightThumbstick.y, rightThumbstick.x) * 180 / 3.14f;
+				playerTurretTransform.rotation.z = atan2f(-rightThumbstick.y, rightThumbstick.x) * 180 / 3.14f;
 
 				if (fireCooldown <= 0)
 				{
@@ -221,7 +221,7 @@ int main()
 					{
 
 						Entity bullet = ecs.newEntity();
-						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .z = 5, .xScale = 5, .yScale = 5 });
+						ecs.addComponent(bullet, Transform{ .position = Vector3(playerTransform.position.x + (aimdirection.x / 4), playerTransform.position.y - (aimdirection.y / 4), 5), .scale = Vector3(5, 5, 0) });
 						ecs.addComponent(bullet, SpriteRenderer{ &texture3 });
 						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
@@ -230,7 +230,7 @@ int main()
 
 						bullets.emplace(bullet);
 						fireCooldown = 0.5f;
-						
+
 						//shooting sound
 						shootSpeaker.Play(sound2);
 					}
@@ -259,7 +259,7 @@ int main()
 					{
 						bullets.erase(bullets.find(bullet));
 						ecs.destroyEntity(bullet);
-						
+
 					}
 					break;
 				}
@@ -272,16 +272,16 @@ int main()
 					if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
 					{
 						rb.velocity = Vector2(0, 0);
-						tf.xScale = 20;
-						tf.yScale = 20;
+						tf.scale.x = 20;
+						tf.scale.y = 20;
 						ecs.destroyEntity(collision.b);
 						ecs.removeComponent<BoxCollider>(bullet);
 						AnimationSystem::PlayAnimation(bullet, "explosion");
-						
-						
-						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.x, tf.y, 1);
+
+
+						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.position.x, tf.position.y, 1);
 						explosionSpeaker.Play(sound3);
-						
+
 
 						break;
 					}
@@ -289,28 +289,28 @@ int main()
 					if (collision.type == Collision::Type::tilemapTrigger)
 					{
 						rb.velocity = Vector2(0, 0);
-						tf.xScale = 20;
-						tf.yScale = 20;
+						tf.scale.x = 20;
+						tf.scale.y = 20;
 						ecs.removeComponent<BoxCollider>(bullet);
 						AnimationSystem::PlayAnimation(bullet, "explosion");
-						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.x, tf.y, 1);
+						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.position.x, tf.position.y, 1);
 						explosionSpeaker.Play(sound3);
 						break;
 					}
 				}
 			}
 		}
-		engine.soundDevice->SetSourceLocation(shootSpeaker, playerTransform.x, playerTransform.y, playerTransform.z);
+		engine.soundDevice->SetSourceLocation(shootSpeaker, playerTransform.position.x, playerTransform.position.y, playerTransform.position.z);
 
-		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.x, playerTransform.y, 1.6));
+		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.position.x, playerTransform.position.y, 1.6));
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		
+
 
 		//engine sound
-		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.x, playerTransform.y, 50);
-		
+		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.position.x, playerTransform.position.y, 50);
+
 
 
 		fireCooldown -= engine.deltaTime;
@@ -320,7 +320,7 @@ int main()
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		cam.SetPosition(playerTransform.x, playerTransform.y, 100);
+		cam.SetPosition(playerTransform.position.x, playerTransform.position.y, 100);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
