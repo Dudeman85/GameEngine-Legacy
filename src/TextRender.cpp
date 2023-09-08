@@ -15,6 +15,18 @@ TextRender::~TextRender()
 {
 }
 
+TrueFont TextRender::SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
+{
+	TrueFont trueFont = {
+		filepathname,
+		face_index,
+		pixel_width,
+		pixel_height
+	};
+
+	return trueFont;
+}
+
 void TextRender::TexConfig()
 {
 	glGenVertexArrays(1, &VAO);
@@ -28,7 +40,7 @@ void TextRender::TexConfig()
 	glBindVertexArray(0);
 }
 
-void TextRender::LoadText()
+void TextRender::LoadText(TrueFont truefont)
 {
 	try
 	{
@@ -37,19 +49,19 @@ void TextRender::LoadText()
 			throw runtime_error("Could not init FreeType Library");
 		}
 
-		if (FT_New_Face(ft, "assets/fonts/ARIAL.TTF", 0, &face))
+		if (FT_New_Face(ft, truefont.filepathname, truefont.face_index, &truefont.aface))
 		{
 			throw runtime_error("Failed to load font");
 		}
 		else
 		{
-			FT_Set_Pixel_Sizes(face, 0, 48);
+			FT_Set_Pixel_Sizes(truefont.aface, truefont.pixel_width, truefont.pixel_height);
 
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 			for (unsigned char c = 0; c < 128; c++)
 			{
-				if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+				if (FT_Load_Char(truefont.aface, c, FT_LOAD_RENDER))
 				{
 					cout << "ERROR::FREETYTPE: Failed to load Glyph" << endl;
 					continue;
@@ -61,12 +73,12 @@ void TextRender::LoadText()
 					GL_TEXTURE_2D,
 					0,
 					GL_RED,
-					face->glyph->bitmap.width,
-					face->glyph->bitmap.rows,
+					truefont.aface->glyph->bitmap.width,
+					truefont.aface->glyph->bitmap.rows,
 					0,
 					GL_RED,
 					GL_UNSIGNED_BYTE,
-					face->glyph->bitmap.buffer
+					truefont.aface->glyph->bitmap.buffer
 				);
 
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -76,9 +88,9 @@ void TextRender::LoadText()
 
 				Character character = {
 					texture,
-					glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-					glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-					static_cast<unsigned int>(face->glyph->advance.x)
+					glm::ivec2(truefont.aface->glyph->bitmap.width, truefont.aface->glyph->bitmap.rows),
+					glm::ivec2(truefont.aface->glyph->bitmap_left, truefont.aface->glyph->bitmap_top),
+					static_cast<unsigned int>(truefont.aface->glyph->advance.x)
 				};
 
 				Characters.insert(pair<char, Character>(c, character));
@@ -87,7 +99,7 @@ void TextRender::LoadText()
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		FT_Done_Face(face);
+		FT_Done_Face(truefont.aface);
 		FT_Done_FreeType(ft);
 
 		TexConfig();
@@ -98,7 +110,7 @@ void TextRender::LoadText()
 	}
 }
 
-void TextRender::RenderText(Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
+void TextRender::RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
 {
 	m_shader->use();
 	projection = cam->GetProjectionMatrix();

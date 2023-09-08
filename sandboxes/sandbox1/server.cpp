@@ -14,7 +14,7 @@
 //	ENetAddress address;
 //	ENetHost* server;
 //	ENetEvent event;
-//	int eventStatus;
+//
 //
 //	address.host = ENET_HOST_ANY;
 //	address.port = 2315;
