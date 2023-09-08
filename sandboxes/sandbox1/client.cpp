@@ -48,13 +48,13 @@ int main(int argc, char** argv)
 	if (enet_host_service(client, &event, 5000) > 0 &&
 		event.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		printf("Connection to %x succeeded.\n", event.peer -> address.host);
+		puts("Connection to host succeeded.");
 
 	}
 	else
 	{
 		enet_peer_reset(peer);
-		printf("Connection to %x failed.\n", event.peer->address.host);
+		puts("Connection to host failed.");
 		return EXIT_SUCCESS;
 	}
 
