@@ -15,7 +15,7 @@
 //	ENetEvent event;
 //
 //	address.host = ENET_HOST_ANY;
-//	address.port = 1234;
+//	address.port = 5555;
 //
 //	server = enet_host_create(&address, 20, 1, 0, 0);
 //
