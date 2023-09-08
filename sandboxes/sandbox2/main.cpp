@@ -18,15 +18,19 @@ int main()
 	cam.SetPosition(0, 0, 10);
 
 	// Initialize the default engine library
-	//EngineLib engine;
+	EngineLib engine;
 	
 	// Window background colour
-	//SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
-	glClearColor(0 / 255, 120 / 255, 0 / 255, 1.0f);
+	SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
+
 
 	// Text
 	TextRender text;
-	text.LoadText();
+	TrueFont trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
+	TrueFont trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
+	text.LoadText(trueFont0);
+	text.LoadText(trueFont1);
+
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -37,12 +41,10 @@ int main()
 		}
 		// Update all engine systems, this usually should go last in the game loop
 		// For greater control of system execution, you can update each one manually
-		//engine.Update(&cam);
+		engine.Update(&cam);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		text.RenderText(&cam, "This is sample text", 1, 1, 2.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		text.RenderText(&cam,"(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		text.RenderText(trueFont0, &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		text.RenderText(trueFont1, &cam,"(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 		// OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
