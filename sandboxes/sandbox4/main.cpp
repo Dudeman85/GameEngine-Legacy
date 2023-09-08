@@ -32,7 +32,7 @@ int main()
 	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
 
 	Entity suzanne2 = ecs.newEntity();
-	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{ .x = 100, .y = -100, .xScale = 7, .yScale = 7, .yRotation = 0 });
+	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{ .x = 5, .y = -5, .xScale = 3, .yScale = 3, .zScale = 3, .yRotation = 0 });
 	ecs.addComponent(suzanne2, ModelRenderer{ .model = &model });
 
 	//Game Loop
@@ -50,9 +50,11 @@ int main()
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-
+		
 		suzanne2Transform.zRotation += 1;
 		suzanne2Transform.yRotation += 1;
+		
+		cam.Rotate(1, 0, 0);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
