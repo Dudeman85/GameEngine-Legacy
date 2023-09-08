@@ -16,6 +16,7 @@ namespace engine
 	{
 	private:
 		Texture(const Texture&);
+		Texture();
 
 	public:
 		Texture(int sx, int sy, const std::vector<std::uint16_t>& data)

@@ -18,8 +18,8 @@ int main()
 	EngineLib engine;
 	//Create the camera
 	Camera cam = Camera(800, 600);
-	cam.perspective = false;
-	cam.SetPosition(0, 0, 500);
+	cam.perspective = true;
+	cam.SetPosition(0, 0, 50);
 
 	//changes window backround color
 	SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
@@ -28,7 +28,7 @@ int main()
 	Model model("assets/suzanne.obj");
 
 	Entity suzanne = ecs.newEntity();
-	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 10, .yScale = 10, .zScale = 10, .yRotation = 0 });
+	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{ .x = 0, .xScale = 3, .yScale = 3, .zScale = 3, .yRotation = 0 });
 	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
 
 	Entity suzanne2 = ecs.newEntity();

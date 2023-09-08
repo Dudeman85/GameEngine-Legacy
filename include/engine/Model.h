@@ -155,7 +155,7 @@ namespace engine
 							number = std::to_string(specularNr++);
 
 						//Set the uniform for the material texture
-						glUniform1i(glGetUniformLocation(shader->ID, ("material." + name + number).c_str()), i);
+						glUniform1i(glGetUniformLocation(shader->ID, (/*"material." + */name + number).c_str()), i);
 
 						glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->ID());
 					}
