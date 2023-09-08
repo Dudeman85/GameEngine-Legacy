@@ -20,7 +20,7 @@ int main()
 	EngineLib engine;
 	
 	// Window background colour
-	RenderSystem::SetBackgroundColor(68, 154, 141);
+	
 
 	// Text
 	TextRender text;
