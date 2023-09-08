@@ -47,6 +47,7 @@ namespace engine
 			else
 				return glm::ortho(position.x - width / 2, position.x + width / 2, position.y - height / 2, position.y + height / 2, 0.01f, farPlane);
 		}
+	
 
 		//Get the model matrix for this camera, aka the view matrix
 		glm::mat4 GetViewMatrix()
