@@ -54,6 +54,7 @@ namespace engine
 		FT_Face face;
 
 		glm::mat4 projection;
+		glm::mat4 viewMatrix;
 
 		engine::Shader* m_shader;
 	};
