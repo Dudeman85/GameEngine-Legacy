@@ -12,7 +12,7 @@ namespace engine
 	{
 	public:
 		//Give the vertex and fragment shader sources directly or if fromFile = true load them from given directories. 
-		Shader(std::string vertexShaderPath = "", std::string fragmentShaderPath = "", bool fromFile = true)
+		Shader(std::string vertexShaderPath, std::string fragmentShaderPath, bool fromFile = true)
 		{
 			//Load Vertex shader
 			std::string vertexShaderString;

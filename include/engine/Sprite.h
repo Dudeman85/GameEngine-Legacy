@@ -79,7 +79,8 @@ namespace engine
 			glDepthFunc(GL_LESS);
 
 			//Create the default sprite shader
-			defaultShader = Shader(R"(
+			defaultShader = new Shader(
+				R"(
 				#version 330 core
 				layout (location = 0) in vec3 aPos;
 				layout(location = 1) in vec2 aTexCoord;
@@ -92,7 +93,8 @@ namespace engine
 					gl_Position = projection * view * model * vec4(aPos, 1.0f);
 					TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 				}
-				)", R"(
+				)", 
+				R"(
 				#version 330 core
 				out vec4 FragColor;
 				in vec2 TexCoord;
@@ -185,10 +187,10 @@ namespace engine
 						continue;
 
 					//If a shader has been specified for this sprite use it, else use the default
-					Shader shader = defaultShader;
+					Shader* shader = defaultShader;
 					if (sprite.shader)
-						shader = *sprite.shader;
-					shader.use();
+						shader = sprite.shader;
+					shader->use();
 
 					//Create the model matrix
 					glm::mat4 model = glm::mat4(1.0f);
@@ -202,15 +204,15 @@ namespace engine
 					model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
 
 					//Give the shader the model matrix
-					unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+					unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 					//Give the shader the view matrix
-					unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+					unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
 					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
 
 					//Give the shader the projection matrix
-					unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
+					unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
 					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
 					//Bind the texture
@@ -244,7 +246,7 @@ namespace engine
 
 	private:
 		unsigned int VAO, VBO, EBO;
-		Shader defaultShader;
+		Shader* defaultShader;
 		Tilemap* tilemap = nullptr;
 	};
 
