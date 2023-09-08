@@ -8,7 +8,7 @@ TextRender::TextRender()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl");
+	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl", true);
 }
 
 TextRender::~TextRender()
@@ -102,7 +102,9 @@ void TextRender::RenderText(Camera* cam, string text, float x, float y, float sc
 {
 	m_shader->use();
 	projection = cam->GetProjectionMatrix();
+	viewMatrix = cam->GetViewMatrix();
 	glUniformMatrix4fv(glGetUniformLocation(m_shader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(m_shader->ID, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(glGetUniformLocation(m_shader->ID, "textColour"), colour.x, colour.y, colour.z);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
