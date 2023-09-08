@@ -12,35 +12,13 @@ namespace engine
 	{
 	public:
 		//Give the vertex and fragment shader sources directly or if fromFile = true load them from given directories. 
-		//Otherwise if no strings given,load the default shaders
 		Shader(std::string vertexShaderPath = "", std::string fragmentShaderPath = "", bool fromFile = true)
 		{
 			//Load Vertex shader
 			std::string vertexShaderString;
 			const char* vertexShaderSource;
-			if (vertexShaderPath == "")
-			{
-				//Load the default Vertex shader if no file given
-				vertexShaderSource =
-					"#version 330 core\n"
-					"layout (location = 0) in vec3 aPos;\n"
-					"layout(location = 1) in vec2 aTexCoord;\n"
-					"out vec2 TexCoord;\n"
-					"uniform mat4 model;\n"
-					"uniform mat4 view;\n"
-					"uniform mat4 projection;\n"
-					"void main()\n"
-					"{\n"
-					"	gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
-					"	TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
-					"}\0";
-			}
-			else if (!fromFile)
-			{
-				//Load the Vertex shader from string
-				vertexShaderSource = vertexShaderPath.c_str();
-			}
-			else
+
+			if (fromFile)
 			{
 				//Load the Vertex shader from file if given
 				std::ifstream file(vertexShaderPath);
@@ -50,6 +28,11 @@ namespace engine
 				buffer << file.rdbuf();
 				vertexShaderString = buffer.str();
 				vertexShaderSource = vertexShaderString.c_str();
+			}
+			else
+			{
+				//Load the Vertex shader from string
+				vertexShaderSource = vertexShaderPath.c_str();
 			}
 
 			//Create and compile the vertex shader
@@ -71,25 +54,8 @@ namespace engine
 			//Load Fragment Shader
 			std::string fragmentShaderString;
 			const char* fragmentShaderSource;
-			if (fragmentShaderPath == "")
-			{
-				//Load the default Fragment shader if no file given
-				fragmentShaderSource =
-					"#version 330 core\n"
-					"out vec4 FragColor;\n"
-					"in vec2 TexCoord;\n"
-					"uniform sampler2D texture1;\n"
-					"void main()\n"
-					"{\n"
-					"   FragColor = texture(texture1, TexCoord);\n"
-					"}\0";
-			}
-			else if (!fromFile)
-			{
-				//Load the Fragment shader from string
-				fragmentShaderSource = fragmentShaderPath.c_str();
-			}
-			else
+
+			if (fromFile)
 			{
 				//Load the Fragment shader from file if given
 				std::ifstream file(fragmentShaderPath);
@@ -99,6 +65,11 @@ namespace engine
 				buffer << file.rdbuf();
 				fragmentShaderString = buffer.str();
 				fragmentShaderSource = fragmentShaderString.c_str();
+			}
+			else
+			{
+				//Load the Fragment shader from string
+				fragmentShaderSource = fragmentShaderPath.c_str();
 			}
 
 			//Create and compile the fragment shader
