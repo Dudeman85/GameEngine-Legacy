@@ -1,7 +1,17 @@
 #include <iostream>
 #include <enet/enet.h>
+#include <stdio.h>
+#include <string.h>
 
-int main()
+/*
+void SendPacket(ENetPeer* peer, const char* data)
+{
+	ENetPacket* packet = enet_packet_create(data, strlen(data) + 1, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet);
+}*/
+
+
+int main(int argc, char** argv)
 {
 	
 	if (enet_initialize() != 0)
@@ -24,8 +34,9 @@ int main()
 	ENetEvent event;
 	ENetPeer* peer;
 
-	enet_address_set_host(&address, "127.0.0.1");
-	address.port = 1234;
+	//in command promt, use "ipconfig" to find out ip address
+	enet_address_set_host(&address, "172.31.18.64");
+	address.port = 2315;
 	peer = enet_host_connect(client, &address, 1, 0);
 	if (peer == NULL)
 	{
@@ -36,27 +47,31 @@ int main()
 	if (enet_host_service(client, &event, 5000) > 0 &&
 		event.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		puts("Connection to 127.0.0.1:1234 succeeded.");
+		puts("Connection to 172.31.20.106:22222 succeeded.");
 	}
 	else
 	{
 		enet_peer_reset(peer);
-		puts("Connection to 127.0.0.1:1234 failed.");
+		puts("Connection to 172.31.20.106:22222 failed.");
 		return EXIT_SUCCESS;
 	}
 
+	//SendPacket(peer, "test_data");
+	/* Create a reliable packet of size 7 containing "packet\0" */
+	ENetPacket* packet = enet_packet_create("packet", strlen("packet") + 1, ENET_PACKET_FLAG_RELIABLE);
+	
+	enet_peer_send(peer, 0, packet);
+	
 	//LOOP
 	while (enet_host_service(client, &event, 1000) > 0)
 	{
 		switch (event.type)
 		{
 		case ENET_EVENT_TYPE_RECEIVE:
-			printf("A packet of length %u containing %s was received from %s on channel %u.\n",
-				event.packet->dataLength,
-				event.packet->data,
-				event.peer->address.host,
-				event.peer->address.port,
-				event.channelID);
+			printf("(Client) Message from server : %s\n", event.packet->data);
+			// Lets broadcast this message to all
+			// enet_host_broadcast(client, 0, event.packet);
+			enet_packet_destroy(event.packet);
 			break;
 		}
 	}
