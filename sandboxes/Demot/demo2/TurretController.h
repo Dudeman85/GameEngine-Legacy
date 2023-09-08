@@ -47,8 +47,8 @@ public:
 				{
 					projectile.destroy = true;
 					rb.velocity = Vector2(0, 0);
-					tf.xScale = 20;
-					tf.yScale = 20;
+					tf.scale.x = 20;
+					tf.scale.y = 20;
 					AnimationSystem::PlayAnimation(entity, "explosion");
 					continue;
 				}
@@ -60,7 +60,7 @@ public:
 				break;
 			}
 
-			if (tf.x < -1000 || tf.y > 1000 || tf.x > 3000 || tf.y < -3000)
+			if (tf.position.x < -1000 || tf.position.y > 1000 || tf.position.x > 3000 || tf.position.y < -3000)
 			{
 				ecs.destroyEntity(entity);
 				break;
@@ -103,12 +103,12 @@ public:
 
 			if (TransformSystem::Distance(entity, player) < 400)
 			{
-				transform.zRotation = TransformSystem::Angle(entity, player);
+				transform.rotation.z = TransformSystem::Angle(entity, player);
 				if (turret.shotsBeforeReload > 0)
 				{
 					if (turret.projectileTimer <= 0)
 					{
-						SpawnProjectile(player, transform.x, transform.y, 5000);
+						SpawnProjectile(player, transform.position.x, transform.position.y, 5000);
 						turret.projectileTimer = 0.2;
 						turret.shotsBeforeReload--;
 						turret.fireSound = 1;
@@ -137,9 +137,9 @@ public:
 		Transform& targetTranform = ecs.getComponent<Transform>(target);
 
 		Entity projectile = ecs.newEntity();
-		ecs.addComponent(projectile, Transform{ .x = x, .y = y, .z = 5, .xScale = 7, .yScale = 7 });
+		ecs.addComponent(projectile, Transform{ .position = Vector3(x, y, 5), .scale = Vector3(7, 7, 0) });
 		ecs.addComponent(projectile, SpriteRenderer{ .texture = projectileTexture });
-		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.x - x, targetTranform.y - y).Normalize() * speed, .kinematic = true });
+		ecs.addComponent(projectile, Rigidbody{ .velocity = Vector2(targetTranform.position.x - x, targetTranform.position.y - y).Normalize() * speed, .kinematic = true });
 		ecs.addComponent(projectile, BoxCollider{ .isTrigger = true });
 		ecs.addComponent(projectile, Projectile{});
 		ecs.addComponent(projectile, Animator{});
@@ -150,7 +150,7 @@ public:
 	Entity CreateTurret(float x, float y)
 	{
 		Entity turret = ecs.newEntity();
-		ecs.addComponent(turret, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 60, .yScale = 20 });
+		ecs.addComponent(turret, Transform{ .position = Vector3(x, y, 1.5), .scale = Vector3(60, 20, 0) });
 		ecs.addComponent(turret, SpriteRenderer{ .texture = defaultTexture });
 		ecs.addComponent(turret, Rigidbody{});
 		ecs.addComponent(turret, BoxCollider{});

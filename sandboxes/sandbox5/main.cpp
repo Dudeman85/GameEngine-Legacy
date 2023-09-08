@@ -41,9 +41,9 @@ int main()
 	//Add the transform component which is required for the Render System
 	// Agregar el componente de trasformacion, que es nesesario para el Render System
 	// dentro de clase Transform estan los componetes relacionados con la (rotacion , escala y posicion)
-	ecs.addComponent(sprite, Transform{ .x = 100, .y = 100, .xScale = 100, .yScale = 100 });
-	ecs.addComponent(sprite1, Transform{ .x = 10, .y = -100, .xScale = 100, .yScale = 100 });
-	ecs.addComponent(sprite2, Transform{ .x = -100, .y = 100, .xScale = 100, .yScale = 100 });
+	ecs.addComponent(sprite, Transform{ .position = Vector3(100, 100, 0), .scale = Vector3(100, 100, 0) });
+	ecs.addComponent(sprite1, Transform{ .position = Vector3(10, -100, 0), .scale = Vector3(100, 100, 0) });
+	ecs.addComponent(sprite2, Transform{ .position = Vector3(-100, 100, 0), .scale = Vector3(100, 100, 0) });
 
 
 

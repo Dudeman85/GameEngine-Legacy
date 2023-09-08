@@ -23,7 +23,7 @@ public:
 		winner = new Texture("assets/winner.png");
 
 		winScreen = ecs.newEntity();
-		ecs.addComponent(winScreen, Transform{ .z = 20, .xScale = 200, .yScale = 200 });
+		ecs.addComponent(winScreen, Transform{ .position = Vector3(0, 0, 20), .scale = Vector3(200, 200, 0) });
 		ecs.addComponent(winScreen, SpriteRenderer{ .texture = winner, .enabled = false });
 	}
 
@@ -48,13 +48,13 @@ public:
 		{
 			ecs.getComponent<SpriteRenderer>(winScreen).enabled = true;
 		}
-		TransformSystem::SetPosition(winScreen, Vector3(ecs.getComponent<Transform>(player).x, ecs.getComponent<Transform>(player).y, 20));
+		TransformSystem::SetPosition(winScreen, Vector3(ecs.getComponent<Transform>(player).position.x, ecs.getComponent<Transform>(player).position.y, 20));
 	}
 
 	Entity CreatePickup(float x, float y)
 	{
 		Entity pickup = ecs.newEntity();
-		ecs.addComponent(pickup, Transform{ .x = x, .y = y, .z = 1.5, .xScale = 35, .yScale = 25 });
+		ecs.addComponent(pickup, Transform{ .position = Vector3(x, y, 1.5), .scale = Vector3(35, 25, 0) });
 		ecs.addComponent(pickup, SpriteRenderer{ .texture = defaultTexture });
 		ecs.addComponent(pickup, Rigidbody{ .kinematic = true });
 		ecs.addComponent(pickup, BoxCollider{ .isTrigger = true });
