@@ -137,6 +137,9 @@ namespace engine
 				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
 				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
+				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
+				glUniform3f(colorLoc, 1.0f, 1.0f, 1.0f);
+
 				//For each mesh in the model
 				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
 				{
