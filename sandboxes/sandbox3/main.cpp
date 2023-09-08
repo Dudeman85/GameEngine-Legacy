@@ -15,10 +15,6 @@ int main()
 	//changes window backround color, values 0-1, RGB
 	
 
-	//Create a new shader by loading the fragment and vertex shaders from file
-	//Leaving either of these empty will use the default shader for that type
-	Shader shader = Shader();
-
 
 	//Create a new entity
 	Entity sprite = ecs.newEntity();

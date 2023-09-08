@@ -58,7 +58,7 @@ namespace engine
 		ModelRenderSystem()
 		{
 			//The default 3D model shader
-			Shader defaultShader = Shader(
+			defaultShader = new Shader(
 				R"(
 				#version 330 core
 				layout(location = 0) in vec3 aPos;
@@ -102,10 +102,10 @@ namespace engine
 				ModelRenderer& modelRenderer = ecs.getComponent<ModelRenderer>(entity);
 
 				//If a shader has been specified for this sprite use it, else use the default
-				Shader shader = defaultShader;
+				Shader* shader = defaultShader;
 				if (modelRenderer.shader)
-					shader = *modelRenderer.shader;
-				shader.use();
+					shader = modelRenderer.shader;
+				shader->use();
 
 				//Create the model matrix, this is the same for each mesh so it only needs to be done once
 				glm::mat4 model = glm::mat4(1.0f);
@@ -119,17 +119,15 @@ namespace engine
 				model = glm::scale(model, glm::vec3(transform.xScale, transform.yScale, transform.zScale));
 
 				//Give the shader the model matrix
-				unsigned int modelLoc = glGetUniformLocation(shader.ID, "model");
+				unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 				//Give the shader the view matrix
-				unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
+				unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
 				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
 
 				//Give the shader the projection matrix
-				unsigned int projLoc = glGetUniformLocation(shader.ID, "projection");
-				//auto proj = glm::perspective(1.0f, 1.0f, 0.001f, 1000.0f);
-				//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
 				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
 				//For each mesh in the model
@@ -157,7 +155,7 @@ namespace engine
 							number = std::to_string(specularNr++);
 
 						//Set the uniform for the material texture
-						glUniform1i(glGetUniformLocation(shader.ID, ("material." + name + number).c_str()), i);
+						glUniform1i(glGetUniformLocation(shader->ID, ("material." + name + number).c_str()), i);
 
 						glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->ID());
 					}
@@ -173,6 +171,6 @@ namespace engine
 			}
 		}
 
-		Shader defaultShader;
+		Shader* defaultShader;
 	};
 }
