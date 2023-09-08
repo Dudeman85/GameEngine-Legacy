@@ -7,6 +7,7 @@
 #include <engine/Model.h>
 #include <engine/Transform.h>
 #include <engine/Physics.h>
+#include <engine/UserInterface.h>
 
 //Other engine libs
 #include <engine/GL/Window.h>
@@ -34,6 +35,7 @@ namespace engine
 		shared_ptr<ModelRenderSystem> modelRenderSystem;
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<PhysicsSystem> physicsSystem;
+		shared_ptr<UISystem> uiSystem;
 
 		EngineLib()
 		{
@@ -50,6 +52,7 @@ namespace engine
 			ecs.registerComponent<Animator>();
 			ecs.registerComponent<Rigidbody>();
 			ecs.registerComponent<BoxCollider>();
+			ecs.registerComponent<UIElement>();
 
 			//Register all default engine systems here
 			//Transform System
@@ -79,6 +82,13 @@ namespace engine
 			animationSystemSignature.set(ecs.getComponentId<Animator>());
 			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
 
+			//UI System
+			uiSystem = ecs.registerSystem<UISystem>();
+			Signature uiSystemSignature;
+			uiSystemSignature.set(ecs.getComponentId<UIElement>());
+			uiSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<UISystem>(uiSystemSignature);
+
 			//Physics System
 			physicsSystem = ecs.registerSystem<PhysicsSystem>();
 			Signature physicsSystemSignature;
@@ -99,6 +109,7 @@ namespace engine
 			animationSystem->Update(deltaTime);
 			spriteRenderSystem->Update(cam);
 			modelRenderSystem->Update(cam);
+			uiSystem->Update(cam);
 
 			//Calculate Delta Time
 			chrono::time_point thisFrame = chrono::high_resolution_clock::now();

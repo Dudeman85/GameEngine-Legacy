@@ -35,6 +35,12 @@ int main()
 	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{  });
 	ecs.addComponent(suzanne2, ModelRenderer{ .model = &model });
 
+	//UI SYSTEM TESTING
+	Texture tex("assets/strawberry.png");
+	Entity strawberry = ecs.newEntity();
+	ecs.addComponent(strawberry, Transform{ .position = Vector3(1, .1, 0), .scale = Vector3(.1, .1, 0) });
+	ecs.addComponent(strawberry, SpriteRenderer{ .texture = &tex, .uiElement = true});
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -50,7 +56,7 @@ int main()
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-				
+
 		cam.Rotate(1, 0, 0);
 
 		//OpenGL stuff, goes very last

@@ -27,9 +27,10 @@ namespace engine
 	//2D Sprite Renderer component
 	struct SpriteRenderer
 	{
-		Texture* texture;
+		Texture* texture = nullptr;
 		Shader* shader = nullptr;
 		bool enabled = true;
+		bool uiElement = false;
 	};
 
 	//Animation struct. Not a component
@@ -93,7 +94,7 @@ namespace engine
 					gl_Position = projection * view * model * vec4(aPos, 1.0f);
 					TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 				}
-				)", 
+				)",
 				R"(
 				#version 330 core
 				out vec4 FragColor;
@@ -157,7 +158,7 @@ namespace engine
 
 			//Sort the entities and tilemap by Z
 			set<float> layersToDraw;
-			if(tilemap)
+			if (tilemap)
 				layersToDraw.insert(tilemap->zLayers.begin(), tilemap->zLayers.end());
 			map<float, vector<Entity>> sortedEntities;
 			for (const Entity& entity : entities)
@@ -170,7 +171,7 @@ namespace engine
 			//Draw everything by layer
 			for (const float& layer : layersToDraw)
 			{
-				if(tilemap)
+				if (tilemap)
 					tilemap->draw(layer);
 
 				//Bind the right VAO after tilemap
@@ -207,13 +208,26 @@ namespace engine
 					unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 					glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-					//Give the shader the view matrix
+					//Get the view and projection locations
 					unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
-					glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
-
-					//Give the shader the projection matrix
 					unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
-					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+
+					if (!sprite.uiElement)
+					{
+						//Give the shader the camera's view matrix
+						glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cam->GetViewMatrix()));
+
+						//Give the shader the camera's projection matrix
+						glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
+					}
+					else
+					{
+						//Give the shader a constant view matrix
+						glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
+						//Give the shader a constant projection matrix
+						glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+					}
 
 					//Bind the texture
 					glActiveTexture(GL_TEXTURE0);
