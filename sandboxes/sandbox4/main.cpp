@@ -13,33 +13,32 @@ int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
 	//Paraeters define window size(x,y) and name
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
+	GLFWwindow* window = CreateWindow(1200, 800, "Window");
 	//Initialize the default engine library
 	EngineLib engine;
 	//Create the camera
-	Camera cam = Camera(800, 600);
+	Camera cam = Camera(1200, 800);
 	cam.perspective = true;
 	cam.SetPosition(0, 0, 50);
 
 	//changes window backround color
-	SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
+	SpriteRenderSystem::SetBackgroundColor(29, 46, 119);
 
 	//Model loading
-	Model model("assets/suzanne.obj");
+	Model model("assets/achelous.obj");
 
-	Entity suzanne = ecs.newEntity();
-	Transform& suzanneTransform = ecs.addComponent(suzanne, Transform{  });
-	ecs.addComponent(suzanne, ModelRenderer{ .model = &model });
-
-	Entity suzanne2 = ecs.newEntity();
-	Transform& suzanne2Transform = ecs.addComponent(suzanne2, Transform{  });
-	ecs.addComponent(suzanne2, ModelRenderer{ .model = &model });
+	Entity ship = ecs.newEntity();
+	Transform& modelTransform = ecs.addComponent(ship, Transform{ .rotation = Vector3(90, 0, 0), .scale = Vector3(1)});
+	ecs.addComponent(ship, ModelRenderer{ .model = &model });
+	//Angle of the ship, 0 is up
+	float angle = 0;
+	float rotationSpeed = 3;
 
 	//UI SYSTEM TESTING
 	Texture tex("assets/strawberry.png");
 	Entity strawberry = ecs.newEntity();
 	ecs.addComponent(strawberry, Transform{ .position = Vector3(1, .1, 0), .scale = Vector3(.1, .1, 0) });
-	ecs.addComponent(strawberry, SpriteRenderer{ .texture = &tex, .uiElement = true});
+	//ecs.addComponent(strawberry, SpriteRenderer{ .texture = &tex, .uiElement = true});
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -49,15 +48,31 @@ int main()
 			glfwSetWindowShouldClose(window, true);
 
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			suzanneTransform.rotation.y += -1;
+		{
+			angle += rotationSpeed;
+			if (angle >= 360)
+				angle -= 360;
+
+			cout << angle << endl;
+
+			modelTransform.rotation.y += -rotationSpeed;
+			modelTransform.rotation.z += rotationSpeed;
+		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			suzanneTransform.rotation.y += 1;
+		{
+			angle -= rotationSpeed;
+			if (angle < 0)
+				angle += 360;
+
+			cout << angle << endl;
+
+			modelTransform.rotation.y += rotationSpeed;
+			modelTransform.rotation.z += -rotationSpeed;
+		}
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
-
-		cam.Rotate(1, 0, 0);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
