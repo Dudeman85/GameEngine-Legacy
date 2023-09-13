@@ -26,6 +26,7 @@ struct Character
 
 struct TrueFont
 {
+	int vecOrder;
 	const char* filepathname;
 	FT_Long face_index;
 	FT_UInt pixel_width;
@@ -59,13 +60,17 @@ namespace engine
 
 	private:
 		map<GLchar, Character> Characters;
+
 		TrueFont TrueFonts;
 
 		unsigned int VAO, VBO;
 
 		unsigned int texture;
+		
+		int TTForder;
 
 		FT_Library ft;
+		FT_Face face;
 
 		glm::mat4 projection;
 		glm::mat4 viewMatrix;

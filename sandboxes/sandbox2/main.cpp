@@ -28,8 +28,11 @@ int main()
 	TextRender text;
 	TrueFont trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
 	TrueFont trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
-	text.LoadText(trueFont0);
-	text.LoadText(trueFont1);
+
+	cout << trueFont0.vecOrder << endl;
+	cout << trueFont1.vecOrder << endl;
+
+
 
 
 	// Game loop
@@ -43,8 +46,8 @@ int main()
 		// For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		text.RenderText(trueFont0, &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		text.RenderText(trueFont1, &cam,"(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		//text.RenderText(trueFont0, &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		//text.RenderText(trueFont1, &cam,"(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 		// OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

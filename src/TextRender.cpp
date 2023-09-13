@@ -9,20 +9,29 @@ TextRender::TextRender()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl", true);
+
+	TTForder = 0;
 }
 
 TextRender::~TextRender()
 {
+	delete &TTForder;
 }
 
 TrueFont TextRender::SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
 {
+	 int vectorOrder = TTForder;
+
 	TrueFont trueFont = {
+		vectorOrder,
 		filepathname,
 		face_index,
 		pixel_width,
-		pixel_height
+		pixel_height,
+		face
 	};
+
+	TTForder += 1;
 
 	return trueFont;
 }
