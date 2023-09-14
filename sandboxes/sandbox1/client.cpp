@@ -36,8 +36,8 @@ int main(int argc, char** argv)
 	
 
 	//in command promt, use "ipconfig" to find out ip address
-	enet_address_set_host(&address, "127.0.0.1");
-	address.port = 2315;
+	enet_address_set_host(&address, "172.31.18.64");
+	address.port = 2310;
 	peer = enet_host_connect(client, &address, 1, 0);
 	if (peer == NULL)
 	{

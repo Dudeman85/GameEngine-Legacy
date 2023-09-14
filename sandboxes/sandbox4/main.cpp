@@ -35,9 +35,11 @@ int main()
 	float rotationSpeed = 3;
 
 	//UI SYSTEM TESTING
+	//If a sprite is designated as a ui element the transform position will be normalized screen space coordinates, scale will also be different, rotation is the same
+	//The type of camera and its size will make no difference to the appearance of the sprite
 	Texture tex("assets/strawberry.png");
 	Entity strawberry = ecs.newEntity();
-	ecs.addComponent(strawberry, Transform{ .position = Vector3(1, .1, 0), .scale = Vector3(.1, .1, 0) });
+	ecs.addComponent(strawberry, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(.1, .1, 0) });
 	//ecs.addComponent(strawberry, SpriteRenderer{ .texture = &tex, .uiElement = true});
 
 	//Game Loop
@@ -69,6 +71,12 @@ int main()
 			modelTransform.rotation.y += rotationSpeed;
 			modelTransform.rotation.z += -rotationSpeed;
 		}
+
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			cam.Rotate(1, 0, 0);
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			cam.Rotate(-1, 0, 0);
+
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually

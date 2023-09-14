@@ -76,6 +76,20 @@ namespace engine
 		return x * x + y * y;
 	}
 
+	float Vector2::Dot(Vector2 b)
+	{
+		return (x * b.x) + (y * b.y);
+	}
+
+	Vector2 Vector2::LeftNormal()
+	{
+		return Vector2(-y, x).Normalize();
+	}
+	Vector2 Vector2::RightNormal()
+	{
+		return Vector2(y, -x).Normalize();
+	}
+
 	Vector3::Vector3()
 	{
 		x = 0;
@@ -136,6 +150,11 @@ namespace engine
 	Vector3 Vector3::Normalize() {
 		float length = sqrt(x * x + y * y + z * z);
 		return Vector3(x / length, y / length, z / length);
+	}
+
+	float Vector3::Dot(Vector3 b)
+	{
+		return (x * b.x) + (y * b.y) + (z * b.z);
 	}
 
 	glm::vec3 Vector3::ToGlm()

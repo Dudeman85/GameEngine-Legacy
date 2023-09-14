@@ -63,7 +63,7 @@ namespace engine
 	};
 
 	//2D Sprite Render system
-	//Requires Sprite and Transform
+	//Requires SpriteRenderer and Transform
 	class SpriteRenderSystem : public System
 	{
 	public:
@@ -148,6 +148,13 @@ namespace engine
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+
+		~SpriteRenderSystem()
+		{
+			glDeleteVertexArrays(1, &VAO);
+			glDeleteVertexArrays(1, &VBO);
+			glDeleteVertexArrays(1, &EBO);
 		}
 
 		//Renders everything. Call this every frame
