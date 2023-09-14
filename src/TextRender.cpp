@@ -9,30 +9,27 @@ TextRender::TextRender()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl", true);
-
-	numFaces = 0;
 }
 
 TextRender::~TextRender()
 {
-	delete& numFaces;
 }
 
-vector<TrueFont> TextRender::SetUpTTF(const char* filepathname, FT_Long face_index,const FT_UInt pixel_width,const FT_UInt pixel_height)
-{
 
-	TrueFont trueFont = {
+
+map<FT_Face, TrueFont> TextRender::SetUpTTF(FT_Face face, const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
+{
+	TrueFont truefont
+	{
 		filepathname,
 		face_index,
 		pixel_width,
 		pixel_height
 	};
 
-	numFaces += 1;
+	Faces.insert(pair<FT_Face, TrueFont>(face, truefont));
 
-	fontDatas.push_back(trueFont);
-
-	return fontDatas;
+	return Faces;
 }
 
 void TextRender::TexConfig()
@@ -48,9 +45,17 @@ void TextRender::TexConfig()
 	glBindVertexArray(0);
 }
 
-/*
-void TextRender::LoadText(vector<TrueFont> fontDatas)
+
+void TextRender::LoadText(map<FT_Face, TrueFont> Faces)
 {
+	for (auto& pair : Faces)
+	{
+		FT_Face face = pair.first;
+		TrueFont truefont = pair.second;
+
+		cout << "FT_Face: face" << endl;
+	}
+	/*
 	try
 	{
 		if (FT_Init_FreeType(&ft))
@@ -165,11 +170,11 @@ void TextRender::LoadText(vector<TrueFont> fontDatas)
 	{
 		cerr << "ERROR::FREETYPE: " << e.what() << endl;
 	}
-	
+	*/
 }
-*/
 
-void TextRender::RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
+
+void TextRender::RenderText(Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
 {
 	m_shader->use();
 	projection = cam->GetProjectionMatrix();
