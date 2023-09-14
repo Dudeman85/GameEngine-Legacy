@@ -140,6 +140,17 @@ namespace engine
 				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
 				glUniform3f(colorLoc, 1.0f, 1.0f, 1.0f);
 
+				unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
+				
+				// lighting
+				glm::vec3 lightPos(15.2f, 5.0f, 7.0f);
+
+				glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
+				
+				unsigned int objectColor = glGetUniformLocation(shader->ID, "objectColor");
+				glUniform3f(objectColor, 1.0f, 0.5f, 0.31f);
+
+
 				//For each mesh in the model
 				for (unsigned int i = 0; i < modelRenderer.model->meshes.size(); i++)
 				{
