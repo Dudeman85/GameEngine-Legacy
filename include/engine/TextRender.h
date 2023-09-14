@@ -26,12 +26,10 @@ struct Character
 
 struct TrueFont
 {
-	int vecOrder;
 	const char* filepathname;
 	FT_Long face_index;
 	FT_UInt pixel_width;
 	FT_UInt pixel_height;
-	FT_Face aface;
 };
 
 namespace engine
@@ -46,14 +44,14 @@ namespace engine
 		~TextRender();
 
 		// Multiple TrueFonts function
-		TrueFont SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
+		vector<TrueFont> SetUpTTF(const char* filepathname, FT_Long face_index,const FT_UInt pixel_width,const FT_UInt pixel_height);
 
 
 		// VAO & VBO function
 		void TexConfig();
 
 		// Text loading function
-		void LoadText(TrueFont truefont);
+		void LoadText(vector<TrueFont> fontDatas);
 		
 		// Text Rendering function
 		void RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
@@ -61,13 +59,15 @@ namespace engine
 	private:
 		map<GLchar, Character> Characters;
 
+		vector<TrueFont> fontDatas;
+		vector<FT_Face> faces;
 		TrueFont TrueFonts;
+		int numFaces;
 
 		unsigned int VAO, VBO;
 
 		unsigned int texture;
-		
-		int TTForder;
+
 
 		FT_Library ft;
 		FT_Face face;

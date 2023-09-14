@@ -26,11 +26,11 @@ int main()
 
 	// Text
 	TextRender text;
-	TrueFont trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
-	TrueFont trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
+	//vector<TrueFont> trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
+	//vector<TrueFont> trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
+	vector<TrueFont> fontDatas = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
+	fontDatas = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
 
-	cout << trueFont0.vecOrder << endl;
-	cout << trueFont1.vecOrder << endl;
 
 
 

@@ -10,30 +10,29 @@ TextRender::TextRender()
 
 	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl", true);
 
-	TTForder = 0;
+	numFaces = 0;
 }
 
 TextRender::~TextRender()
 {
-	delete &TTForder;
+	delete& numFaces;
 }
 
-TrueFont TextRender::SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
+vector<TrueFont> TextRender::SetUpTTF(const char* filepathname, FT_Long face_index,const FT_UInt pixel_width,const FT_UInt pixel_height)
 {
-	 int vectorOrder = TTForder;
 
 	TrueFont trueFont = {
-		vectorOrder,
 		filepathname,
 		face_index,
 		pixel_width,
-		pixel_height,
-		face
+		pixel_height
 	};
 
-	TTForder += 1;
+	numFaces += 1;
 
-	return trueFont;
+	fontDatas.push_back(trueFont);
+
+	return fontDatas;
 }
 
 void TextRender::TexConfig()
@@ -49,7 +48,8 @@ void TextRender::TexConfig()
 	glBindVertexArray(0);
 }
 
-void TextRender::LoadText(TrueFont truefont)
+/*
+void TextRender::LoadText(vector<TrueFont> fontDatas)
 {
 	try
 	{
@@ -58,10 +58,57 @@ void TextRender::LoadText(TrueFont truefont)
 			throw runtime_error("Could not init FreeType Library");
 		}
 
-		if (FT_New_Face(ft, truefont.filepathname, truefont.face_index, &truefont.aface))
+		for (const TrueFont& truefont : fontDatas)
 		{
-			throw runtime_error("Failed to load font");
+			if (FT_New_Face(ft, truefont.filepathname, , &face))
+			{
+				throw runtime_error("Failed to load font from: " + string(fontDatas[f].filepathname));
+			}
+			else
+			{
+				FT_Set_Pixel_Sizes(face, fontDatas[f].pixel_width, fontDatas[f].pixel_height);
+			}
+
+			faces.push_back(face);			
+
+			cout << "Pixel width: " + to_string(fontDatas[f].pixel_width) << endl;
+			cout << "Face " + to_string(f) + " pixel width : " + to_string(faces[f]->size->metrics.x_ppem) << endl;
 		}
+
+		//debug
+		for (int d = 0; d < numFaces; ++d)
+		{
+			cout << faces[d]->family_name << endl;
+			cout << faces[d]->face_index << endl;
+			cout << faces[d]->size->metrics.x_ppem << endl;
+			cout << faces[d]->size->metrics.y_ppem << endl;
+		}
+	}
+	catch (const exception& e)
+	{
+		cerr << "ERROR::FREETYPE: " << e.what() << endl;
+	}
+
+
+	
+	try
+	{
+		if (FT_Init_FreeType(&ft))
+		{
+			throw runtime_error("Could not init FreeType Library");
+		}
+		for (int c = 0; c < numFaces; ++c)
+		{
+			if (FT_New_Face(ft, fontDatas[c].filepathname, fontDatas[c].face_index, &face))
+			{
+				throw runtime_error("Failed to load font");
+			}
+		}
+		//if (FT_New_Face(ft, truefont.filepathname, truefont.face_index, &truefont.aface))
+		//{
+			//throw runtime_error("Failed to load font");
+		//}
+		
 		else
 		{
 			FT_Set_Pixel_Sizes(truefont.aface, truefont.pixel_width, truefont.pixel_height);
@@ -112,12 +159,15 @@ void TextRender::LoadText(TrueFont truefont)
 		FT_Done_FreeType(ft);
 
 		TexConfig();
+		
 	}
 	catch (const exception& e)
 	{
 		cerr << "ERROR::FREETYPE: " << e.what() << endl;
 	}
+	
 }
+*/
 
 void TextRender::RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
 {
