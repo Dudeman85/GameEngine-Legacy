@@ -175,11 +175,10 @@ namespace engine
 
                  // lighting color
 				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
-				glUniform3f(colorLoc, 1.0f, 1.0f, 1.0f);
+				glUniform3f(colorLoc, lightColor.x/255, lightColor.y/255 , lightColor.z/255);
 
 				// lighting position
 				unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
-				glm::vec3 lightPos(0.0f, 200.0f, 200.0f);
 				glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 
 				// camara pposition
@@ -227,6 +226,10 @@ namespace engine
 				}
 			}
 		}
+
+		Vector3 lightPos;
+		Vector3 lightColor = Vector3(255);
+
 
 		Shader* defaultShader;
 	};

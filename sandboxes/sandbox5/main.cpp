@@ -48,7 +48,7 @@ int main()
 	ecs.addComponent(zuzanne, ModelRenderer{ .model = &model });
 	/*ecs.addComponent(sprite1, Transform{ .x = 10, .y = -100, .xScale = 100, .yScale = 100 });
 	ecs.addComponent(sprite2, Transform{ .x = -100, .y = 100, .xScale = 100, .yScale = 100 });*/
-
+	engine.modelRenderSystem->lightPos = Vector3(0, 200, 200);
 
 	while (!glfwWindowShouldClose(window))
 	{
