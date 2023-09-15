@@ -66,13 +66,17 @@ namespace engine
 		{
 			//The default 3D model shader
 			defaultShader = new Shader(
-				R"(
+				R"( //////////////// vexterShader ////////////////////////////
 				#version 330 core
 				layout(location = 0) in vec3 aPos;
 				layout(location = 1) in vec3 aNormal;
 				layout(location = 2) in vec2 aTexCoords;
+                
+				
+                out vec3 FragPos;
+                out vec3 Normal;
+                out vec2 TexCoords;
 
-				out vec2 TexCoords;
 
 				uniform mat4 model;
 				uniform mat4 view;
@@ -81,22 +85,54 @@ namespace engine
 				void main()
 				{
 					TexCoords = aTexCoords;
+                    FragPos = vec3 (model * vec4(aPos,1.0));
+                    Normal = mat3(transpose(inverse(model))) *aNormal;
+ 
 					gl_Position = projection * view * model * vec4(aPos, 1.0);
+                    
 				}
 				)",
-				R"(
+				R"( ////////////////// FragmerSheder///////////////////////////////////////////////
 				#version 330 core
 				out vec4 FragColor;
+ 
 
 				in vec2 TexCoords;
+                in vec3 Normal;
+                in vec3 FragPos;
 
-				uniform sampler2D texture_diffuse1;
-
+                uniform sampler2D texture_diffuse1;
+				uniform vec3 lightPos;
+                uniform vec3 lightColor;
+                uniform vec3 viewPos;
+ 
 				void main()
 				{    
-					FragColor = texture(texture_diffuse1, TexCoords);
+					vec3 objectColor = texture(texture_diffuse1, TexCoords).xyz;
+//////////////////////////////////// Ambient //////////////////////////////////////////////////////////
+					float ambientStrength = 0.3;
+					vec3 ambient = ambientStrength * lightColor;
+                    
+///////////////////////////////// diffuce //////////////////////////////////////////////////////////////
+                    vec3 norm = normalize(Normal);
+                    vec3 lightDir = normalize(lightPos - FragPos);
+                    float diff = max(dot(norm , lightDir), 0.0);
+                    vec3 diffuse = diff * lightColor;
+
+/////////////////////////////// Specular //////////////////////////////////////////////////////////////////
+                    float specularStrength = 0.5;
+                    vec3 viewDir = normalize(viewPos - FragPos);
+                    vec3 reflectDir = reflect(-lightDir, norm);  
+                    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+                    vec3 specular = specularStrength * spec * lightColor; 
+
+//////////////////////////////// Phong ///////////////////////////////////////////////////////////////////// 
+                   vec3 result = (ambient + diffuse + specular ) * objectColor;
+                   FragColor = vec4(result, 1.0);  
+				 
 				}
 				)", false);
+			
 		}
 
 		void Update(Camera* cam)
@@ -137,18 +173,17 @@ namespace engine
 				unsigned int projLoc = glGetUniformLocation(shader->ID, "projection");
 				glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(cam->GetProjectionMatrix()));
 
+                 // lighting color
 				unsigned int colorLoc = glGetUniformLocation(shader->ID, "lightColor");
-				glUniform3f(colorLoc, 1.0f, 1.0f, 1.0f);
+				glUniform3f(colorLoc, lightColor.x/255, lightColor.y/255 , lightColor.z/255);
 
+				// lighting position
 				unsigned int lightPosLoc = glGetUniformLocation(shader->ID, "lightPos");
-				
-				// lighting
-				glm::vec3 lightPos(15.2f, 5.0f, 7.0f);
-
 				glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
-				
-				unsigned int objectColor = glGetUniformLocation(shader->ID, "objectColor");
-				glUniform3f(objectColor, 1.0f, 0.5f, 0.31f);
+
+				// camara pposition
+				unsigned int viewPosLoc = glGetUniformLocation(shader->ID, "viewPos");
+				glUniform3fv(viewPosLoc,1, glm::value_ptr(cam->position));
 
 
 				//For each mesh in the model
@@ -191,6 +226,10 @@ namespace engine
 				}
 			}
 		}
+
+		Vector3 lightPos;
+		Vector3 lightColor = Vector3(255);
+
 
 		Shader* defaultShader;
 	};
