@@ -28,9 +28,11 @@ int main()
 	TextRender text;
 	//vector<TrueFont> trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
 	//vector<TrueFont> trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
-	FT_Face face0;
-	//map<FT_Face, TrueFont> Faces = text.SetUpTTF(face0, "assets/fonts/ARIAL.TTF", 0, 0, 48);
-	//text.LoadText(Faces);
+	FT_Face face0 = 0;
+	FT_Face face1 = 0;
+	vector<FT_Face> Faces = text.SetUpTTF(face0, "assets/fonts/ARIAL.TTF", 0, 0, 48);
+	Faces = text.SetUpTTF(face1, "assets/fonts/wingding.ttf", 0, 0, 48);
+	text.LoadText(Faces);
 
 
 
@@ -47,8 +49,10 @@ int main()
 		// For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		//text.RenderText(trueFont0, &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		//text.RenderText(trueFont1, &cam,"(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		text.RenderText(Faces[0], &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		text.RenderText(Faces[1], &cam, "(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+
+		//cout << Faces[0]->glyph->bitmap << endl;
 
 		// OpenGL stuff, goes very last
 		glfwSwapBuffers(window);
