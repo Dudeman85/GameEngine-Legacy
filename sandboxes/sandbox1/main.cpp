@@ -1,269 +1,166 @@
-//#include <iostream>
-//#include <engine/Tilemap.h>
-//
-//#include <chrono> // std::chrono::microseconds
-//#include <thread> // std::this_thread::sleep_for
-//
-//#include <fstream>
+////#if 0
 //
 //#include <engine/Application.h>
-//#include <../src/detail/pugixml.hpp>
+//#include <engine/Tilemap.h>
+//#include <vector>
+//#include <set>
+//#include <chrono>
+//#include <thread>
+//#include "PlayerController.h"
+//#include "PickupController.h"
+//#include "TurretController.h"
 //
 //using namespace std;
 //using namespace engine;
-//ECS ecs;
 //
-////void mouse_callback(GLFWwindow * window, double xpos, double ypos)
-////	{
-////	cout << xpos << "x : " << ypos <<"y"<< endl;
-////	}
+//ECS ecs;
 //
 //int main()
 //{
+//
+//
 //	//Create the window and OpenGL context before creating EngineLib
-//	GLFWwindow* window = CreateWindow(800, 600, "Window");
-//
-//	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-//
-//
-//	//glfwSetCursorPosCallback(window, mouse_callback);
+//	GLFWwindow* window = CreateWindow(1250, 1000, "Window");
+//	//Create the camera
+//	Camera cam = Camera(1250, 1000);
 //
 //	//Initialize the default engine library
 //	EngineLib engine;
 //
-//	//engine.physicsSystem->gravity = Vector2(0, 0);
-//	//engine.physicsSystem->step = 4;
+//	ecs.registerComponent<Player>();
+//	shared_ptr<PlayerController> playerController = ecs.registerSystem<PlayerController>();
+//	Signature playerControllerSignature;
+//	playerControllerSignature.set(ecs.getComponentId<Transform>());
+//	playerControllerSignature.set(ecs.getComponentId<Player>());
+//	playerControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
+//	playerControllerSignature.set(ecs.getComponentId<Rigidbody>());
+//	playerControllerSignature.set(ecs.getComponentId<BoxCollider>());
+//	ecs.setSystemSignature<PlayerController>(playerControllerSignature);
+//	//Register Turret Controller
+//	ecs.registerComponent<Turret>();
+//	shared_ptr<TurretController> turretController = ecs.registerSystem<TurretController>();
+//	Signature turretControllerSignature;
+//	turretControllerSignature.set(ecs.getComponentId<Transform>());
+//	turretControllerSignature.set(ecs.getComponentId<Turret>());
+//	turretControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
+//	turretControllerSignature.set(ecs.getComponentId<Rigidbody>());
+//	turretControllerSignature.set(ecs.getComponentId<BoxCollider>());
+//	ecs.setSystemSignature<TurretController>(turretControllerSignature);
+//	//Register Pickup Controller
+//	ecs.registerComponent<Pickup>();
+//	shared_ptr<PickupController> pickupController = ecs.registerSystem<PickupController>();
+//	Signature pickupControllerSignature;
+//	pickupControllerSignature.set(ecs.getComponentId<Transform>());
+//	pickupControllerSignature.set(ecs.getComponentId<Pickup>());
+//	pickupControllerSignature.set(ecs.getComponentId<SpriteRenderer>());
+//	pickupControllerSignature.set(ecs.getComponentId<Rigidbody>());
+//	pickupControllerSignature.set(ecs.getComponentId<BoxCollider>());
+//	ecs.setSystemSignature<PickupController>(pickupControllerSignature);
 //
-//	//Create the camera
-//	Camera cam = Camera(800, 600);
-//
-//	float volume = 0.2f;
+//	engine.physicsSystem->gravity = Vector2(0, 0);
+//	engine.physicsSystem->step = 8;
 //
 //
-//	static SoundSource mySpeaker1;
-//	static SoundSource mySpeaker2;
-//	static SoundSource mySpeaker3;
-//	static SoundSource mySpeaker4;
+//	static SoundSource tankSpeaker;
+//	static SoundSource shootSpeaker;
+//	static SoundSource explosionSpeaker;
+//	static SoundSource enemySpeaker;
 //
-//	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/jump.wav");
-//	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/sound100.wav");
-//	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/bang_09.wav");
-//	uint32_t sound4 = SoundBuffer::getFile()->addSoundEffect("assets/hit.wav");
+//	///////////////////Texture & audio loading////////////////////
 //
-//	MusicBuffer myMusic("assets/forest.wav");
-//	myMusic.SetVolume(0.2f);
-//	mySpeaker1.setLinearDistanceClamped(1.f, 100.f, 600.f, 1.f);
-//	mySpeaker2.setLinearDistanceClamped(1.f, 20.f, 200.f, 1.f);
-//	mySpeaker3.setLinearDistanceClamped(1.f, 20.f, 400.f, 2.4f);
-//	mySpeaker4.setLinearDistanceClamped(1.f, 20.f, 300.f, 1.f);
-//	//Load a new texture
-//	Texture texture = Texture("assets/strawberry.png");
+//	Texture texture = Texture("assets/Hull.png");
+//	Texture turretTexture = Texture("assets/Gun_01.png");
 //	Texture texture2 = Texture("assets/crosshairEdit.png");
 //	Texture texture3 = Texture("assets/bullet.png");
 //
+//	//load sound from file
+//	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
+//	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/bang_05.wav");
+//	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/bang_09.wav");
 //
-//	// mouse settings
-//	GLFWimage cursor_image;
-//	cursor_image.pixels = stbi_load("assets/crosshairEdit.png", &cursor_image.width, &cursor_image.height, 0, 4);
-//	GLFWcursor* cursor = glfwCreateCursor(&cursor_image, 0, 0);
-//	stbi_image_free(cursor_image.pixels);
-//	glfwSetCursor(window, cursor);
+//	tankSpeaker.setLinearDistance(0.1f, 50.f, 60.f, 1.f);
+//	shootSpeaker.setLinearDistance(1.5f, 100.f, 700.f, 0.5f);
+//	explosionSpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
+//	enemySpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
 //
 //
-//	////Create a new entity
-//	//Entity player = ecs.newEntity();
-//	//Transform& playerTransform = ecs.addComponent(player, Transform{ .x = 0, .y = 25, .xScale = 30, .yScale = 30 });
-//	//ecs.addComponent(player, Sprite{});
-//	//ecs.addComponent(player, Animator{});
-//	//ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0, .friction = 0.2, .elasticity = 0 });
-//	//ecs.addComponent(player, BoxCollider{ .isTrigger = true });
-//	//BoxCollider& playerCollider = ecs.getComponent<BoxCollider>(player);
-//	//Rigidbody& playerRigidbody = ecs.getComponent<Rigidbody>(player);
-//	//TransformSystem::SetPosition(player, 0, 10, 0);
 //
-//	////Define the test animation
-//	//Animator& animator = ecs.getComponent<Animator>(player);
-//	//auto testAnims = AnimationsFromSpritesheet("warriorsheet.png", 8, 4, vector<int>(32, 100));
-//	//AnimationSystem::AddAnimation(player, testAnims[0], "1");
-//	//AnimationSystem::AddAnimation(player, testAnims[1], "2");
-//	//AnimationSystem::PlayAnimation(player, "2", true);
-//
-//	//
 //	//Create a new entity
 //	Entity player = ecs.newEntity();
-//	ecs.addComponent(player, Transform{ .x = 0, .y = 0, .xScale = 40, .yScale = 40, .yRotation = 0 });
-//	ecs.addComponent(player, Sprite{});
-//	ecs.addComponent(player, Animator{});
-//	ecs.addComponent(player, Rigidbody{ .gravityScale = 0, .drag = 0,  .friction = 0, .elasticity = 0 });
-//	ecs.addComponent(player, BoxCollider{});
+//	Transform& playerTransform = ecs.addComponent(player, Transform{ .position = Vector3(168, -150, 1.5), .scale = Vector3(40, 40, 0) });
+//	ecs.addComponent(player, SpriteRenderer{ &texture });
+//	ecs.addComponent(player, Player{});
+//	Rigidbody& playerRigidbody = ecs.addComponent(player, Rigidbody{ .gravityScale = 1, .drag = 0, .friction = 0.0, .elasticity = 0 });
+//	BoxCollider& playerCollider = ecs.addComponent(player, BoxCollider{});
 //
-//	//Define the test animation
-//	Animator animator = ecs.getComponent<Animator>(player);
-//	auto testAnims = AnimationsFromSpritesheet("assets/warriorattack.png", 4, 4, vector<int>(16, 200));
-//	AnimationSystem::AddAnimation(player, testAnims[0], "1");
-//	AnimationSystem::AddAnimation(player, testAnims[1], "2");
-//	AnimationSystem::AddAnimation(player, testAnims[2], "3");
-//	AnimationSystem::AddAnimation(player, testAnims[3], "4");
-//	AnimationSystem::PlayAnimation(player, "2", true);
+//	Entity playerTurret = ecs.newEntity();
+//	Transform& playerTurretTransform = ecs.addComponent(playerTurret, Transform{ .scale = Vector3(50, 16.5, 0) });
+//	ecs.addComponent(playerTurret, SpriteRenderer{ .texture = &turretTexture });
 //
+//	//play sound files
+//	tankSpeaker.Play(sound1);
+//	tankSpeaker.SetLooping(1);
 //
-//	//Top-Right
-//	Entity sprite2 = ecs.newEntity();
-//	ecs.addComponent(sprite2, Transform{ .x = 300, .y = 200, .xScale = 20, .yScale = 20 });
-//	ecs.addComponent(sprite2, Sprite{ &texture });
-//	ecs.addComponent(sprite2, Rigidbody{ .kinematic = true });
-//	ecs.addComponent(sprite2, BoxCollider{ .scale = Vector2(10, 1) });
-//	//Bottom-Left
-//	Entity sprite3 = ecs.newEntity();
-//	ecs.addComponent(sprite3, Transform{ .x = -300, .y = -200, .xScale = 20, .yScale = 20 });
-//	ecs.addComponent(sprite3, Sprite{ &texture });
-//	ecs.addComponent(sprite3, Rigidbody{ .kinematic = true });
-//	ecs.addComponent(sprite3, BoxCollider{});
-//	//Top-Left
-//	Entity sprite4 = ecs.newEntity();
-//	ecs.addComponent(sprite4, Transform{ .x = -310, .y = 200, .xScale = 20, .yScale = 20 });
-//	ecs.addComponent(sprite4, Sprite{ &texture });
-//	ecs.addComponent(sprite4, Rigidbody{ .drag = 0.1, .friction = 0.2, .elasticity = 0.125, .kinematic = false });
-//	ecs.addComponent(sprite4, BoxCollider{});
-//	//Bottom-Right
-//	Entity sprite5 = ecs.newEntity();
-//	ecs.addComponent(sprite5, Transform{ .x = 300, .y = -200, .xScale = 20, .yScale = 20 });
-//	ecs.addComponent(sprite5, Sprite{ &texture });
-//	ecs.addComponent(sprite5, Rigidbody{ .velocity = Vector2(-985, 1000), .drag = 0.25, .elasticity = 0.125, .kinematic = false });
-//	ecs.addComponent(sprite5, BoxCollider{});
+//	turretController->player = player;
+//	turretController->CreateTurret(1000, -1000);
+//	turretController->CreateTurret(360, -690);
+//	turretController->CreateTurret(1395, -1010);
+//	turretController->CreateTurret(1448, -376);
+//	turretController->CreateTurret(1066, -168);
+//	turretController->CreateTurret(350, -1280);
 //
-//	
 //	// create entity crosshair for gamepad
 //	Entity crosshair = ecs.newEntity();
 //	// adds crosshair texture
-//	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .x = 500, .y = 500, .xScale = 20, .yScale = 20 });
-//	ecs.addComponent(crosshair, Sprite{ &texture2 });
+//	Transform crosshairTransform = ecs.addComponent(crosshair, Transform{ .position = Vector3(500, 500, 0), .scale = Vector3(20, 20, 0) });
+//	ecs.addComponent(crosshair, SpriteRenderer{ &texture2 });
 //
-//	vector <Entity>bullets;
+//	set<Entity>bullets;
 //
 //
-//	float fireCooldown = 0.4f;
+//	float fireCooldown = 0.04f;
 //	bool canFire = true;
-//	
 //
+//	SpriteRenderSystem::SetBackgroundColor(68, 154, 141);
+//	Tilemap map(&cam);
+//	map.loadMap("assets/demo2.tmx");
+//	engine.physicsSystem->SetTilemap(&map);
+//	engine.spriteRenderSystem->SetTilemap(&map);
 //
-//	RenderSystem::SetBackgroundColor(100, 50, 1);
+//	pickupController->CreatePickup(600, -75);
+//	pickupController->CreatePickup(325, -1400);
+//	pickupController->CreatePickup(1340, -1375);
+//	pickupController->CreatePickup(1450, -100);
 //
-//	BoxCollider& collider = ecs.getComponent<BoxCollider>(player);
-//	myMusic.Play();
-//
-//	//play sound files
-//	mySpeaker4.Play(sound1);
-//	//sets sound to loop, value 1=true
-//	mySpeaker4.SetLooping(1);
+//	Animation explosion = AnimationsFromSpritesheet("assets/explosion.png", 5, 1, vector<int>(5, 75))[0];
 //
 //	//Game Loop
 //	while (!glfwWindowShouldClose(window))
 //	{
 //
-//		myMusic.updateBufferStream();
 //
-//
-//		if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+//		if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 //		{
-//			myMusic.Pause();
-//			mySpeaker4.Pause();
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-//		{
-//			myMusic.Resume();
-//			mySpeaker4.Resume();
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-//		{
-//			volume -= 0.01f;
-//			if (volume < 0.0f) volume = 0.0f; // Clamp the volume to a minimum of 0.0f
-//			myMusic.SetVolume(volume);
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-//		{
-//			volume += 0.01f;
-//			if (volume > 1.0f) volume = 1.0f; // Clamp the volume to a max 1.0f
-//			myMusic.SetVolume(volume);
+//			cout << playerTransform.position.x << ", " << playerTransform.position.y << endl;
 //		}
 //
 //		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 //			glfwSetWindowShouldClose(window, true);
 //
-//		//test movement
-//		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-//		{
-//			engine.physicsSystem->Move(player, Vector2(500, 0) * engine.deltaTime);
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-//		{
-//			engine.physicsSystem->Move(player, Vector2(-500, 0) * engine.deltaTime);
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-//		{
-//			engine.physicsSystem->Move(player, Vector2(0, 500) * engine.deltaTime);
-//		}
-//		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-//		{
-//			engine.physicsSystem->Move(player, Vector2(0, -500) * engine.deltaTime);
-//		}
-//		
-//
-//		Transform playerTransform = ecs.getComponent<Transform>(player);
-//		engine.physicsSystem->Move(sprite3, Vector2(playerTransform.x, playerTransform.y) * engine.deltaTime);
-//		engine.soundDevice->SetLocation(playerTransform.x, playerTransform.y, playerTransform.z);
+//		playerController->Update(window, engine.deltaTime, engine.physicsSystem);
+//		pickupController->Update(player);
+//		engine.soundDevice->SetLocation(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z);
 //		engine.soundDevice->SetOrientation(0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
-//
-//		if (collider.collisions.size() > 0)
-//		{
-//			for (Collision c : collider.collisions)
-//			{
-//				cout << c.a << " " << c.b << endl;
-//			}
-//		}
-//
-//		if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-//		{
-//			Transform sprite2Transform = ecs.getComponent<Transform>(sprite2);
-//			mySpeaker1.Play(sound3);
-//			//engine.soundDevice->SetSourceLocation(1, sprite2Transform.x, sprite2Transform.y, 20.f);
-//			mySpeaker1.SetLooping(0);
-//			Transform sprite3Transform = ecs.getComponent<Transform>(sprite3);
-//			//engine.soundDevice->SetSourceLocation(3, sprite3Transform.x, sprite3Transform.y, 2.f);
-//			mySpeaker3.Play(sound4);
-//		}
-//
-//		
-//
-//
-//		if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-//		{
-//			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
-//			mySpeaker2.Play(sound2);
-//			//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
-//Transform sprite5Transform = ecs.getComponent<Transform>(sprite5);
-//		//engine.soundDevice->SetSourceLocation(4, sprite5Transform.x, sprite5Transform.y, 0.f);
-//		mySpeaker4.Play(sound2);
-//		}
-//
-//
-//		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-//		{
-//			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
-//			mySpeaker2.Play(sound1);
-//			//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
-//		}
-//		cam.SetPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-//
 //		///////////////////////////////////////////////////////////////////////////////////////////////////////
 //		/////////////////OHJAINSÄÄDÖT////////////////////////////////////////////////////
 //		int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-//		if (present == GLFW_TRUE) {
+//		if (present == GLFW_TRUE)
+//		{
 //
 //			GLFWgamepadstate state;
 //
 //			// set player speed
-//			float playerSpeed = 500.0f;
+//			float playerSpeed = 400.0f;
 //			//define deadzone
 //			float deadzoneSize = 0.5f;
 //			//calculate deadzone barrier
@@ -287,13 +184,19 @@
 //
 //				// move player based on movement vector
 //				engine.physicsSystem->Move(player, movement * engine.deltaTime);
+//				//engine.physicsSystem->Move(hull, movement * engine.deltaTime);
 //
+//				Vector2 leftThumbstick(axes[0], axes[1]);
+//				leftThumbstick = (leftThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
+//				leftThumbstick -= Vector2(0.5f, 0.5f);
+//				leftThumbstick *= 2.0f;
+//
+//				playerTransform.rotation.z = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
 //			}
 //
-//			// sets crosshair position to zero
-//			Vector2 crosshairPosition(0, 0);
 //			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
 //			{
+//
 //				// Changes joystick cordinates into origo and scales it between -1, 1
 //				Vector2 rightThumbstick(axes[2], axes[3]);
 //				rightThumbstick = (rightThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
@@ -307,11 +210,13 @@
 //				// normalizes vector and sets crosshair distance
 //				aimdirection.Normalize();
 //				aimdirection *= 150.0f;
-//				ecs.getComponent<Sprite>(crosshair).enabled = true;
+//				ecs.getComponent<SpriteRenderer>(crosshair).enabled = true;
 //				// crosshair position based on player position
-//				Vector3 playerPosition(playerTransform.x, playerTransform.y, playerTransform.z);
-//				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 0);
+//				Vector3 playerPosition = playerTransform.position;
+//				Vector3 crosshairPosition = playerPosition + Vector3(aimdirection.x, -aimdirection.y, 10);
 //				TransformSystem::SetPosition(crosshair, crosshairPosition);
+//
+//				playerTurretTransform.rotation.z = atan2f(-rightThumbstick.y, rightThumbstick.x) * 180 / 3.14f;
 //
 //				if (fireCooldown <= 0)
 //				{
@@ -319,67 +224,108 @@
 //					{
 //
 //						Entity bullet = ecs.newEntity();
-//						ecs.addComponent(bullet, Transform{ .x = playerTransform.x + (aimdirection.x / 4), .y = playerTransform.y - (aimdirection.y / 4), .xScale = 5, .yScale = 5 });
-//						ecs.addComponent(bullet, Sprite{ &texture3 });
-//						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 40, -aimdirection.y * 40), .drag = 0, .elasticity = 0, .kinematic = true });
+//						ecs.addComponent(bullet, Transform{ .position = Vector3(playerTransform.position.x + (aimdirection.x / 4), playerTransform.position.y - (aimdirection.y / 4), 5), .scale = Vector3(5, 5, 0) });
+//						ecs.addComponent(bullet, SpriteRenderer{ &texture3 });
+//						ecs.addComponent(bullet, Rigidbody{ .velocity = Vector2(aimdirection.x * 50, -aimdirection.y * 50), .drag = 0, .elasticity = 0, .kinematic = true });
 //						ecs.addComponent(bullet, BoxCollider{ .isTrigger = true });
-//						bullets.push_back(bullet);
-//						fireCooldown = 0.4f;
+//						ecs.addComponent(bullet, Animator{});
+//						AnimationSystem::AddAnimation(bullet, explosion, "explosion");
+//
+//						bullets.emplace(bullet);
+//						fireCooldown = 0.5f;
+//
+//						//shooting sound
+//						shootSpeaker.Play(sound2);
 //					}
 //				}
-//				else
-//				{
-//					fireCooldown -= engine.deltaTime;
-//				}
-//
-//				// set camera location between player and crosshair
-//				//cam.SetPosition(playerTransform.x + (aimdirection.x / 8), playerTransform.y - (aimdirection.y / 8), playerTransform.z);
 //			}
 //			else
 //			{
-//				ecs.getComponent<Sprite>(crosshair).enabled = false;
+//				ecs.getComponent<SpriteRenderer>(crosshair).enabled = false;
 //			}
 //
-//			for (const Entity& bullet : bullets)
+//			for (Entity bullet : bullets)
 //			{
-//				auto hit = ecs.getComponent<BoxCollider>(bullet);
+//				if (!ecs.entityExists(bullet))
+//					continue;
+//
+//				BoxCollider hit;
+//				if (ecs.hasComponent<BoxCollider>(bullet))
+//					hit = ecs.getComponent<BoxCollider>(bullet);
+//				auto& rb = ecs.getComponent<Rigidbody>(bullet);
+//				auto& tf = ecs.getComponent<Transform>(bullet);
+//				auto& animator = ecs.getComponent<Animator>(bullet);
+//
+//				if (!ecs.hasComponent<BoxCollider>(bullet))
+//				{
+//					if (!animator.playingAnimation)
+//					{
+//						bullets.erase(bullets.find(bullet));
+//						ecs.destroyEntity(bullet);
+//
+//					}
+//					break;
+//				}
+//
 //				for (const Collision& collision : hit.collisions)
 //				{
+//					if (collision.a == player || collision.b == player)
+//						continue;
+//
 //					if (collision.type == Collision::Type::entityTrigger && collision.b != bullet)
 //					{
+//						rb.velocity = Vector2(0, 0);
+//						tf.scale.x = 20;
+//						tf.scale.y = 20;
 //						ecs.destroyEntity(collision.b);
-//						bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
-//						ecs.destroyEntity(bullet);
+//						ecs.removeComponent<BoxCollider>(bullet);
+//						AnimationSystem::PlayAnimation(bullet, "explosion");
+//
+//
+//						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.position.x, tf.position.y, 1);
+//						explosionSpeaker.Play(sound3);
+//
+//
+//						break;
+//					}
+//
+//					if (collision.type == Collision::Type::tilemapTrigger)
+//					{
+//						rb.velocity = Vector2(0, 0);
+//						tf.scale.x = 20;
+//						tf.scale.y = 20;
+//						ecs.removeComponent<BoxCollider>(bullet);
+//						AnimationSystem::PlayAnimation(bullet, "explosion");
+//						engine.soundDevice->SetSourceLocation(explosionSpeaker, tf.position.x, tf.position.y, 1);
+//						explosionSpeaker.Play(sound3);
+//						break;
 //					}
 //				}
 //			}
-//
-//			if (buttons[0] == GLFW_PRESS)
-//			{
-//				Vector2 movement(0.0f, playerSpeed);
-//				engine.physicsSystem->Move(player, movement * engine.deltaTime);
-//			}
-//			if (buttons[1] == GLFW_PRESS)
-//			{
-//				Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
-//				mySpeaker2.Play(sound2);
-//				//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
-//			}
-//
 //		}
+//		engine.soundDevice->SetSourceLocation(shootSpeaker, playerTransform.position.x, playerTransform.position.y, playerTransform.position.z);
 //
-//		
+//		TransformSystem::SetPosition(playerTurret, Vector3(playerTransform.position.x, playerTransform.position.y, 1.6));
+//
 //		///////////////////////////////////////////////////////////////////////////////////////////////////////
 //		///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //
+//		//engine sound
+//		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.position.x, playerTransform.position.y, 50);
 //
 //
-//		//Update all engine systems
+//
+//		fireCooldown -= engine.deltaTime;
+//
+//		turretController->Update(engine.deltaTime);
+//		//Update all engine systems, this usually should go last in the game loop
+//		//For greater control of system execution, you can update each one manually
 //		engine.Update(&cam);
 //
+//		cam.SetPosition(playerTransform.position.x, playerTransform.position.y, 100);
 //
-//
+//		//OpenGL stuff, goes very last
 //		glfwSwapBuffers(window);
 //		glfwPollEvents();
 //	}
@@ -388,3 +334,72 @@
 //
 //	return 0;
 //}
+////#endif
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//#include <iostream>
+//#include <engine/Tilemap.h>
+//
+
+////void mouse_callback(GLFWwindow * window, double xpos, double ypos)
+////	{
+////	cout << xpos << "x : " << ypos <<"y"<< endl;
+////	}
+//
+
+//	//glfwSetCursorPosCallback(window, mouse_callback);
+//
+
+//	// mouse settings
+//	GLFWimage cursor_image;
+//	cursor_image.pixels = stbi_load("assets/crosshairEdit.png", &cursor_image.width, &cursor_image.height, 0, 4);
+//	GLFWcursor* cursor = glfwCreateCursor(&cursor_image, 0, 0);
+//	stbi_image_free(cursor_image.pixels);
+//	glfwSetCursor(window, cursor);
+//
+//	
+//	//Game Loop
+//	while (!glfwWindowShouldClose(window))
+//	{
+//
+//		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+//		{
+//			Transform sprite4Transform = ecs.getComponent<Transform>(sprite4);
+//			mySpeaker2.Play(sound1);
+//			//engine.soundDevice->SetSourceLocation(2, sprite4Transform.x, sprite4Transform.y, 20.f);
+//		}
+//	}
+
