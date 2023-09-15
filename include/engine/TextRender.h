@@ -46,22 +46,23 @@ namespace engine
 		//
 
 		// Multiple TrueFonts function
-		map<FT_Face, TrueFont> SetUpTTF(FT_Face face, const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
+		vector<FT_Face> SetUpTTF(FT_Face face, const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
 
 
 		// VAO & VBO function
 		void TexConfig();
 
 		// Text loading function
-		void LoadText(map<FT_Face, TrueFont> Faces);
+		void LoadText(vector<FT_Face> Faces);
 		
 		// Text Rendering function
-		void RenderText(Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
+		void RenderText(FT_Face face, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
 
 	private:
 		map<GLchar, Character> Characters;
+		map<FT_Face, map<GLchar, Character>> FacesLinker;
 
-		map<FT_Face, TrueFont> Faces;
+		vector<FT_Face> Faces;
 
 		unsigned int VAO, VBO;
 
