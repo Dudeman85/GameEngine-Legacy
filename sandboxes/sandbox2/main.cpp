@@ -28,8 +28,9 @@ int main()
 	TextRender text;
 	//vector<TrueFont> trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
 	//vector<TrueFont> trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
-	vector<TrueFont> fontDatas = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
-	fontDatas = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
+	FT_Face face0;
+	//map<FT_Face, TrueFont> Faces = text.SetUpTTF(face0, "assets/fonts/ARIAL.TTF", 0, 0, 48);
+	//text.LoadText(Faces);
 
 
 
