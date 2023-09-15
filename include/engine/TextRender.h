@@ -24,14 +24,12 @@ struct Character
 	unsigned int Advance;
 };
 
-struct TrueFont
+struct  TrueFont
 {
-	int vecOrder;
 	const char* filepathname;
 	FT_Long face_index;
 	FT_UInt pixel_width;
 	FT_UInt pixel_height;
-	FT_Face aface;
 };
 
 namespace engine
@@ -45,32 +43,32 @@ namespace engine
 		// Destructor
 		~TextRender();
 
+		//
+
 		// Multiple TrueFonts function
-		TrueFont SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
+		vector<FT_Face> SetUpTTF(FT_Face face, const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height);
 
 
 		// VAO & VBO function
 		void TexConfig();
 
 		// Text loading function
-		void LoadText(TrueFont truefont);
+		void LoadText(vector<FT_Face> Faces);
 		
 		// Text Rendering function
-		void RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
+		void RenderText(FT_Face face, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
 
 	private:
 		map<GLchar, Character> Characters;
+		map<FT_Face, map<GLchar, Character>> FacesLinker;
 
-		TrueFont TrueFonts;
+		vector<FT_Face> Faces;
 
 		unsigned int VAO, VBO;
 
 		unsigned int texture;
-		
-		int TTForder;
 
 		FT_Library ft;
-		FT_Face face;
 
 		glm::mat4 projection;
 		glm::mat4 viewMatrix;

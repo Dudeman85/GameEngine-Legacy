@@ -10,30 +10,57 @@ TextRender::TextRender()
 
 	m_shader = new Shader("textVertexShader.glsl", "textFragmentShader.glsl", true);
 
-	TTForder = 0;
+	try
+	{
+		if (FT_Init_FreeType(&ft))
+		{
+			throw runtime_error("Could not init FreeType Library");
+		}
+	}
+	catch (const exception& e)
+	{
+		cerr << "ERROR::FREETYPE: " << e.what() << endl;
+	}
+
 }
 
 TextRender::~TextRender()
 {
-	delete &TTForder;
 }
 
-TrueFont TextRender::SetUpTTF(const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
-{
-	 int vectorOrder = TTForder;
 
-	TrueFont trueFont = {
-		vectorOrder,
+
+vector<FT_Face> TextRender::SetUpTTF(FT_Face face, const char* filepathname, FT_Long face_index, FT_UInt pixel_width, FT_UInt pixel_height)
+{
+	TrueFont truefont
+	{
 		filepathname,
 		face_index,
 		pixel_width,
-		pixel_height,
-		face
+		pixel_height
 	};
 
-	TTForder += 1;
+	try
+	{
+		if (FT_New_Face(ft, truefont.filepathname, truefont.face_index, &face))
+		{
+			throw runtime_error("Failed to load font from: " + string(truefont.filepathname));
+		}
+		else
+		{
+			FT_Set_Pixel_Sizes(face, truefont.pixel_width, truefont.pixel_height);
 
-	return trueFont;
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		}
+	}
+	catch (const exception& e)
+	{
+		cerr << "ERROR::FREETYPE: " << e.what() << endl;
+	}
+
+	Faces.push_back(face);
+
+	return Faces;
 }
 
 void TextRender::TexConfig()
@@ -49,77 +76,63 @@ void TextRender::TexConfig()
 	glBindVertexArray(0);
 }
 
-void TextRender::LoadText(TrueFont truefont)
+
+void TextRender::LoadText(vector<FT_Face> Faces)
 {
-	try
+	for (int f = 0; f < Faces.size(); ++f)
 	{
-		if (FT_Init_FreeType(&ft))
-		{
-			throw runtime_error("Could not init FreeType Library");
-		}
+		FT_Face face = Faces[f];
 
-		if (FT_New_Face(ft, truefont.filepathname, truefont.face_index, &truefont.aface))
+		for (unsigned char c = 0; c < 128; ++c)
 		{
-			throw runtime_error("Failed to load font");
-		}
-		else
-		{
-			FT_Set_Pixel_Sizes(truefont.aface, truefont.pixel_width, truefont.pixel_height);
-
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-			for (unsigned char c = 0; c < 128; c++)
+			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 			{
-				if (FT_Load_Char(truefont.aface, c, FT_LOAD_RENDER))
-				{
-					cout << "ERROR::FREETYTPE: Failed to load Glyph" << endl;
-					continue;
-				}
-
-				glGenTextures(1, &texture);
-				glBindTexture(GL_TEXTURE_2D, texture);
-				glTexImage2D(
-					GL_TEXTURE_2D,
-					0,
-					GL_RED,
-					truefont.aface->glyph->bitmap.width,
-					truefont.aface->glyph->bitmap.rows,
-					0,
-					GL_RED,
-					GL_UNSIGNED_BYTE,
-					truefont.aface->glyph->bitmap.buffer
-				);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-				Character character = {
-					texture,
-					glm::ivec2(truefont.aface->glyph->bitmap.width, truefont.aface->glyph->bitmap.rows),
-					glm::ivec2(truefont.aface->glyph->bitmap_left, truefont.aface->glyph->bitmap_top),
-					static_cast<unsigned int>(truefont.aface->glyph->advance.x)
-				};
-
-				Characters.insert(pair<char, Character>(c, character));
+				cout << "ERROR::FREETYTPE: Failed to load Glyph" << endl;
+				continue;
 			}
 
-			glBindTexture(GL_TEXTURE_2D, 0);
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				face->glyph->bitmap.width,
+				face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				face->glyph->bitmap.buffer
+			);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			Character character = {
+					texture,
+					glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+					glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+					static_cast<unsigned int>(face->glyph->advance.x)
+			};
+
+			Characters.insert(pair<char, Character>(c, character));
+
 		}
+		FacesLinker.insert(pair<FT_Face, map<GLchar, Character>>(face, Characters));
 
-		FT_Done_Face(truefont.aface);
-		FT_Done_FreeType(ft);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		TexConfig();
+		//FT_Done_Face(face);
 	}
-	catch (const exception& e)
-	{
-		cerr << "ERROR::FREETYPE: " << e.what() << endl;
-	}
+	//FT_Done_FreeType(ft);
+
+	TexConfig();
 }
 
-void TextRender::RenderText(TrueFont trueFont, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
+
+void TextRender::RenderText(FT_Face face, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
 {
 	m_shader->use();
 	projection = cam->GetProjectionMatrix();
@@ -129,35 +142,49 @@ void TextRender::RenderText(TrueFont trueFont, Camera* cam, string text, float x
 	glUniform3f(glGetUniformLocation(m_shader->ID, "textColour"), colour.x, colour.y, colour.z);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
-	
-	string::const_iterator c;
-	for (c = text.begin(); c != text.end(); c++)
+
+	for (const auto& pair : FacesLinker)
 	{
-		Character ch = Characters[*c];
-		
-		float xpos = x + ch.Bearing.x * scale;
-		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-		
-		float w = ch.Size.x * scale;
-		float h = ch.Size.y * scale;
-		
-		float vertices[6][4] = {
-			{xpos, ypos + h, 0.0f, 0.0f },
-			{xpos, ypos, 0.0f, 1.0f },
-			{xpos + w, ypos, 1.0f, 1.0f },
-			
-		{xpos, ypos + h, 0.0f, 0.0f },
-			{xpos + w, ypos, 1.0f, 1.0f },
-			{xpos + w, ypos + h, 1.0f, 0.0f}
-		};
-		
-		glBindTexture(GL_TEXTURE_2D, ch.TextureID);		
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);		
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		x += (ch.Advance >> 6) * scale;
+		FT_Face kFace = pair.first;
+
+		if (kFace == face)
+		{
+			const map<GLchar, Character>& currentCharacters = pair.second;
+
+			string::const_iterator c;
+			for (c = text.begin(); c != text.end(); c++)
+			{
+				Character ch = currentCharacters.at(*c);
+
+				float xpos = x + ch.Bearing.x * scale;
+				float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+				float w = ch.Size.x * scale;
+				float h = ch.Size.y * scale;
+
+				float vertices[6][4] = {
+					{xpos, ypos + h, 0.0f, 0.0f },
+					{xpos, ypos, 0.0f, 1.0f },
+					{xpos + w, ypos, 1.0f, 1.0f },
+
+				{xpos, ypos + h, 0.0f, 0.0f },
+					{xpos + w, ypos, 1.0f, 1.0f },
+					{xpos + w, ypos + h, 1.0f, 0.0f}
+				};
+
+				glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+				glBindBuffer(GL_ARRAY_BUFFER, VBO);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+				x += (ch.Advance >> 6) * scale;
+			}
+		}
 	}
+
+
+	
+	
 	
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
