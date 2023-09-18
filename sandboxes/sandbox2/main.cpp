@@ -1,6 +1,10 @@
 #include <engine/Application.h>
 #include <engine/TextRender.h>
 
+// enet wrappaus ja cpp:stä enetin kutsu tai CreateWindows funktion nimen muutos enginessä
+//#include <enet/enet.h>
+
+
 using namespace std;
 using namespace engine;
 
@@ -11,7 +15,7 @@ ECS ecs;
 int main()
 {
 	// Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(800, 600, "Text rendering");
+	GLFWwindow* window = engine::CreateWindow(800, 600, "Text rendering");
 	
 	// Camera
 	Camera cam = Camera(800, 600);
