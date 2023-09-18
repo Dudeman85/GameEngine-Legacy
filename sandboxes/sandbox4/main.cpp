@@ -1,8 +1,6 @@
 #include <engine/Application.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <engine/Primitive.h>
 
 using namespace engine;
 
@@ -18,7 +16,7 @@ int main()
 	EngineLib engine;
 	//Create the camera
 	Camera cam = Camera(1200, 800);
-	cam.perspective = true;
+	cam.perspective = false;
 	cam.SetPosition(0, 0, 50);
 
 	//changes window backround color
@@ -28,8 +26,8 @@ int main()
 	Model model("assets/achelous.obj");
 
 	Entity ship = ecs.newEntity();
-	Transform& modelTransform = ecs.addComponent(ship, Transform{ .rotation = Vector3(90, 0, 0), .scale = Vector3(1)});
-	ecs.addComponent(ship, ModelRenderer{ .model = &model });
+	Transform& modelTransform = ecs.addComponent(ship, Transform{ .rotation = Vector3(90, 0, 0), .scale = Vector3(1) });
+	//ecs.addComponent(ship, ModelRenderer{ .model = &model });
 	//Angle of the ship, 0 is up
 	float angle = 0;
 	float rotationSpeed = 3;
@@ -42,12 +40,30 @@ int main()
 	ecs.addComponent(strawberry, Transform{ .position = Vector3(0, 0, 0), .scale = Vector3(.1, .1, 0) });
 	//ecs.addComponent(strawberry, SpriteRenderer{ .texture = &tex, .uiElement = true});
 
+
+	//PRIMITIVE RENDER TESTING
+	ecs.registerComponent<PrimitiveRenderer>();
+	shared_ptr<PrimitiveRenderSystem> primitiveRenderSystem = ecs.registerSystem<PrimitiveRenderSystem>();
+	Signature primitiveRenderSystemSignature;
+	primitiveRenderSystemSignature.set(ecs.getComponentId<PrimitiveRenderer>());
+	primitiveRenderSystemSignature.set(ecs.getComponentId<Transform>());
+	ecs.setSystemSignature<PrimitiveRenderSystem>(primitiveRenderSystemSignature);
+
+	Entity primitive = ecs.newEntity();
+	//Primitive line = Primitive::Line(Vector3(0, 0, 0), Vector3(1, 1, 0));
+	Primitive line = Primitive::Triangle();
+	ecs.addComponent(primitive, Transform{ .scale = Vector3(0.5) });
+	ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = &line, .color = Vector3(0, 1, 0), .wireframe = false, .uiElement = true });
+	
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
 		//Close window when Esc is pressed
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+
+		//Clear the screen
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		{
@@ -80,7 +96,9 @@ int main()
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
-		engine.Update(&cam);
+		//engine.Update(&cam);
+
+		primitiveRenderSystem->Update(&cam);
 
 		//OpenGL stuff, goes very last
 		glfwSwapBuffers(window);

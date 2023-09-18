@@ -8,6 +8,7 @@
 
 //STL
 #include <vector>
+#include <math.h>
 
 //Engine
 #include <engine/ECSCore.h>
@@ -24,8 +25,10 @@ namespace engine
 	class Primitive
 	{
 	private:
-		Primitive(float* vertices, unsigned int* indices)
+		Primitive(std::vector<float> vertices, std::vector<unsigned int> indices, unsigned int numVerts)
 		{
+			numVertices = numVerts;
+
 			//Make the Vertex Array Object, Vertex Buffer Object, and Element Buffer Object
 			glGenVertexArrays(1, &VAO);
 			glGenBuffers(1, &VBO);
@@ -36,14 +39,14 @@ namespace engine
 
 			//Bind the Vertex Bufer Object and set vertices
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
 
 			//Bind and set indices to EBO
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(), GL_STATIC_DRAW);
 
 			//Configure Vertex attribute at location 0 aka position
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 			glEnableVertexAttribArray(0);
 
 			//Unbind all buffers and arrays
@@ -60,21 +63,49 @@ namespace engine
 			glDeleteVertexArrays(1, &EBO);
 		}
 
-		static Primitive Line(float x, float y)
+		//Create a line starting at p1 and ending at p2
+		static Primitive Line(Vector3 p1, Vector3 p2)
 		{
-			float* vertices = new float[]
+			//Rectangle vertices start at top left and go clockwise to bottom left
+			std::vector<float> vertices
 			{
-				0, 0,
-				1, 1,
+				//Positions		
+				p1.x, p1.y, p1.x,
+				p2.x, p2.y, p2.z,
 			};
-			unsigned int* indices = new unsigned int[]
+			//Indices to draw a line
+			std::vector<unsigned int> indices
 			{
 				0, 1
 			};
 
-			return Primitive(vertices, indices);
+			//Create the primitive object from vertice data and set numVertices accordingly
+			return Primitive(vertices, indices, 2);
 		}
 
+		//Create a triangle from three vertices
+		//Defaults to equilateral triangle
+		static Primitive Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 3, 0))
+		{
+			//Rectangle vertices start at top left and go clockwise to bottom left
+			std::vector<float> vertices
+			{
+				//Positions		
+				v1.x, v1.y, v1.z,
+				v2.x, v2.y, v2.z,
+				v3.x, v3.y, v3.z,
+			};
+			//Indices to draw a triangle
+			std::vector<unsigned int> indices
+			{
+				0, 1, 2,
+			};
+
+			//Create the primitive object from vertice data and set numVertices accordingly
+			return Primitive(vertices, indices, 3);
+		}
+
+		unsigned int numVertices = 0;
 		unsigned int VAO, VBO, EBO;
 	};
 
@@ -82,12 +113,12 @@ namespace engine
 	//They consist of only a primitive shape and a color, no texture
 	struct PrimitiveRenderer
 	{
-		Primitive* primitive;
+		Primitive* primitive = nullptr;
 		Vector3 color;
+		bool wireframe = false;
 		bool enabled = true;
 		bool uiElement = false;
 	};
-
 
 	//Primitive Render system
 	//Requires PrimitiveRenderer and Transform
@@ -105,9 +136,13 @@ namespace engine
 				uniform mat4 model;
 				uniform mat4 view;
 				uniform mat4 projection;
+				uniform vec4 color;
+
+				out vec4 vertexColor;			
 
 				void main()
 				{
+					vertexColor = color;
 					gl_Position = projection * view * model * vec4(aPos, 1.0);
 				}
 				)",
@@ -115,11 +150,11 @@ namespace engine
 				#version 330 core
 				out vec4 FragColor;
 
-				uniform vec4 color;
+				in vec4 vertexColor;
 
 				void main()
 				{    
-					FragColor = color;
+					FragColor = vertexColor;
 				}
 				)", false);
 		}
@@ -157,8 +192,8 @@ namespace engine
 				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 				//Give the shader the primitive's color
-				unsigned int projLoc = glGetUniformLocation(defaultShader->ID, "color");
-				//glUniform4f(modelLoc, 1, GL_FALSE, glm::vec4(primitiveRenderer.color.ToGlm(), 0));
+				unsigned int colorLoc = glGetUniformLocation(defaultShader->ID, "color");
+				glUniform4f(colorLoc, primitiveRenderer.color.x, primitiveRenderer.color.y, primitiveRenderer.color.z, 1);
 
 				//Get the view and projection locations
 				unsigned int viewLoc = glGetUniformLocation(defaultShader->ID, "view");
@@ -180,7 +215,16 @@ namespace engine
 					//Give the shader a constant projection matrix
 					glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 				}
+
+				//Render either as lines or triangles
+				if (primitiveRenderer.wireframe)
+					glDrawElements(GL_LINES, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
+				else
+					glDrawElements(GL_TRIANGLES, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
 			}
+
+			//Unbind vertex array
+			glBindVertexArray(0);
 		}
 
 		Shader* defaultShader;
