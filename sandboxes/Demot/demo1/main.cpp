@@ -18,7 +18,7 @@ ECS ecs;
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
-	GLFWwindow* window = CreateWindow(1000, 800, "Window");
+	GLFWwindow* window = CreateGLWindow(1000, 800, "Window");
 
 	//Create the camera
 	Camera cam = Camera(1066, 600);

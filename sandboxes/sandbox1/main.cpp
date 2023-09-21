@@ -9,7 +9,10 @@
 //#include "PlayerController.h"
 //#include "PickupController.h"
 //#include "TurretController.h"
-//
+//#if defined(_WIN32)
+//#define WIN32_LEAN_AND_MEAN
+//#endif
+//#include <enet/enet.h>
 //using namespace std;
 //using namespace engine;
 //
@@ -20,7 +23,7 @@
 //
 //
 //	//Create the window and OpenGL context before creating EngineLib
-//	GLFWwindow* window = CreateWindow(1250, 1000, "Window");
+//	GLFWwindow* window = CreateGLWindow(1250, 1000, "Window");
 //	//Create the camera
 //	Camera cam = Camera(1250, 1000);
 //
