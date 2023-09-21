@@ -25,9 +25,9 @@ namespace engine
 	class Primitive
 	{
 	private:
-		Primitive(std::vector<float> vertices, std::vector<unsigned int> indices, unsigned int numVerts)
+		Primitive(std::vector<float> vertices, std::vector<unsigned int> indices)
 		{
-			numVertices = numVerts;
+			numVertices = indices.size();
 
 			//Make the Vertex Array Object, Vertex Buffer Object, and Element Buffer Object
 			glGenVertexArrays(1, &VAO);
@@ -39,11 +39,11 @@ namespace engine
 
 			//Bind the Vertex Bufer Object and set vertices
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
 			//Bind and set indices to EBO
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
 			//Configure Vertex attribute at location 0 aka position
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -64,7 +64,7 @@ namespace engine
 		}
 
 		//Create a line starting at p1 and ending at p2
-		static Primitive Line(Vector3 p1, Vector3 p2)
+		static Primitive Line(Vector3 p1 = Vector3(-1, 0, 0), Vector3 p2 = Vector3(1, 0, 0))
 		{
 			//Rectangle vertices start at top left and go clockwise to bottom left
 			std::vector<float> vertices
@@ -79,18 +79,18 @@ namespace engine
 				0, 1
 			};
 
-			//Create the primitive object from vertice data and set numVertices accordingly
-			return Primitive(vertices, indices, 2);
+			//Create the primitive object from vertice data
+			return Primitive(vertices, indices);
 		}
 
 		//Create a triangle from three vertices
 		//Defaults to equilateral triangle
-		static Primitive Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 3, 0))
+		static Primitive Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 1, 0))
 		{
-			//Rectangle vertices start at top left and go clockwise to bottom left
+			//Rectangle vertices start at bottom left and go clockwise to bottom right
 			std::vector<float> vertices
 			{
-				//Positions		
+				//Positions	
 				v1.x, v1.y, v1.z,
 				v2.x, v2.y, v2.z,
 				v3.x, v3.y, v3.z,
@@ -101,8 +101,51 @@ namespace engine
 				0, 1, 2,
 			};
 
-			//Create the primitive object from vertice data and set numVertices accordingly
-			return Primitive(vertices, indices, 3);
+			//Create the primitive object from vertice data
+			return Primitive(vertices, indices);
+		}
+		
+		//Create a rectangle from four vertices going clockwise
+		//Defaults to square
+		static Primitive Rectangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(-1, 1, 0), Vector3 v3 = Vector3(1, 1, 0), Vector3 v4 = Vector3(1, -1, 0))
+		{
+			//Rectangle vertices start at bottom left and go clockwise to bottom right
+			std::vector<float> vertices
+			{
+				//Positions		
+				v1.x, v1.y, v1.z,
+				v2.x, v2.y, v2.z,
+				v3.x, v3.y, v3.z,
+				v4.x, v4.y, v4.z,
+			};
+			//Indices to draw a rectangle
+			std::vector<unsigned int> indices
+			{
+				0, 1, 2,
+				2, 3, 0,
+			};
+
+			//Create the primitive object from vertice data
+			return Primitive(vertices, indices);
+		}
+
+		//Create a polygon from provided vertices, going clockwise
+		static Primitive Polygon(std::vector<Vector3> verts)
+		{
+			//Move all Vector3 vertices to a simple float vector
+			std::vector<float> vertices;
+			//Automaticaly create indices to draw triangles
+			std::vector<unsigned int> indices;
+			for (int i = 0; i < verts.size(); i++)
+			{
+				vertices.push_back(verts[i].x);
+				vertices.push_back(verts[i].y);
+				vertices.push_back(verts[i].z);
+				indices.push_back(i);
+			}
+
+			//Create the primitive object from vertice data
+			return Primitive(vertices, indices);
 		}
 
 		unsigned int numVertices = 0;
@@ -217,8 +260,8 @@ namespace engine
 				}
 
 				//Render either as lines or triangles
-				if (primitiveRenderer.wireframe)
-					glDrawElements(GL_LINES, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
+				if (primitiveRenderer.wireframe || primitiveRenderer.primitive->numVertices < 3)
+					glDrawElements(GL_LINE_LOOP, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
 				else
 					glDrawElements(GL_TRIANGLES, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
 			}

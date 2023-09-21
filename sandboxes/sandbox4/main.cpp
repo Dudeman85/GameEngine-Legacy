@@ -50,10 +50,10 @@ int main()
 	ecs.setSystemSignature<PrimitiveRenderSystem>(primitiveRenderSystemSignature);
 
 	Entity primitive = ecs.newEntity();
-	//Primitive line = Primitive::Line(Vector3(0, 0, 0), Vector3(1, 1, 0));
-	Primitive line = Primitive::Triangle();
-	ecs.addComponent(primitive, Transform{ .scale = Vector3(0.5) });
-	ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = &line, .color = Vector3(0, 1, 0), .wireframe = false, .uiElement = true });
+	vector<Vector3> verts{ Vector3(0.35, 0.35, 0), Vector3(0.5, 0, 0), Vector3(0.35, -0.35, 0), Vector3(0, -0.5, 0), Vector3(-0.35, -0.35, 0), Vector3(-0.5, 0, 0), Vector3(-0.35, 0.35, 0), Vector3(0, 0.5, 0) };
+	Primitive line = Primitive::Polygon(verts);
+	Transform& primitiveTransform = ecs.addComponent(primitive, Transform{ .scale = Vector3(0.5) });
+	ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = &line, .color = Vector3(0, 1, 0), .wireframe = true, .uiElement = true });
 	
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -93,10 +93,11 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			cam.Rotate(-1, 0, 0);
 
+		primitiveTransform.rotation.z += 1;
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
-		//engine.Update(&cam);
+		engine.Update(&cam);
 
 		primitiveRenderSystem->Update(&cam);
 
