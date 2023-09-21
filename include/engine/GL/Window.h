@@ -1,4 +1,5 @@
 #pragma once
+
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -8,7 +9,7 @@ namespace engine
 	bool OPENGL_INITIALIZED = false;
 
 	//Create OpenGL window and context
-	GLFWwindow* CreateWindow(int width, int height, const char* name)
+	GLFWwindow* CreateGLWindow(int width, int height, const char* name)
 	{
 		//Initialize GLFW and set it to require OpenGL 3
 		glfwInit();
