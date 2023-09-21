@@ -56,11 +56,11 @@ namespace engine
 		void LoadText(vector<FT_Face> Faces);
 		
 		// Text Rendering function
-		void RenderText(FT_Face face, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
+		void RenderText(string styleName, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour);
 
 	private:
 		map<GLchar, Character> Characters;
-		map<FT_Face, map<GLchar, Character>> FacesLinker;
+		map<string, map<GLchar, Character>> StyleLinker;
 
 		vector<FT_Face> Faces;
 

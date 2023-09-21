@@ -62,6 +62,7 @@ configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox4/tilemapVertexS
 configure_file("bin/tilemapVertexShader.glsl" "sandboxes/sandbox5/tilemapVertexShader.glsl" COPYONLY)
 configure_file("bin/tilemapVertexShader.glsl" "sandboxes/Demot/demo1/tilemapVertexShader.glsl" COPYONLY)
 configure_file("bin/tilemapVertexShader.glsl" "sandboxes/Demot/demo2/tilemapVertexShader.glsl" COPYONLY)
+configure_file("bin/tilemapVertexShader.glsl" "sandboxes/TORPEDOES/tilemapVertexShader.glsl" COPYONLY)
 
 # fragmentShader copy
 configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox1/tilemapFragmentShader.glsl" COPYONLY)
@@ -71,6 +72,7 @@ configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox4/tilemapFragm
 configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/sandbox5/tilemapFragmentShader.glsl" COPYONLY)
 configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/Demot/demo1/tilemapFragmentShader.glsl" COPYONLY)
 configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/Demot/demo2/tilemapFragmentShader.glsl" COPYONLY)
+configure_file("bin/tilemapFragmentShader.glsl" "sandboxes/TORPEDOES/tilemapFragmentShader.glsl" COPYONLY)
 
 # OpenAL32 copy
 IF (WIN32)
@@ -80,7 +82,8 @@ IF (WIN32)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox4/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/sandbox5/OpenAL32.dll" COPYONLY)
 	configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo1/OpenAL32.dll" COPYONLY)
-configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo2/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/Demot/demo2/OpenAL32.dll" COPYONLY)
+	configure_file("bin/OpenAL32.dll" "sandboxes/TORPEDOES/OpenAL32.dll" COPYONLY)
 ENDIF()
 
 

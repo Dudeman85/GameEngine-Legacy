@@ -120,7 +120,7 @@ void TextRender::LoadText(vector<FT_Face> Faces)
 			Characters.insert(pair<char, Character>(c, character));
 
 		}
-		FacesLinker.insert(pair<FT_Face, map<GLchar, Character>>(face, Characters));
+		StyleLinker.insert(pair<string, map<GLchar, Character>>(face->family_name, Characters));
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -132,7 +132,7 @@ void TextRender::LoadText(vector<FT_Face> Faces)
 }
 
 
-void TextRender::RenderText(FT_Face face, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
+void TextRender::RenderText(string styleName, Camera* cam, string text, float x, float y, float scale, glm::vec3 colour)
 {
 	m_shader->use();
 	projection = cam->GetProjectionMatrix();
@@ -143,49 +143,50 @@ void TextRender::RenderText(FT_Face face, Camera* cam, string text, float x, flo
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
 
-	for (const auto& pair : FacesLinker)
+	auto it = StyleLinker.find(styleName);
+
+	if (it != StyleLinker.end())
 	{
-		FT_Face kFace = pair.first;
+		map<GLchar, Character> currentCharacters = it->second;
 
-		if (kFace == face)
+		string::const_iterator c;
+		for (c = text.begin(); c != text.end(); ++c)
 		{
-			const map<GLchar, Character>& currentCharacters = pair.second;
+			Character ch = currentCharacters[*c];
 
-			string::const_iterator c;
-			for (c = text.begin(); c != text.end(); c++)
-			{
-				Character ch = currentCharacters.at(*c);
+			float xpos = x + ch.Bearing.x * scale;
+			float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
 
-				float xpos = x + ch.Bearing.x * scale;
-				float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+			float w = ch.Size.x * scale;
+			float h = ch.Size.y * scale;
 
-				float w = ch.Size.x * scale;
-				float h = ch.Size.y * scale;
-
-				float vertices[6][4] = {
-					{xpos, ypos + h, 0.0f, 0.0f },
-					{xpos, ypos, 0.0f, 1.0f },
-					{xpos + w, ypos, 1.0f, 1.0f },
+			float vertices[6][4] = {
+				{xpos, ypos + h, 0.0f, 0.0f },
+				{xpos, ypos, 0.0f, 1.0f },
+				{xpos + w, ypos, 1.0f, 1.0f },
 
 				{xpos, ypos + h, 0.0f, 0.0f },
-					{xpos + w, ypos, 1.0f, 1.0f },
-					{xpos + w, ypos + h, 1.0f, 0.0f}
-				};
+				{xpos + w, ypos, 1.0f, 1.0f },
+				{xpos + w, ypos + h, 1.0f, 0.0f}
+			};
 
-				glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-				glBindBuffer(GL_ARRAY_BUFFER, VBO);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-				x += (ch.Advance >> 6) * scale;
-			}
+			printf("RenderText: %s, textureId: %d\n", text.c_str(), ch.TextureID);
+			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			x += (ch.Advance >> 6) * scale;
+
 		}
+
+		currentCharacters.clear();
 	}
-
-
-	
-	
-	
+	else
+	{
+		cout << "error" << endl;
+	}
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 }
