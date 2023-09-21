@@ -41,7 +41,7 @@ namespace engine
 
 	Vector2 Vector2::operator-(Vector2 sub)
 	{
-		return Vector2(x - sub.x, y - sub.x);
+		return Vector2(x - sub.x, y - sub.y);
 	}
 	Vector2& Vector2::operator-=(const Vector2& sub)
 	{

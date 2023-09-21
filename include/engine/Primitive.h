@@ -64,7 +64,7 @@ namespace engine
 		}
 
 		//Create a line starting at p1 and ending at p2
-		static Primitive Line(Vector3 p1 = Vector3(-1, 0, 0), Vector3 p2 = Vector3(1, 0, 0))
+		static Primitive* Line(Vector3 p1 = Vector3(-1, 0, 0), Vector3 p2 = Vector3(1, 0, 0))
 		{
 			//Rectangle vertices start at top left and go clockwise to bottom left
 			std::vector<float> vertices
@@ -80,12 +80,12 @@ namespace engine
 			};
 
 			//Create the primitive object from vertice data
-			return Primitive(vertices, indices);
+			return new Primitive(vertices, indices);
 		}
 
 		//Create a triangle from three vertices
 		//Defaults to equilateral triangle
-		static Primitive Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 1, 0))
+		static Primitive* Triangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(1, -1, 0), Vector3 v3 = Vector3(0, 1, 0))
 		{
 			//Rectangle vertices start at bottom left and go clockwise to bottom right
 			std::vector<float> vertices
@@ -102,12 +102,12 @@ namespace engine
 			};
 
 			//Create the primitive object from vertice data
-			return Primitive(vertices, indices);
+			return new Primitive(vertices, indices);
 		}
 		
 		//Create a rectangle from four vertices going clockwise
 		//Defaults to square
-		static Primitive Rectangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(-1, 1, 0), Vector3 v3 = Vector3(1, 1, 0), Vector3 v4 = Vector3(1, -1, 0))
+		static Primitive* Rectangle(Vector3 v1 = Vector3(-1, -1, 0), Vector3 v2 = Vector3(-1, 1, 0), Vector3 v3 = Vector3(1, 1, 0), Vector3 v4 = Vector3(1, -1, 0))
 		{
 			//Rectangle vertices start at bottom left and go clockwise to bottom right
 			std::vector<float> vertices
@@ -126,11 +126,11 @@ namespace engine
 			};
 
 			//Create the primitive object from vertice data
-			return Primitive(vertices, indices);
+			return new Primitive(vertices, indices);
 		}
 
 		//Create a polygon from provided vertices, going clockwise
-		static Primitive Polygon(std::vector<Vector3> verts)
+		static Primitive* Polygon(std::vector<Vector3> verts)
 		{
 			//Move all Vector3 vertices to a simple float vector
 			std::vector<float> vertices;
@@ -145,7 +145,7 @@ namespace engine
 			}
 
 			//Create the primitive object from vertice data
-			return Primitive(vertices, indices);
+			return new Primitive(vertices, indices);
 		}
 
 		unsigned int numVertices = 0;
@@ -236,7 +236,7 @@ namespace engine
 
 				//Give the shader the primitive's color
 				unsigned int colorLoc = glGetUniformLocation(defaultShader->ID, "color");
-				glUniform4f(colorLoc, primitiveRenderer.color.x, primitiveRenderer.color.y, primitiveRenderer.color.z, 1);
+				glUniform4f(colorLoc, primitiveRenderer.color.x / 255, primitiveRenderer.color.y / 255, primitiveRenderer.color.z / 255, 1);
 
 				//Get the view and projection locations
 				unsigned int viewLoc = glGetUniformLocation(defaultShader->ID, "view");

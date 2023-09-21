@@ -14,13 +14,53 @@ struct PolygonCollider
 	vector<Vector2> vertices;
 };
 
-bool checkOverlap(Entity a, Entity b)
+bool CheckOverlap(Entity a, Entity b)
 {
 	PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
 	PolygonCollider& bCollider = ecs.getComponent<PolygonCollider>(b);
+	Transform& aTransform = ecs.getComponent<Transform>(a);
+	Transform& bTransform = ecs.getComponent<Transform>(b);
 
-	
+	vector<Vector2> aVerts;
+	//Rotate, scale and move every point
+	for (int i = 0; i < aVerts.size(); i++)
+	{
+		//Rotate
+		aVerts[i] = Vector2((aVerts[i].x * cos(aTransform.rotation.z)), (aVerts[i].y * sin(aTransform.rotation.z)));
+		//Scale
+		aVerts[i] = Vector2(aVerts[i].x * aTransform.scale.x, aVerts[i].y * aTransform.scale.y);
+	}
 
+
+	//For each vertice in a
+	for (int i = 0; i < aCollider.vertices.size(); i++)
+	{
+		//Overflow nextVertice to beginning
+		int nextVertice = i < aCollider.vertices.size() - 1 ? i + 1 : 0;
+		//Calculate the normal vector to project the other polygon to (left normal because clockwise)
+		Vector2 normal = (aCollider.vertices[nextVertice] - aCollider.vertices[i]).LeftNormal();
+
+
+		Entity primitive = ecs.newEntity();
+		Primitive* line = Primitive::Line(Vector3(0, 0, 0), normal.Normalize());
+		ecs.addComponent(primitive, Transform{ .scale = Vector3(1) });
+		ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = line, .color = Vector3(0, 255.f / (i / 4.f + 1.f), 0), .wireframe = true, .uiElement = true });
+		Entity primitive2 = ecs.newEntity();
+		Primitive* line2 = Primitive::Line(aCollider.vertices[i], aCollider.vertices[nextVertice]);
+		ecs.addComponent(primitive2, Transform{ .scale = Vector3(1) });
+		ecs.addComponent(primitive2, PrimitiveRenderer{ .primitive = line2, .color = Vector3(0, 255.f / (i / 4.f + 1.f), 0), .wireframe = true, .uiElement = true });
+
+		//For each vertice in b
+		for (int i = 0; i < bCollider.vertices.size(); i++)
+		{
+			float projection = normal.Dot(bCollider.vertices[i]);
+
+			Entity box = ecs.newEntity();
+			ecs.addComponent(box, Transform{ .position = normal * projection, .scale = Vector3(0.01) });
+			ecs.addComponent(box, PrimitiveRenderer{ .primitive = Primitive::Rectangle(), .color = Vector3(255, 0, 0), .wireframe = false, .uiElement = true });
+		}
+	}
+	return false;
 }
 
 
@@ -28,11 +68,11 @@ int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
 	//Paraeters define window size(x,y) and name
-	GLFWwindow* window = CreateWindow(1200, 800, "Window");
+	GLFWwindow* window = CreateGLWindow(800, 800, "Window");
 	//Initialize the default engine library
 	EngineLib engine;
 	//Create the camera
-	Camera cam = Camera(1200, 800);
+	Camera cam = Camera(800, 800);
 	cam.perspective = false;
 	cam.SetPosition(0, 0, 50);
 
@@ -66,12 +106,32 @@ int main()
 	primitiveRenderSystemSignature.set(ecs.getComponentId<Transform>());
 	ecs.setSystemSignature<PrimitiveRenderSystem>(primitiveRenderSystemSignature);
 
+
 	Entity primitive = ecs.newEntity();
-	vector<Vector3> verts{ Vector3(0.35, 0.35, 0), Vector3(0.5, 0, 0), Vector3(0.35, -0.35, 0), Vector3(0, -0.5, 0), Vector3(-0.35, -0.35, 0), Vector3(-0.5, 0, 0), Vector3(-0.35, 0.35, 0), Vector3(0, 0.5, 0) };
-	Primitive line = Primitive::Polygon(verts);
-	Transform& primitiveTransform = ecs.addComponent(primitive, Transform{ .scale = Vector3(0.5) });
-	ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = &line, .color = Vector3(0, 1, 0), .wireframe = true, .uiElement = true });
-	
+	vector<Vector3> verts1{ Vector3(0.35, 0.35, 0), Vector3(0.5, 0, 0), Vector3(0.35, -0.35, 0), Vector3(0, -0.5, 0), Vector3(-0.35, -0.35, 0), Vector3(-0.5, 0, 0), Vector3(-0.35, 0.35, 0), Vector3(0, 0.5, 0) };
+	Primitive* line = Primitive::Polygon(verts1);
+	Transform& primitiveTransform = ecs.addComponent(primitive, Transform{ .scale = Vector3(0.9) });
+	//ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = line, .color = Vector3(1, 0, 0), .wireframe = true, .uiElement = true });
+
+
+
+	//POLYGON COLLIDER TESTING
+	ecs.registerComponent<PolygonCollider>();
+
+	Entity a = ecs.newEntity();
+	Entity b = ecs.newEntity();
+
+	vector<Vector2> verts{ Vector2(0.35, 0.35), Vector2(0.5, 0), Vector2(0.35, -0.35), Vector2(0, -0.5), Vector2(-0.35, -0.35), Vector2(-0.5, 0), Vector2(-0.35, 0.35), Vector2(0, 0.5) };
+	vector<Vector2> verts2{ Vector2(0.25, 0.25), Vector2(0.25, -0.25), Vector2(-0.25, -0.25), Vector2(-0.25, 0.25) };
+	vector<Vector3> verts3{ Vector3(0.25, 0.25, 0), Vector3(0.25, -0.25, 0), Vector3(-0.25, -0.25, 0), Vector3(-0.25, 0.25, 0) };
+
+	ecs.addComponent(a, PolygonCollider{ .vertices = verts });
+	ecs.addComponent(b, PolygonCollider{ .vertices = verts2 });
+	ecs.addComponent(b, Transform{});
+	ecs.addComponent(b, PrimitiveRenderer{ .primitive = Primitive::Polygon(verts3), .color = Vector3(1, 0, 0), .wireframe = true, .uiElement = true });
+
+	CheckOverlap(a, b);
+
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -110,7 +170,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			cam.Rotate(-1, 0, 0);
 
-		primitiveTransform.rotation.z += 1;
+
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
