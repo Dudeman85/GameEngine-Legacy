@@ -7,6 +7,23 @@ using namespace engine;
 //Creates a global instance of the ECS manager
 ECS ecs;
 
+struct PolygonCollider
+{
+	//The vertices of the polygon making up the collider, going clockwise
+	//The vertices must form a convex polygon
+	vector<Vector2> vertices;
+};
+
+bool checkOverlap(Entity a, Entity b)
+{
+	PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
+	PolygonCollider& bCollider = ecs.getComponent<PolygonCollider>(b);
+
+	
+
+}
+
+
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
