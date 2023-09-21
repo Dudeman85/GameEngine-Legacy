@@ -25,7 +25,7 @@ int main()
 
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 0, 120); // tämä toimii decimali rgb codi 
 
-	Model model("assets/Achelous.obj");
+	Model model("assets/untitled.obj");
 
 	/*Texture textura1("assets/laatikko.png", GL_LINEAR);
 	Texture textura2("assets/latikko.png", GL_LINEAR);*/
@@ -39,7 +39,7 @@ int main()
 	// Add the sprite component with a texture and default shader
 	// agregae el componente sprite con una textura y un shader predecterminado
 
-	Transform& suzanneTransform = ecs.addComponent(zuzanne, Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0,0,0), .scale = Vector3(30)  });
+	Transform& suzanneTransform = ecs.addComponent(zuzanne, Transform{ .position = Vector3(0,0,0), .rotation = Vector3(0,0,0), .scale = Vector3(60)  });
 
 	//Add the transform component which is required for the Render System
 	// Agregar el componente de trasformacion, que es nesesario para el Render System
