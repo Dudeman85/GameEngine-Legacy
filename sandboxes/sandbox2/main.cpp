@@ -34,15 +34,24 @@ int main()
 	SpriteRenderSystem::SetBackgroundColor(0, 120, 0);
 
 
+	
+	//Font arialFont("assets/fonts/ARIAL.TTF");
+
 	// Text
-	TextRender text;
-	//vector<TrueFont> trueFont0 = text.SetUpTTF("assets/fonts/ARIAL.TTF", 0, 0, 48);
-	//vector<TrueFont> trueFont1 = text.SetUpTTF("assets/fonts/COMIC.TTF", 0, 0, 48);
+	TextRender text0;
 	FT_Face face0 = 0;
+	const char* font0 = "Arial";
+	vector<FT_Face> Faces0 = text0.SetUpTTF(face0, "assets/fonts/ARIAL.TTF", 0, 0, 48);
+	text0.LoadText(Faces0);
+
+
+
+
+	TextRender text1;
 	FT_Face face1 = 0;
-	vector<FT_Face> Faces = text.SetUpTTF(face0, "assets/fonts/ARIAL.TTF", 0, 0, 48);
-	Faces = text.SetUpTTF(face1, "assets/fonts/wingding.ttf", 0, 0, 48);
-	text.LoadText(Faces);
+	const char* font1 = "Wingdings";
+	vector<FT_Face> Faces1 = text1.SetUpTTF(face1, "assets/fonts/wingding.ttf", 0, 0, 48);
+	text1.LoadText(Faces1);
 
 
 
@@ -59,8 +68,11 @@ int main()
 		// For greater control of system execution, you can update each one manually
 		engine.Update(&cam);
 
-		text.RenderText(Faces[0], &cam, "This is sample text", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-		text.RenderText(Faces[1], &cam, "(C) LearnOpenGL.com", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		text0.RenderText(font0, &cam, "This1", -390.0f, -290.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+		//arialText.render(0,0,"fdfds");
+		///arialText.render(10,0,"fdsfsfdsf");
+
+		text1.RenderText(font1, &cam, "This2", 150.0f, 275.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 		//cout << Faces[0]->glyph->bitmap << endl;
 
