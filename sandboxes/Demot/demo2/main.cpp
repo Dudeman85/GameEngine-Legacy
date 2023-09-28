@@ -124,7 +124,7 @@ int main()
 
 	SpriteRenderSystem::SetBackgroundColor(68, 154, 141);
 	Tilemap map(&cam);
-	map.loadMap("assets/torptest.tmx");
+	map.loadMap("assets/demo2.tmx");
 	engine.physicsSystem->SetTilemap(&map);
 	engine.spriteRenderSystem->SetTilemap(&map);
 
