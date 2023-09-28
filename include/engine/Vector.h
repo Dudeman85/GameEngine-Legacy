@@ -23,6 +23,7 @@ namespace engine
 		Vector2& operator-=(const Vector2& sub);
 		Vector2 operator*(float mult);
 		Vector2& operator*=(float mult);
+		Vector2& operator*=(const Vector2& mult);
 		Vector2 operator/(float div);
 
 		Vector2 Normalize();

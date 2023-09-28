@@ -59,8 +59,8 @@ namespace engine
 		~Primitive()
 		{
 			glDeleteVertexArrays(1, &VAO);
-			glDeleteVertexArrays(1, &VBO);
-			glDeleteVertexArrays(1, &EBO);
+			glDeleteBuffers(1, &VBO);
+			glDeleteBuffers(1, &EBO);
 		}
 
 		//Create a line starting at p1 and ending at p2
@@ -129,7 +129,7 @@ namespace engine
 			return new Primitive(vertices, indices);
 		}
 
-		//Create a polygon from provided vertices, going clockwise
+		//Create a polygon from provided 3D vertices, going clockwise
 		static Primitive* Polygon(std::vector<Vector3> verts)
 		{
 			//Move all Vector3 vertices to a simple float vector
@@ -141,6 +141,24 @@ namespace engine
 				vertices.push_back(verts[i].x);
 				vertices.push_back(verts[i].y);
 				vertices.push_back(verts[i].z);
+				indices.push_back(i);
+			}
+
+			//Create the primitive object from vertice data
+			return new Primitive(vertices, indices);
+		}
+		//Create a polygon from provided 2D vertices, going clockwise
+		static Primitive* Polygon(std::vector<Vector2> verts)
+		{
+			//Move all Vector3 vertices to a simple float vector
+			std::vector<float> vertices;
+			//Automaticaly create indices to draw triangles
+			std::vector<unsigned int> indices;
+			for (int i = 0; i < verts.size(); i++)
+			{
+				vertices.push_back(verts[i].x);
+				vertices.push_back(verts[i].y);
+				vertices.push_back(0);
 				indices.push_back(i);
 			}
 
@@ -264,6 +282,8 @@ namespace engine
 					glDrawElements(GL_LINE_LOOP, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
 				else
 					glDrawElements(GL_TRIANGLES, primitiveRenderer.primitive->numVertices, GL_UNSIGNED_INT, 0);
+
+				int a = 0;
 			}
 
 			//Unbind vertex array

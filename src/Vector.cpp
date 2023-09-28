@@ -60,7 +60,13 @@ namespace engine
 		y *= mult;
 		return *this;
 	}
+	Vector2& Vector2::operator*=(const Vector2& mult)
+	{
+		x *= mult.x;
+		y *= mult.y;
 
+		return *this;
+	}
 
 	Vector2 Vector2::operator/(float div)
 	{

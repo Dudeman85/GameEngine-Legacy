@@ -1,6 +1,8 @@
 #include <engine/Application.h>
 
 #include <engine/Primitive.h>
+#include <map>
+#define PI 3.14159265
 
 using namespace engine;
 
@@ -14,6 +16,67 @@ struct PolygonCollider
 	vector<Vector2> vertices;
 };
 
+map<Entity, vector<vector<Entity>>> projectionPoints;
+map<Entity, vector<Entity>> normalVectors;
+
+bool OverlapAtoB(vector<Vector2> aVerts, vector<Vector2> bVerts, Entity a, Entity b)
+{
+	Vector2 aPosition = ecs.getComponent<Transform>(a).position;
+	Vector2 bPosition = ecs.getComponent<Transform>(b).position;
+
+	//For each vertice in b move it to have a at origin
+	for (int i = 0; i < bVerts.size(); i++)
+	{
+		bVerts[i] += bPosition;
+		bVerts[i] -= aPosition;
+	}
+
+	//For each vertice in a
+	for (int i = 0; i < aVerts.size(); i++)
+	{
+		//Overflow nextVertice to beginning
+		int nextVertice = i < aVerts.size() - 1 ? i + 1 : 0;
+		//Calculate the normal vector to project the other polygon to (left normal because clockwise)
+		Vector2 normal = (aVerts[nextVertice] - aVerts[i]).LeftNormal();
+
+		if (normalVectors[a].size() < aVerts.size())
+		{
+			normalVectors[a].push_back(ecs.newEntity());
+			ecs.addComponent(normalVectors[a].back(), PrimitiveRenderer{ .primitive = Primitive::Line(aPosition, normal + aPosition), .color = Vector3(182, 66, 245), .wireframe = true, .uiElement = true });
+			ecs.addComponent(normalVectors[a].back(), Transform{});
+		}
+		else
+		{
+			PrimitiveRenderer& pr = ecs.getComponent<PrimitiveRenderer>(normalVectors[a][i]);
+			delete pr.primitive;
+			pr.primitive = Primitive::Line(aPosition, normal + aPosition);
+		}
+
+		//For each vertice in b
+		for (int j = 0; j < bVerts.size(); j++)
+		{
+			float projection = normal.Dot(bVerts[j]);
+
+			if (projectionPoints[a].size() < aVerts.size())
+			{
+				projectionPoints[a].push_back(vector<Entity>());
+			}
+			if (projectionPoints[a][i].size() < bVerts.size())
+			{
+				projectionPoints[a][i].push_back(ecs.newEntity());
+				ecs.addComponent(projectionPoints[a][i].back(), PrimitiveRenderer{ .primitive = Primitive::Rectangle(), .color = Vector3(255, 0, 0), .wireframe = false, .uiElement = true });
+				ecs.addComponent(projectionPoints[a][i].back(), Transform{ .position = normal * projection, .scale = Vector3(0.01) });
+			}
+			else
+			{
+				Transform& projectionTransform = ecs.getComponent<Transform>(projectionPoints[a][i][j]);
+				projectionTransform.position = normal * projection + aPosition;
+			}
+		}
+	}
+	return false;
+}
+
 bool CheckOverlap(Entity a, Entity b)
 {
 	PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
@@ -22,57 +85,47 @@ bool CheckOverlap(Entity a, Entity b)
 	Transform& bTransform = ecs.getComponent<Transform>(b);
 
 	vector<Vector2> aVerts;
-	//Rotate, scale and move every point
-	for (int i = 0; i < aVerts.size(); i++)
-	{
-		//Rotate
-		aVerts[i] = Vector2((aVerts[i].x * cos(aTransform.rotation.z)), (aVerts[i].y * sin(aTransform.rotation.z)));
-		//Scale
-		aVerts[i] = Vector2(aVerts[i].x * aTransform.scale.x, aVerts[i].y * aTransform.scale.y);
-	}
-
-
-	//For each vertice in a
+	//Rotate and scale every point, movement is handled later
 	for (int i = 0; i < aCollider.vertices.size(); i++)
 	{
-		//Overflow nextVertice to beginning
-		int nextVertice = i < aCollider.vertices.size() - 1 ? i + 1 : 0;
-		//Calculate the normal vector to project the other polygon to (left normal because clockwise)
-		Vector2 normal = (aCollider.vertices[nextVertice] - aCollider.vertices[i]).LeftNormal();
-
-
-		Entity primitive = ecs.newEntity();
-		Primitive* line = Primitive::Line(Vector3(0, 0, 0), normal.Normalize());
-		ecs.addComponent(primitive, Transform{ .scale = Vector3(1) });
-		ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = line, .color = Vector3(0, 255.f / (i / 4.f + 1.f), 0), .wireframe = true, .uiElement = true });
-		Entity primitive2 = ecs.newEntity();
-		Primitive* line2 = Primitive::Line(aCollider.vertices[i], aCollider.vertices[nextVertice]);
-		ecs.addComponent(primitive2, Transform{ .scale = Vector3(1) });
-		ecs.addComponent(primitive2, PrimitiveRenderer{ .primitive = line2, .color = Vector3(0, 255.f / (i / 4.f + 1.f), 0), .wireframe = true, .uiElement = true });
-
-		//For each vertice in b
-		for (int i = 0; i < bCollider.vertices.size(); i++)
-		{
-			float projection = normal.Dot(bCollider.vertices[i]);
-
-			Entity box = ecs.newEntity();
-			ecs.addComponent(box, Transform{ .position = normal * projection, .scale = Vector3(0.01) });
-			ecs.addComponent(box, PrimitiveRenderer{ .primitive = Primitive::Rectangle(), .color = Vector3(255, 0, 0), .wireframe = false, .uiElement = true });
-		}
+		Vector2 transformedVert = aCollider.vertices[i];
+		//Rotate
+		float angle = aTransform.rotation.z * PI / 180;
+		transformedVert.x = aCollider.vertices[i].x * cos(angle) - aCollider.vertices[i].y * sin(angle);
+		transformedVert.y = aCollider.vertices[i].x * sin(angle) + aCollider.vertices[i].y * cos(angle);
+		//Scale
+		transformedVert *= Vector2(aTransform.scale);
+		aVerts.push_back(transformedVert);
 	}
+	vector<Vector2> bVerts;
+	//Rotate and scale every point, movement is handled later
+	for (int i = 0; i < bCollider.vertices.size(); i++)
+	{
+		Vector2 transformedVert = bCollider.vertices[i];
+		//Rotate
+		float angle = bTransform.rotation.z * PI / 180;
+		transformedVert.x = bCollider.vertices[i].x * cos(angle) - bCollider.vertices[i].y * sin(angle);
+		transformedVert.y = bCollider.vertices[i].x * sin(angle) + bCollider.vertices[i].y * cos(angle);
+		//Scale
+		transformedVert *= Vector2(bTransform.scale);
+		bVerts.push_back(transformedVert);
+	}
+
+	OverlapAtoB(aVerts, bVerts, a, b);
+	OverlapAtoB(bVerts, aVerts, b, a);
+
 	return false;
 }
-
 
 int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
 	//Paraeters define window size(x,y) and name
-	GLFWwindow* window = CreateGLWindow(800, 800, "Window");
+	GLFWwindow* window = CreateGLWindow(1000, 1000, "Window");
 	//Initialize the default engine library
 	EngineLib engine;
 	//Create the camera
-	Camera cam = Camera(800, 800);
+	Camera cam = Camera(1000, 1000);
 	cam.perspective = false;
 	cam.SetPosition(0, 0, 50);
 
@@ -107,30 +160,21 @@ int main()
 	ecs.setSystemSignature<PrimitiveRenderSystem>(primitiveRenderSystemSignature);
 
 
-	Entity primitive = ecs.newEntity();
-	vector<Vector3> verts1{ Vector3(0.35, 0.35, 0), Vector3(0.5, 0, 0), Vector3(0.35, -0.35, 0), Vector3(0, -0.5, 0), Vector3(-0.35, -0.35, 0), Vector3(-0.5, 0, 0), Vector3(-0.35, 0.35, 0), Vector3(0, 0.5, 0) };
-	Primitive* line = Primitive::Polygon(verts1);
-	Transform& primitiveTransform = ecs.addComponent(primitive, Transform{ .scale = Vector3(0.9) });
-	//ecs.addComponent(primitive, PrimitiveRenderer{ .primitive = line, .color = Vector3(1, 0, 0), .wireframe = true, .uiElement = true });
-
-
-
 	//POLYGON COLLIDER TESTING
 	ecs.registerComponent<PolygonCollider>();
 
+
 	Entity a = ecs.newEntity();
+	vector<Vector2> aVerts{ Vector2(0.35, 0.35), Vector2(0.5, 0), Vector2(0.35, -0.35), Vector2(0, -0.5), Vector2(-0.35, -0.35), Vector2(-0.5, 0), Vector2(-0.35, 0.35), Vector2(0, 0.5) };
+	ecs.addComponent(a, PolygonCollider{ .vertices = aVerts });
+	Transform& aTransform = ecs.addComponent(a, Transform{ .scale = Vector3(0.5) });
+	ecs.addComponent(a, PrimitiveRenderer{ .primitive = Primitive::Polygon(aVerts), .color = Vector3(0, 255, 0), .wireframe = true, .uiElement = true });
+
 	Entity b = ecs.newEntity();
-
-	vector<Vector2> verts{ Vector2(0.35, 0.35), Vector2(0.5, 0), Vector2(0.35, -0.35), Vector2(0, -0.5), Vector2(-0.35, -0.35), Vector2(-0.5, 0), Vector2(-0.35, 0.35), Vector2(0, 0.5) };
-	vector<Vector2> verts2{ Vector2(0.25, 0.25), Vector2(0.25, -0.25), Vector2(-0.25, -0.25), Vector2(-0.25, 0.25) };
-	vector<Vector3> verts3{ Vector3(0.25, 0.25, 0), Vector3(0.25, -0.25, 0), Vector3(-0.25, -0.25, 0), Vector3(-0.25, 0.25, 0) };
-
-	ecs.addComponent(a, PolygonCollider{ .vertices = verts });
-	ecs.addComponent(b, PolygonCollider{ .vertices = verts2 });
-	ecs.addComponent(b, Transform{});
-	ecs.addComponent(b, PrimitiveRenderer{ .primitive = Primitive::Polygon(verts3), .color = Vector3(1, 0, 0), .wireframe = true, .uiElement = true });
-
-	CheckOverlap(a, b);
+	vector<Vector2> bVerts{ Vector2(0.25, 0.25), Vector2(0.25, -0.25), Vector2(-0.25, -0.25), Vector2(-0.25, 0.25) };
+	ecs.addComponent(b, PolygonCollider{ .vertices = bVerts });
+	Transform& bTransform = ecs.addComponent(b, Transform{ .scale = Vector3(0.5) });
+	ecs.addComponent(b, PrimitiveRenderer{ .primitive = Primitive::Polygon(bVerts), .color = Vector3(0, 255, 0), .wireframe = true, .uiElement = true });
 
 	//Game Loop
 	while (!glfwWindowShouldClose(window))
@@ -142,35 +186,58 @@ int main()
 		//Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS)
 		{
-			angle += rotationSpeed;
-			if (angle >= 360)
-				angle -= 360;
-
-			cout << angle << endl;
-
-			modelTransform.rotation.y += -rotationSpeed;
-			modelTransform.rotation.z += rotationSpeed;
+			bTransform.position.x += 0.01;
 		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS)
 		{
-			angle -= rotationSpeed;
-			if (angle < 0)
-				angle += 360;
-
-			cout << angle << endl;
-
-			modelTransform.rotation.y += rotationSpeed;
-			modelTransform.rotation.z += -rotationSpeed;
+			bTransform.position.x += -0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS)
+		{
+			bTransform.position.y += 0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_KP_5) == GLFW_PRESS)
+		{
+			bTransform.position.y += -0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_KP_7) == GLFW_PRESS)
+		{
+			bTransform.rotation.z += 1;
+		}
+		if (glfwGetKey(window, GLFW_KEY_KP_9) == GLFW_PRESS)
+		{
+			bTransform.rotation.z += -1;
 		}
 
-		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			cam.Rotate(1, 0, 0);
-		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			cam.Rotate(-1, 0, 0);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		{
+			aTransform.position.x += 0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		{
+			aTransform.position.x += -0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		{
+			aTransform.position.y += 0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		{
+			aTransform.position.y += -0.01;
+		}
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		{
+			aTransform.rotation.z += 1;
+		}
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		{
+			aTransform.rotation.z += -1;
+		}
 
 
+		CheckOverlap(a, b);
 
 		//Update all engine systems, this usually should go last in the game loop
 		//For greater control of system execution, you can update each one manually
