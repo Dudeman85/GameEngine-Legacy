@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="demo2_tileset.tsx"/>
+ <layer id="3" name="collider" width="50" height="50" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzt1kEKgCAQQFGhA3j/27pyGTim+Uf+B7c2D6ysTyn1opU1Hax0sKI5Zr9BOvZ0i2M2HaxWOU7fd3Sw0sHq9Lle1a0OUpGZdOxPxz9zRWeL7k1zzO6tI/6snXvT3vNI2f/jPR2sss/f08FKBysdrHSw0sFKB6sRx9udeHTpWOvIkA5WX88+bTUV4Bvr
+  </data>
+ </layer>
+ <layer id="1" name="Tile Layer 1" width="50" height="50" visible="0">
+  <properties>
+   <property name="Z" type="float" value="0"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztwzEJAAAMA7Cys/4FV8cggfSSqqqqqqqqqqqq6vMDVZZ1MQ==
+  </data>
+ </layer>
+ <layer id="2" name="Tile Layer 2" width="50" height="50">
+  <properties>
+   <property name="Z" type="float" value="1"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJzt2UEKgCAQQFHpqt6g+y+iRcs0Q+nP9B/M3g+iiHUrpSaaqOxgsYOF1rE3psWONbJ0vGUHy6yO1r7u7e0Z7GCxgyXLeyRrB8nIWWfHenasXNX4/Z6lY4Qd47J0rBT9Hr/YwRJ9/Rc7WOxgsYPFDhY7WOxgedLR+xP4+s/g9KeOCOxguXvXRp0DbC6hQQ==
+  </data>
+ </layer>
+</map>
