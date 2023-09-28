@@ -3,6 +3,8 @@ Engine uses Tiled 2D's map editor program's tileset's and tilemap's to create a 
 
 For us to use tilemaps and tilesets on our engine we are using Matt Marchant's **tmxlite** library to read and edit our files in engine.
 
+Map needs to be **Orthogonal, Base64(zlib copressed)**
+
 ## Map loading and drawing
 
 All the functions needed to draw a map on the screen are located inside Tilemap.h. No other includes are needed in the main souurce file.
