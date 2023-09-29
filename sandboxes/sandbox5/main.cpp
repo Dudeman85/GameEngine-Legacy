@@ -14,7 +14,7 @@ ECS ecs;
 int main()
 {
 
-	GLFWwindow *window = engine::CreateWindow(800, 600, "Windos");
+	GLFWwindow *window = engine::CreateGLWindow(800, 600, "Windos");
 
 	engine::EngineLib engine;
 
@@ -25,7 +25,7 @@ int main()
 
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 0, 120); // tämä toimii decimali rgb codi 
 
-	Model model("assets/untitled.obj");
+	Model model("assets/LaMuerte.obj");
 
 	/*Texture textura1("assets/laatikko.png", GL_LINEAR);
 	Texture textura2("assets/latikko.png", GL_LINEAR);*/
