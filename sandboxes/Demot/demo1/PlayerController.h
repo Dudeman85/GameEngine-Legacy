@@ -57,6 +57,12 @@ public:
 			Rigidbody& rigidbody = ecs.getComponent<Rigidbody>(entity);
 			BoxCollider& collider = ecs.getComponent<BoxCollider>(entity);
 			Animator& animator = ecs.getComponent<Animator>(entity);
+			
+			int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+			GLFWgamepadstate state;
+			glfwGetGamepadState(GLFW_JOYSTICK_1, &state);
+			int buttonCount;
+			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 
 			if (player.attacking > 0)
 			{
@@ -105,9 +111,11 @@ public:
 				//Wall Slide
 				rigidbody.velocity.y = max(rigidbody.velocity.y, -1000.f);
 			}
+			
+
 
 			//Right
-			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && player.attacking == 0)
+			if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] && player.attacking == 0)
 			{
 				//If touching ground play run and walk sound
 				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
@@ -132,7 +140,7 @@ public:
 				}
 			}
 			//Left
-			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && player.attacking == 0)
+			else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT] && player.attacking == 0)
 			{
 				//If touching ground play run but mirror it
 				if (collider.sidesCollided[Direction::down] && player.shouldWallslide <= 0)
@@ -172,7 +180,7 @@ public:
 			}
 
 			//When jump is pressed
-			if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && player.attacking == 0)
+			if ((glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_A] || state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP]) && player.attacking == 0)
 			{
 				//If touching ground
 				if (collider.sidesCollided[Direction::down])
@@ -257,7 +265,7 @@ public:
 				AnimationSystem::PlayAnimation(entity, "Wallslide");
 
 			//Attack
-			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || state.buttons[GLFW_GAMEPAD_BUTTON_B])
 			{
 				if (collider.sidesCollided[Direction::down])
 				{
@@ -280,7 +288,13 @@ public:
 
 			//Lock the max fall speed
 			rigidbody.velocity.y = max(rigidbody.velocity.y, -8000.f);
+
+
+
+			
+
 		}
+
 	}
 
 	uint32_t jumpSound;

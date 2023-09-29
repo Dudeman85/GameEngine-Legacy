@@ -10,8 +10,8 @@ Aleksi
 
 Aaro
 
-- 
-- 
+- continued text rendering
+
 
 
 Viksteri
