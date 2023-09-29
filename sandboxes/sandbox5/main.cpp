@@ -25,7 +25,7 @@ int main()
 
 	engine::SpriteRenderSystem::SetBackgroundColor(0, 0, 120); // tämä toimii decimali rgb codi 
 
-	Model model("assets/untitled.obj");
+	Model model("assets/LaMuerte.obj");
 
 	/*Texture textura1("assets/laatikko.png", GL_LINEAR);
 	Texture textura2("assets/latikko.png", GL_LINEAR);*/

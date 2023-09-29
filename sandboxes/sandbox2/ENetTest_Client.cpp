@@ -1,6 +1,9 @@
 #if 0
 #include <iostream>
 #include <enet/enet.h>
+#include <string>
+
+using namespace std;
 
 int main(int argc, char ** argv)
 {
@@ -24,14 +27,14 @@ int main(int argc, char ** argv)
 	ENetEvent event;
 	ENetPeer* peer;
 
-	enet_address_set_host(&address, "127.0.0.1");
-	address.port = 7777;
+	enet_address_set_host(&address, "172.31.18.64");
+	address.port = 2310;
 
 	peer = enet_host_connect(client, &address, 1, 0);
 
 	if (peer == NULL)
 	{
-		fprintf(stderr, "No availaböe peers for initiating an ENet connection\n");
+		fprintf(stderr, "No available peers for initiating an ENet connection\n");
 		return EXIT_FAILURE;
 	}
 
@@ -60,6 +63,18 @@ int main(int argc, char ** argv)
 				event.channelID);
 			break;
 		}
+
+		// Packet client
+		string userInput;
+		cout << "Enter a message to send to the server: ";
+		getline(cin, userInput);
+
+		ENetPacket* packet = enet_packet_create(userInput.c_str(), userInput.length(), ENET_PACKET_FLAG_RELIABLE);
+
+		int channelID = 0;
+		enet_peer_send(peer, channelID, packet);
+
+		enet_packet_destroy(packet);
 	}
 	// Game loop end
 
@@ -80,12 +95,6 @@ int main(int argc, char ** argv)
 	}
 	return EXIT_SUCCESS;
 }
-
-
-
-
-
-
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
