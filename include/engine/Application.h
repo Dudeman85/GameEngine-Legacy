@@ -7,6 +7,7 @@
 #include <engine/Model.h>
 #include <engine/Transform.h>
 #include <engine/Physics.h>
+#include <engine/Collision.h>
 #include <engine/UserInterface.h>
 
 //Other engine libs
@@ -35,6 +36,7 @@ namespace engine
 		shared_ptr<ModelRenderSystem> modelRenderSystem;
 		shared_ptr<AnimationSystem> animationSystem;
 		shared_ptr<PhysicsSystem> physicsSystem;
+		shared_ptr<CollisionSystem> collisionSystem;
 		shared_ptr<UISystem> uiSystem;
 
 		EngineLib()
@@ -52,6 +54,7 @@ namespace engine
 			ecs.registerComponent<Animator>();
 			ecs.registerComponent<Rigidbody>();
 			ecs.registerComponent<BoxCollider>();
+			ecs.registerComponent<PolygonCollider>();
 			ecs.registerComponent<UIElement>();
 
 			//Register all default engine systems here
@@ -82,13 +85,6 @@ namespace engine
 			animationSystemSignature.set(ecs.getComponentId<Animator>());
 			ecs.setSystemSignature<AnimationSystem>(animationSystemSignature);
 
-			//UI System
-			uiSystem = ecs.registerSystem<UISystem>();
-			Signature uiSystemSignature;
-			uiSystemSignature.set(ecs.getComponentId<UIElement>());
-			uiSystemSignature.set(ecs.getComponentId<Transform>());
-			ecs.setSystemSignature<UISystem>(uiSystemSignature);
-
 			//Physics System
 			physicsSystem = ecs.registerSystem<PhysicsSystem>();
 			Signature physicsSystemSignature;
@@ -96,6 +92,20 @@ namespace engine
 			physicsSystemSignature.set(ecs.getComponentId<Transform>());
 			physicsSystemSignature.set(ecs.getComponentId<BoxCollider>());
 			ecs.setSystemSignature<PhysicsSystem>(physicsSystemSignature);
+
+			//Collision System
+			collisionSystem = ecs.registerSystem<CollisionSystem>();
+			Signature collisionSystemSignature;
+			collisionSystemSignature.set(ecs.getComponentId<Transform>());
+			collisionSystemSignature.set(ecs.getComponentId<PolygonCollider>());
+			ecs.setSystemSignature<CollisionSystem>(collisionSystemSignature);
+
+			//UI System
+			uiSystem = ecs.registerSystem<UISystem>();
+			Signature uiSystemSignature;
+			uiSystemSignature.set(ecs.getComponentId<UIElement>());
+			uiSystemSignature.set(ecs.getComponentId<Transform>());
+			ecs.setSystemSignature<UISystem>(uiSystemSignature);
 
 			soundDevice = SoundDevice::getDevice()->getDevice();
 		}
@@ -106,6 +116,7 @@ namespace engine
 			//Update engine systems
 			transformSystem->Update();
 			physicsSystem->Update(deltaTime);
+			collisionSystem->Update();
 			animationSystem->Update(deltaTime);
 			spriteRenderSystem->Update(cam);
 			modelRenderSystem->Update(cam);

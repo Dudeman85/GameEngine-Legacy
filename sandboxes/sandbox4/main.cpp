@@ -9,13 +9,6 @@ using namespace engine;
 //Creates a global instance of the ECS manager
 ECS ecs;
 
-struct PolygonCollider
-{
-	//The vertices of the polygon making up the collider, going clockwise
-	//The vertices must form a convex polygon
-	vector<Vector2> vertices;
-};
-
 map<Entity, vector<vector<Entity>>> projectionPoints;
 map<Entity, vector<Entity>> normalVectors;
 
