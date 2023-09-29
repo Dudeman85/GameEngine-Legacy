@@ -31,6 +31,9 @@ bool OverlapAtoB(vector<Vector2> aVerts, vector<Vector2> bVerts, Entity a, Entit
 		bVerts[i] -= aPosition;
 	}
 
+	//ONlY FOR VISUALISATION
+	bool returnValue = true;
+
 	//For each vertice in a
 	for (int i = 0; i < aVerts.size(); i++)
 	{
@@ -38,7 +41,9 @@ bool OverlapAtoB(vector<Vector2> aVerts, vector<Vector2> bVerts, Entity a, Entit
 		int nextVertice = i < aVerts.size() - 1 ? i + 1 : 0;
 		//Calculate the normal vector to project the other polygon to (left normal because clockwise)
 		Vector2 normal = (aVerts[nextVertice] - aVerts[i]).LeftNormal();
+		float boundry = normal.Dot(aVerts[i]);
 
+		//Visualisation
 		if (normalVectors[a].size() < aVerts.size())
 		{
 			normalVectors[a].push_back(ecs.newEntity());
@@ -52,11 +57,15 @@ bool OverlapAtoB(vector<Vector2> aVerts, vector<Vector2> bVerts, Entity a, Entit
 			pr.primitive = Primitive::Line(aPosition, normal + aPosition);
 		}
 
+		//For Visualisation
+		bool miss = true;
+
 		//For each vertice in b
 		for (int j = 0; j < bVerts.size(); j++)
 		{
 			float projection = normal.Dot(bVerts[j]);
 
+			//Visualisation
 			if (projectionPoints[a].size() < aVerts.size())
 			{
 				projectionPoints[a].push_back(vector<Entity>());
@@ -70,17 +79,29 @@ bool OverlapAtoB(vector<Vector2> aVerts, vector<Vector2> bVerts, Entity a, Entit
 			else
 			{
 				Transform& projectionTransform = ecs.getComponent<Transform>(projectionPoints[a][i][j]);
+				PrimitiveRenderer& primitiveRenderer = ecs.getComponent<PrimitiveRenderer>(projectionPoints[a][i][j]);
 				projectionTransform.position = normal * projection + aPosition;
+				if (abs(projection) < abs(boundry))
+				{
+					primitiveRenderer.color = Vector3(255, 0, 0);
+					miss = false;
+				}
+				else
+					primitiveRenderer.color = Vector3(0, 255, 0);
 			}
 		}
+		if (miss)
+			returnValue = false;
 	}
-	return false;
+	return returnValue;
 }
 
 bool CheckOverlap(Entity a, Entity b)
 {
 	PolygonCollider& aCollider = ecs.getComponent<PolygonCollider>(a);
 	PolygonCollider& bCollider = ecs.getComponent<PolygonCollider>(b);
+	PrimitiveRenderer& aRenderer = ecs.getComponent<PrimitiveRenderer>(a);
+	PrimitiveRenderer& bRenderer = ecs.getComponent<PrimitiveRenderer>(b);
 	Transform& aTransform = ecs.getComponent<Transform>(a);
 	Transform& bTransform = ecs.getComponent<Transform>(b);
 
@@ -111,10 +132,21 @@ bool CheckOverlap(Entity a, Entity b)
 		bVerts.push_back(transformedVert);
 	}
 
-	OverlapAtoB(aVerts, bVerts, a, b);
-	OverlapAtoB(bVerts, aVerts, b, a);
+	bool abCollided = OverlapAtoB(aVerts, bVerts, a, b);
+	bool baCollided = OverlapAtoB(bVerts, aVerts, b, a);
 
-	return false;
+	if (abCollided && baCollided)
+	{
+		aRenderer.color = Vector3(255, 0, 0);
+		bRenderer.color = Vector3(255, 0, 0);
+	}
+	else
+	{
+		aRenderer.color = Vector3(0, 255, 0);
+		bRenderer.color = Vector3(0, 255, 0);
+	}
+
+	return abCollided && baCollided;
 }
 
 int main()
