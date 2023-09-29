@@ -73,12 +73,14 @@ namespace engine
 		return Vector2(x / div, y / div);
 	}
 
-	Vector2 Vector2::Normalize() {
+	Vector2 Vector2::Normalize()
+	{
 		float length = sqrt(x * x + y * y);
 		return Vector2(x / length, y / length);
 	}
 
-	float Vector2::Squared() const {
+	float Vector2::Squared() const
+	{
 		return x * x + y * y;
 	}
 
@@ -135,13 +137,16 @@ namespace engine
 		z += add.z;
 		return *this;
 	}
-	Vector3 Vector3::operator*(float mult) {
+	Vector3 Vector3::operator*(float mult)
+	{
 		return Vector3(x * mult, y * mult, z * mult);
 	}
-	Vector3 Vector3::operator*(Vector3 mult) {
+	Vector3 Vector3::operator*(Vector3 mult)
+	{
 		return Vector3(x * mult.x, y * mult.y, z * mult.z);
 	}
-	Vector3& Vector3::operator*=(float mult) {
+	Vector3& Vector3::operator*=(float mult)
+	{
 		x *= mult;
 		y *= mult;
 		z *= mult;
@@ -153,7 +158,8 @@ namespace engine
 		return Vector3(pow(x, power), pow(y, power), pow(z, power));
 	}
 
-	Vector3 Vector3::Normalize() {
+	Vector3 Vector3::Normalize()
+	{
 		float length = sqrt(x * x + y * y + z * z);
 		return Vector3(x / length, y / length, z / length);
 	}

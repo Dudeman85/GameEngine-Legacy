@@ -2,7 +2,6 @@
 
 #include <engine/Primitive.h>
 #include <map>
-#define PI 3.14159265
 
 using namespace engine;
 
