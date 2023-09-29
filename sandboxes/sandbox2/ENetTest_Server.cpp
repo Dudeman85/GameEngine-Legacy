@@ -1,4 +1,7 @@
 #include <iostream>
+#if defined(_WIN32)
+	#define WIN32_LEAN_AND_MEAN
+#endif
 #include <enet/enet.h>
 
 int main(int argc, char** argv)
