@@ -7,7 +7,7 @@ int main()
 {
 	//Create the window and OpenGL context before creating EngineLib
 	//Values define window size(x,y) and name
-	GLFWwindow* window = CreateWindow(800, 600, "Window");
+	GLFWwindow* window = CreateGLWindow(800, 600, "Window");
 	//Initialize the default engine library
 	EngineLib engine;
 	//Create the camera
