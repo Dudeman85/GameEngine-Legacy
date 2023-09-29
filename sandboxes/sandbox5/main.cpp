@@ -14,7 +14,7 @@ ECS ecs;
 int main()
 {
 
-	GLFWwindow *window = engine::CreateWindow(800, 600, "Windos");
+	GLFWwindow *window = engine::CreateGLWindow(800, 600, "Windos");
 
 	engine::EngineLib engine;
 

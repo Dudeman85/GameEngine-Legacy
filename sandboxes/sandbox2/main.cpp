@@ -1,4 +1,4 @@
-
+#if 0
 
 #include <engine/Application.h>
 #include <engine/TextRender.h>
@@ -84,3 +84,4 @@ int main()
 
 	return 0;
 }
+#endif
