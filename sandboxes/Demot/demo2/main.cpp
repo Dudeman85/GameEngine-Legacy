@@ -75,15 +75,14 @@ int main()
 	Texture texture3 = Texture("assets/bullet.png");
 
 	//load sound from file
-	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/enginemono.wav");
+	uint32_t sound1 = SoundBuffer::getFile()->addSoundEffect("assets/engineloop.wav");
 	uint32_t sound2 = SoundBuffer::getFile()->addSoundEffect("assets/bang_05.wav");
 	uint32_t sound3 = SoundBuffer::getFile()->addSoundEffect("assets/bang_09.wav");
 
-	tankSpeaker.setLinearDistance(0.1f, 50.f, 60.f, 1.f);
+	tankSpeaker.setLinearDistance(0.1f, 50.f, 600.f, 1.f);
 	shootSpeaker.setLinearDistance(1.5f, 100.f, 700.f, 0.5f);
 	explosionSpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
 	enemySpeaker.setLinearDistance(1.f, 10.f, 600.f, 1.f);
-
 
 
 	//Create a new entity
@@ -99,8 +98,10 @@ int main()
 	ecs.addComponent(playerTurret, SpriteRenderer{ .texture = &turretTexture });
 
 	//play sound files
+	
 	tankSpeaker.Play(sound1);
 	tankSpeaker.SetLooping(1);
+	
 
 	turretController->player = player;
 	turretController->CreateTurret(1000, -1000);
@@ -186,13 +187,14 @@ int main()
 				// move player based on movement vector
 				engine.physicsSystem->Move(player, movement * engine.deltaTime);
 				//engine.physicsSystem->Move(hull, movement * engine.deltaTime);
-
+				
 				Vector2 leftThumbstick(axes[0], axes[1]);
 				leftThumbstick = (leftThumbstick + Vector2(1.0f, 1.0f)) / 2.0f;
 				leftThumbstick -= Vector2(0.5f, 0.5f);
 				leftThumbstick *= 2.0f;
 
 				playerTransform.rotation.z = atan2f(-leftThumbstick.y, leftThumbstick.x) * 180 / 3.14f;
+				
 			}
 
 			if (abs(axes[2]) > deadzoneTreshold || abs(axes[3]) > deadzoneTreshold)
@@ -313,7 +315,7 @@ int main()
 
 
 		//engine sound
-		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.position.x, playerTransform.position.y, 50);
+		engine.soundDevice->SetSourceLocation(tankSpeaker, playerTransform.position.x, playerTransform.position.y, 500);
 
 
 

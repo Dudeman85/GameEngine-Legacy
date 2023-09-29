@@ -13,6 +13,9 @@ namespace engine
 		Vector3 position;
 		Vector3 rotation;
 		Vector3 scale = Vector3(1.0f);
+
+		//If true updates all transform based caches, reverts to false after that is done
+		bool staleCache = false;
 	};
 
 	//Transform system

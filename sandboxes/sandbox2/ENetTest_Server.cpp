@@ -1,8 +1,11 @@
 #include <iostream>
+#include <cstring>
+#include <string>
 #if defined(_WIN32)
 	#define WIN32_LEAN_AND_MEAN
 #endif
 #include <enet/enet.h>
+
 
 int main(int argc, char** argv)
 {
@@ -31,7 +34,7 @@ int main(int argc, char** argv)
 	}
 
 	const char* responseMessage = "Hello from the server!";
-	size_t responseMessageLength = strlen(responseMessage);
+	size_t responseMessageLength = std::strlen(responseMessage);
 	ENetPacket* responsePacket = enet_packet_create(responseMessage, responseMessageLength, ENET_PACKET_FLAG_RELIABLE);
 
 	// Game loop start
