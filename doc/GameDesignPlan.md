@@ -46,7 +46,7 @@ Chaotic multiplayer with friend is fun and exciting, winning creates joy
 
 # Menu Flowchart
 
-<img src="MenuFlowchart.PNG" width="738" height="751">
+<img src="MenuFlowchart.png" width="738" height="751">
 
 
 
