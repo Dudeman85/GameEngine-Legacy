@@ -44,6 +44,11 @@ Chaotic multiplayer with friend is fun and exciting, winning creates joy
 - Party game 
 
 
+# Menu Flowchart
+
+<img src="MenuFlowchart.png" width="738" height="751">
+
+
 
 # QuickGameReview
 
