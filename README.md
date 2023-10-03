@@ -2,6 +2,8 @@
 This is very much still in-dev and should not be used as components will be changed and deprecated.<br>
 This is a 2D game engine made from scratch. It is built on a custom implementation of [Entity Component System (ECS)](doc/ECS%20Technical%20Documentation.docx).
 
+Getting started guide: [here](doc/Class%20References/Getting%20started.md)
+
 Features:
 - [ECS Architecture](doc/Class%20References/ECS%20Reference.md), enabling more memory and performance efficient game objects
 - [Sprite](doc/Class%20References/Sprite%20Reference.md) and 3D model rendering, using OpenGL
@@ -20,5 +22,7 @@ Futures:
 - Text rendering
 - Comprehensive documentation
 
-Getting started guide: [here](doc/Class%20References/Getting%20started.md)
 
+## Demos
+![](demo1.mp4)
+![](demo2.mp4)
