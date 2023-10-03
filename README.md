@@ -1,15 +1,15 @@
 # OpenGL Game Engine
 This is very much still in-dev and should not be used as components will be changed and deprecated.<br>
-This is a 2D game engine made from scratch. It is built on a custom implementation of Entity Component System (ECS).
+This is a 2D game engine made from scratch. It is built on a custom implementation of [Entity Component System (ECS)](doc/ECS%20Technical%20Documentation.docx).
 
 Features:
-- ECS Architecture, enabling more memory and performance efficient game objects
-- Sprite and 3D model rendering, using OpenGL
+- [ECS Architecture](doc/Class%20References/ECS%20Reference.md), enabling more memory and performance efficient game objects
+- [Sprite](doc/Class%20References/Sprite%20Reference.md) and 3D model rendering, using OpenGL
 - Spritesheet based animation system
-- Audio, using OpenAL
+- [Audio](doc/Class%20References/Audio%20Reference.md), using OpenAL
 - 3D model loading, using Assimp
-- Tilemap loading, using Tiled
-- Physics and collision system
+- [Tilemap](doc/Class%20References/Tiled%20Reference.md) loading, using Tiled
+- [Physics and collision](doc/Class%20References/Physics%20Reference.md) system
 
 Futures:
 - Networking, using Enet
@@ -20,4 +20,5 @@ Futures:
 - Text rendering
 - Comprehensive documentation
 
-Getting started guide: here
+Getting started guide: [here](doc/Class%20References/Getting%20started.md)
+
